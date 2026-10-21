@@ -433,7 +433,7 @@ footer a:hover { color: var(--fg); }
     <a href="#formats">Formats</a>
     <a href="#tools">Tools</a>
     <a href="#faq">FAQ</a>
-    <a class="btn primary small" href="https://github.com/smit-vanani/tapformat-releases/releases/latest/download/Tapformat.dmg" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download</a>
+    <a class="btn primary small" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download</a>
   </div>
 </nav>
 
@@ -446,7 +446,7 @@ footer a:hover { color: var(--fg); }
     </h1>
     <p class="lede">Select a file in Finder and tap <b>⇧⌘</b>. A ring opens at your pointer with only the formats that make sense. <b>Point, click, saved.</b></p>
     <div class="cta">
-      <a class="btn primary glow" href="https://github.com/smit-vanani/tapformat-releases/releases/latest/download/Tapformat.dmg" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
+      <a class="btn primary glow" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
       <span class="req">macOS 15+ · Apple silicon &amp; Intel · 26 MB</span>
     </div>
 
@@ -602,7 +602,7 @@ footer a:hover { color: var(--fg); }
   </div>
   <h2 class="reveal">Stop opening <span class="serif">converter websites.</span></h2>
   <p class="reveal">Tapformat 1.0 · macOS 15 or later · Apple silicon &amp; Intel</p>
-  <a class="btn primary glow reveal" href="https://github.com/smit-vanani/tapformat-releases/releases/latest/download/Tapformat.dmg" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
+  <a class="btn primary glow reveal" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
 </section>
 
 <div class="wrap">
@@ -623,7 +623,7 @@ footer a:hover { color: var(--fg); }
     <div class="cap"><b id="ovName">Sunset.heic</b> <span id="ovDetail">· aim and click</span></div>
   </div>
 </div>
-<div class="toast" id="toast" role="status"><span>That's Tapformat. In Finder it converts the real file.</span><a href="https://github.com/smit-vanani/tapformat-releases/releases/latest/download/Tapformat.dmg" data-download>Download</a></div>
+<div class="toast" id="toast" role="status"><span>That's Tapformat. In Finder it converts the real file.</span><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download</a></div>
 
 <div class="guide" id="guide" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-card">
@@ -650,6 +650,14 @@ footer a:hover { color: var(--fg); }
   const C = { JPG: "#ff8f2e", PNG: "#3885ff", PDF: "#f5454d", HEIC: "#9e61ff", GIF: "#ff549e", MP3: "#29c770", M4A: "#ff6b66", WAV: "#fab81f", MP4: "#735cff", MOV: "#33a8ff",
     Word: "#336bf2", Shrink: "#2fc79c", "1 PDF": "#f5454d", Crop: "#fab81f", Resize: "#1ab8cc", Rotate: "#7c6cf0", Mute: "#ff6b66" };
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+  // Count one visit per browser session on the live counter.
+  try {
+    if (!sessionStorage.getItem("tf-visit")) {
+      sessionStorage.setItem("tf-visit", "1");
+      fetch("https://tapformat.smit-jsv.workers.dev/hit", { method: "POST", mode: "cors", keepalive: true }).catch(() => {});
+    }
+  } catch {}
 
   // Lay option circles around a disc. R comes from the disc's --R, so CSS breakpoints drive the size.
   const placeOpts = (container, labels) => {

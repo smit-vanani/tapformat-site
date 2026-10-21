@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tapformat Open Stats</title>
+<meta name="description" content="Live downloads and visitors for Tapformat, the free Mac app that converts any file with ⇧⌘.">
+<meta name="theme-color" content="#050507">
+<meta property="og:title" content="Tapformat · Open stats">
+<meta property="og:description" content="Live downloads and visitors, building in public.">
+<meta property="og:image" content="https://smit-vanani.github.io/tapformat-site/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* Open stats: one 16:9 card drawn on a canvas, so what you see is exactly the image you post on X. */
+:root {
+  --bg: #050507; --fg: #f4f4f6; --muted: #8b8b96; --dim: #55555f;
+  --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.14);
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; color: var(--fg); font: 400 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; min-height: 100svh;
+  background: radial-gradient(60% 50% at 15% 0%, rgba(158, 97, 255, 0.25), transparent 70%), radial-gradient(50% 45% at 90% 5%, rgba(56, 133, 255, 0.2), transparent 70%), var(--bg); }
+a { color: inherit; text-decoration: none; }
+.wrap { width: min(1100px, 100% - 32px); margin: 0 auto; padding: 28px 0 60px; display: grid; gap: 22px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.brand img { width: 26px; height: 26px; border-radius: 7px; }
+.top .back { color: var(--muted); font-size: 14px; }
+.top .back:hover { color: var(--fg); }
+h1 { margin: 8px 0 0; font-weight: 600; font-size: clamp(34px, 5vw, 56px); letter-spacing: -0.045em; line-height: 1; }
+h1 .serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
+.lede { margin: 0; color: var(--muted); }
+.live { display: inline-flex; align-items: center; gap: 8px; font: 500 13px var(--mono); color: var(--muted); }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: #2fc79c; box-shadow: 0 0 0 0 #2fc79c; animation: ping 2s ease-out infinite; }
+@keyframes ping { to { box-shadow: 0 0 0 9px transparent; } }
+.card { border-radius: 22px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 50px 140px -30px rgba(158, 97, 255, 0.45); background: #000; }
+canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 20px; border-radius: 999px; font: 560 15px var(--sans); cursor: pointer; border: 0; transition: transform 0.2s; }
+.btn:active { transform: scale(0.97); }
+.btn svg { width: 16px; height: 16px; }
+.btn.x { background: #fff; color: #08080a; }
+.btn.ghost { background: rgba(255, 255, 255, 0.05); color: var(--fg); border: 1px solid var(--line-2); }
+.btn:focus-visible { outline: 2px solid #3b82ff; outline-offset: 3px; }
+.post { border-radius: 16px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); padding: 16px 18px; display: grid; gap: 10px; }
+.post label { font: 500 12px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.post textarea { width: 100%; min-height: 150px; resize: vertical; background: transparent; border: 0; color: var(--fg); font: 400 15px/1.55 var(--sans); outline: none; }
+.post .meta { display: flex; justify-content: space-between; color: var(--dim); font: 500 12px var(--mono); }
+.note { color: var(--dim); font-size: 13px; }
+.toast { position: fixed; left: 50%; bottom: 24px; opacity: 0; transform: translate(-50%, 150%); padding: 10px 18px; border-radius: 999px; background: #fff; color: #000; font-weight: 560; transition: transform 0.4s cubic-bezier(.3,1.5,.5,1); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .live i { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="./"><img src="favicon.png" alt="">Tapformat</a>
+    <a class="back" href="./">← Back to the app</a>
+  </div>
+  <div>
+    <span class="live"><i></i><span id="updated">Loading live numbers…</span></span>
+    <h1>Open <span class="serif">stats.</span></h1>
+    <p class="lede">Every download and visit, live. Building Tapformat in public.</p>
+  </div>
+
+  <div class="card"><canvas id="card" width="1600" height="900" aria-label="Tapformat stats card"></canvas></div>
+
+  <div class="actions">
+    <button class="btn x" id="share" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Share on X</button>
+    <button class="btn ghost" id="save" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg>Download image</button>
+    <button class="btn ghost" id="copy" type="button">Copy post text</button>
+  </div>
+
+  <div class="post">
+    <label for="text">Your post</label>
+    <textarea id="text" spellcheck="true"></textarea>
+    <div class="meta"><span>Edit it here before sharing</span><span id="count">0 / 280</span></div>
+  </div>
+  <p class="note">Tip: download the image first, then click Share on X and attach it. Posts with an image get far more reach.</p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const API = "https://tapformat.smit-jsv.workers.dev/stats";
+  const SITE = "https://smit-vanani.github.io/tapformat-site/";
+  const $ = (id) => document.getElementById(id);
+  const cv = $("card"), ctx = cv.getContext("2d");
+  const W = 1600, H = 900;
+  const COLORS = ["#ff8f2e", "#9e61ff", "#3885ff", "#29c770", "#ff549e", "#f5454d"];
+  const fmt = (n) => n.toLocaleString("en-US");
+  let data = null, edited = false;
+
+  const dayNumber = (launched) => launched ? Math.round((Date.parse(new Date().toISOString().slice(0, 10)) - Date.parse(launched.slice(0, 10))) / 864e5) + 1 : 1;
+  const today = () => (data && data.days.length && data.days[data.days.length - 1].day === new Date().toISOString().slice(0, 10)) ? data.days[data.days.length - 1] : { downloads: 0, visits: 0 };
+  const downloads = () => Math.max(data.confirmed, data.downloads);
+
+  function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+  function glow(x, y, r, color, a) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, color + Math.round(a * 255).toString(16).padStart(2, "0")); g.addColorStop(1, color + "00");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  function logo(x, y, s) {
+    const g = ctx.createLinearGradient(0, y, 0, y + s); g.addColorStop(0, "#34353a"); g.addColorStop(1, "#151619");
+    ctx.fillStyle = g; rr(x, y, s, s, s * 0.23); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.12)"; ctx.lineWidth = 1.5; ctx.stroke();
+    const cx = x + s / 2, cy = y + s / 2;
+    [0, 60, 120, 180, 240, 300].forEach((a, i) => {
+      const t = (a * Math.PI) / 180;
+      ctx.fillStyle = [COLORS[0], COLORS[1], COLORS[2], COLORS[3], COLORS[4], COLORS[5]][i];
+      ctx.beginPath(); ctx.arc(cx + Math.sin(t) * s * 0.278, cy - Math.cos(t) * s * 0.278, s * 0.06, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx, cy, s * 0.12, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#050507"; ctx.fillRect(0, 0, W, H);
+    glow(260, 40, 900, "#9e61ff", 0.42); glow(1420, 120, 820, "#3885ff", 0.34); glow(860, 1000, 760, "#ff8f2e", 0.26);
+    const v = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.75);
+    v.addColorStop(0, "rgba(5,5,7,0)"); v.addColorStop(1, "rgba(5,5,7,0.85)"); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = "alphabetic";
+
+    // header
+    logo(80, 72, 64);
+    ctx.fillStyle = "#f4f4f6"; ctx.font = "600 38px Geist"; ctx.fillText("Tapformat", 164, 117);
+    const day = data ? dayNumber(data.launched) : 1;
+    const pill = `Day ${day} · live`;
+    ctx.font = "500 26px 'Geist Mono'"; const pw = ctx.measureText(pill).width + 74;
+    ctx.fillStyle = "rgba(255,255,255,0.06)"; rr(W - 80 - pw, 76, pw, 56, 28); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = "#2fc79c"; ctx.beginPath(); ctx.arc(W - 80 - pw + 32, 104, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#c9c9d2"; ctx.fillText(pill, W - 80 - pw + 52, 113);
+
+    if (!data) { ctx.fillStyle = "#8b8b96"; ctx.font = "500 40px Geist"; ctx.fillText("Loading live numbers…", 80, 470); return; }
+
+    // hero number
+    const big = fmt(downloads());
+    ctx.fillStyle = "#f4f4f6"; ctx.font = "600 300px Geist"; ctx.letterSpacing = "-14px";
+    ctx.fillText(big, 72, 520); const bw = ctx.measureText(big).width; ctx.letterSpacing = "0px";
+    ctx.font = "italic 400 120px 'Instrument Serif'";
+    const grad = ctx.createLinearGradient(bw + 110, 0, bw + 600, 0); grad.addColorStop(0, "#ffb06b"); grad.addColorStop(1, "#ff549e");
+    ctx.fillStyle = grad; ctx.fillText(downloads() === 1 ? "download" : "downloads", 72 + bw + 40, 515);
+
+    // stat row
+    const t = today();
+    const stats = [
+      [fmt(data.visits), "website visitors"],
+      [fmt(t.downloads), "download clicks today"],
+      [fmt(t.visits), "visitors today"],
+    ];
+    stats.forEach(([n, l], i) => {
+      const x = 80 + i * 400;
+      ctx.fillStyle = "#f4f4f6"; ctx.font = "600 76px Geist"; ctx.letterSpacing = "-3px"; ctx.fillText(n, x, 680); ctx.letterSpacing = "0px";
+      ctx.fillStyle = "#8b8b96"; ctx.font = "500 28px Geist"; ctx.fillText(l, x, 724);
+    });
+
+    // visits per day bars (last 14 days)
+    const days = data.days.slice(-14);
+    if (days.length >= 3) {
+    const max = Math.max(1, ...days.map((d) => d.visits));
+    const bx = 1290, by = 724, bh = 150, gap = 6, bwid = Math.min(36, (230 - gap * (days.length - 1)) / Math.max(1, days.length));
+    days.forEach((d, i) => {
+      const h = Math.max(6, (d.visits / max) * bh);
+      ctx.fillStyle = i === days.length - 1 ? "#9e61ff" : "rgba(158,97,255,0.45)";
+      rr(bx + i * (bwid + gap), by - h, bwid, h, 6); ctx.fill();
+    });
+    ctx.fillStyle = "#55555f"; ctx.font = "500 20px 'Geist Mono'"; ctx.fillText("visitors / day", bx, by + 32);
+    }
+
+    // footer
+    ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(80, 790); ctx.lineTo(W - 80, 790); ctx.stroke();
+    ctx.fillStyle = "#c9c9d2"; ctx.font = "500 30px Geist"; ctx.fillText("Free Mac app · select a file, tap ⇧⌘, convert anything", 80, 846);
+    ctx.fillStyle = "#8b8b96"; ctx.font = "500 24px 'Geist Mono'"; const tag = "#buildinpublic"; ctx.fillText(tag, W - 80 - ctx.measureText(tag).width, 844);
+  }
+
+  function postText() {
+    const d = dayNumber(data.launched), t = today();
+    return `Day ${d} of building Tapformat in public 🚀\n\n📥 ${fmt(downloads())} downloads\n👀 ${fmt(data.visits)} website visitors\n⚡️ ${fmt(t.downloads)} downloads today\n\nA free Mac app: select any file, tap ⇧⌘, convert it.\n\nLive stats 👇\n${SITE}stats`;
+  }
+  const setText = () => { if (!edited && data) $("text").value = postText(); $("count").textContent = `${$("text").value.length} / 280`; };
+  $("text").addEventListener("input", () => { edited = true; $("count").textContent = `${$("text").value.length} / 280`; });
+
+  const toast = (m) => { const t = $("toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); };
+  $("share").addEventListener("click", () => {
+    window.open("https://x.com/intent/post?text=" + encodeURIComponent($("text").value), "_blank", "noopener");
+  });
+  $("save").addEventListener("click", () => {
+    cv.toBlob((b) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(b); a.download = `tapformat-stats-day-${data ? dayNumber(data.launched) : 1}.png`; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      toast("Image saved");
+    }, "image/png");
+  });
+  $("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("text").value); toast("Copied"); }
+    catch { $("text").select(); toast("Press ⌘C to copy"); }
+  });
+
+  async function load() {
+    try {
+      const r = await fetch(API, { cache: "no-store" });
+      data = await r.json();
+      $("updated").textContent = "Live · updated " + new Date(data.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    } catch { $("updated").textContent = "Couldn't reach the live counter. Retrying…"; }
+    draw(); setText();
+  }
+  document.fonts.load("600 300px Geist").then(() => document.fonts.load("italic 400 120px 'Instrument Serif'")).then(() => document.fonts.load("500 26px 'Geist Mono'")).finally(() => { draw(); load(); });
+  setInterval(load, 30000);
+})();
+</script>
+</body>
+</html>

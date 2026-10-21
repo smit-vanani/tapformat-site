@@ -300,11 +300,11 @@ footer a:hover { color: var(--fg); }
   const LAUNCH_DAY = "2026-10-21";
   const dayNumber = () => Math.max(1, Math.round((Date.parse(todayKey()) - Date.parse(LAUNCH_DAY)) / 864e5) + 1);
   const today = () => (data && data.days.length && data.days[data.days.length - 1].day === todayKey()) ? data.days[data.days.length - 1] : { downloads: 0, visits: 0 };
-  const downloads = () => Math.max(data.confirmed, data.downloads);
+  const downloads = () => data.downloads; // unique downloads through the website (one per device)
 
   // ── The stats ring ─────────────────────────────────────────
   const METRICS = [
-    { key: "dl", short: "Total", label: "downloads", cap: "since launch", color: "#ff8f2e", val: () => downloads() },
+    { key: "dl", short: "Total", label: "downloads", cap: "unique, since launch", color: "#ff8f2e", val: () => downloads() },
     { key: "vis", short: "Visits", label: "visitors", cap: "on the website", color: "#9e61ff", val: () => data.visits },
     { key: "tdl", short: "Today ↓", label: "downloads", cap: "today", color: "#ff549e", val: () => today().downloads },
     { key: "tvis", short: "Today 👀", label: "visitors", cap: "today", color: "#3885ff", val: () => today().visits },

@@ -710,6 +710,15 @@ footer a:hover { color: var(--fg); }
     }
   }
 
+  // Unique downloads: a device that already downloaded sends ?repeat=1, so the counter skips it.
+  try {
+    if (localStorage.getItem("tf-downloaded")) document.querySelectorAll("[data-download]").forEach((l) => { l.href = l.href.split("?")[0] + "?repeat=1"; });
+  } catch {}
+  document.querySelectorAll("[data-download]").forEach((l) => l.addEventListener("click", () => {
+    try {
+      if (!localStorage.getItem("tf-downloaded")) { localStorage.setItem("tf-downloaded", new Date().toISOString()); setTimeout(() => document.querySelectorAll("[data-download]").forEach((x) => { x.href = x.href.split("?")[0] + "?repeat=1"; }), 50); }
+    } catch {}
+  }));
   // ── Download → first-launch guide ────────────────────────────
   const guide = $("guide");
   document.querySelectorAll("[data-download]").forEach(a => a.addEventListener("click", () => setTimeout(() => guide.classList.add("show"), 350)));

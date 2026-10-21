@@ -58,6 +58,13 @@ button { font: inherit; color: inherit; }
 h1 { margin: 0; font-weight: 600; font-size: clamp(52px, 8vw, 110px); line-height: 0.92; letter-spacing: -0.055em; }
 .serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
 .title p { margin: 0; max-width: 360px; color: var(--muted); }
+.headline { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.daybadge { display: inline-grid; justify-items: center; align-content: center; width: clamp(78px, 9vw, 112px); aspect-ratio: 1; border-radius: 28%; transform: rotate(-6deg);
+  background: linear-gradient(145deg, #ffcf5a, #ff8f2e 55%, #ff549e); color: #120a00; box-shadow: 0 18px 50px -10px rgba(255, 143, 46, 0.65), inset 0 2px 0 rgba(255,255,255,.45);
+  animation: daypop 0.9s var(--spring) 0.2s both; }
+.daybadge small { font: 600 clamp(11px, 1.2vw, 14px) var(--mono); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; line-height: 1; }
+.daybadge b { font: 700 clamp(40px, 5vw, 60px) var(--sans); letter-spacing: -0.06em; line-height: 0.95; }
+@keyframes daypop { from { transform: rotate(-30deg) scale(0.3); opacity: 0; } }
 
 /* the stats ring */
 .ringbox { position: relative; overflow-x: clip; padding-block: 24px; display: grid; place-items: center; touch-action: manipulation; }
@@ -129,7 +136,8 @@ h1 { margin: 0; font-weight: 600; font-size: clamp(52px, 8vw, 110px); line-heigh
 .day .bar.d { background: linear-gradient(var(--jpg), #b35a12); box-shadow: 0 0 24px rgba(255,143,46,.45); }
 .day .bar em { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); font: 600 12px var(--mono); font-style: normal; color: var(--fg); }
 @keyframes grow { from { transform: scaleY(0); } }
-.day small { font: 500 12px var(--mono); color: var(--dim); padding-bottom: 8px; white-space: nowrap; }
+.day small { display: grid; justify-items: center; gap: 2px; font: 500 11px var(--mono); color: var(--dim); padding-bottom: 8px; white-space: nowrap; }
+.day small .dn { font: 600 14px var(--sans); color: var(--fg); letter-spacing: -0.01em; }
 
 /* share */
 .share { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 26px; align-items: start; }
@@ -195,7 +203,7 @@ footer a:hover { color: var(--fg); }
 
   <section class="hero">
     <div class="title">
-      <h1>Your <span class="serif">stats.</span></h1>
+      <div class="headline"><h1>Your <span class="serif">stats.</span></h1><span class="daybadge" id="dayBadge"><small>Day</small><b>1</b></span></div>
       <p>Every download and every visit, live, the moment it happens. Private to you: only your devices with the key can see this.</p>
     </div>
 
@@ -409,14 +417,15 @@ footer a:hover { color: var(--fg); }
 
   // ── Day by day ─────────────────────────────────────────────
   function renderDays() {
-    const days = data.days.slice(-21), max = Math.max(1, ...days.map((d) => Math.max(d.visits, d.downloads)));
+    const days = data.days.filter((d) => d.day >= LAUNCH_DAY).slice(-21), max = Math.max(1, ...days.map((d) => Math.max(d.visits, d.downloads)));
     $("days").innerHTML = days.map((d, i) => {
-      const label = new Date(d.day + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      const date = new Date(d.day + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      const n = Math.round((Date.parse(d.day) - Date.parse(LAUNCH_DAY)) / 864e5) + 1;
       const h = (v) => Math.max(4, (v / max) * 180);
       return `<div class="day"><div class="bars">
         <div class="bar v" style="height:${h(d.visits)}px;animation-delay:${i * 0.05}s"><em>${d.visits}</em></div>
         <div class="bar d" style="height:${h(d.downloads)}px;animation-delay:${i * 0.05 + 0.08}s"><em>${d.downloads}</em></div>
-      </div><small>${label}</small></div>`;
+      </div><small><b class="dn">Day ${n}</b>${date}</small></div>`;
     }).join("");
   }
 
@@ -527,6 +536,7 @@ footer a:hover { color: var(--fg); }
       const newDownload = seen && (next.events || []).some((e) => e.type === "download" && fresh.has(e.at + e.type));
       data = next; seen = keys;
       $("updated").textContent = "Live · " + new Date(data.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      $("dayBadge").querySelector("b").textContent = dayNumber();
       paintOpts(); setAim(aim, true); renderFeed(fresh); renderDays(); draw(); setText();
       if (newDownload) { setAim(0, true); lastHover = performance.now(); burst(); toast("🎉 Someone just downloaded Tapformat"); }
       else if (fresh.size) burst(10);

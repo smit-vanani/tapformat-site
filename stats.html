@@ -176,6 +176,18 @@ footer a:hover { color: var(--fg); }
 .tabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); width: max-content; max-width: 100%; overflow-x: auto; }
 .tab { border: 0; cursor: pointer; padding: 8px 16px; border-radius: 999px; background: transparent; color: var(--muted); font: 560 14px var(--sans); white-space: nowrap; }
 .tab[aria-selected="true"] { background: #fff; color: #08080a; }
+.fbtabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); width: max-content; max-width: 100%; overflow-x: auto; margin-bottom: 18px; }
+.fbtab { border: 0; cursor: pointer; padding: 8px 14px; border-radius: 999px; background: transparent; color: var(--muted); font: 560 14px var(--sans); white-space: nowrap; }
+.fbtab[aria-selected="true"] { background: #fff; color: #08080a; }
+.fblist { display: grid; gap: 12px; }
+.fbempty { color: var(--dim); margin: 0; padding: 26px; border-radius: 20px; border: 1px dashed var(--line-2); text-align: center; }
+.fbempty b { color: var(--muted); font-weight: 560; }
+.fb { position: relative; border-radius: 20px; padding: 18px 20px 18px 24px; background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015)); border: 1px solid var(--line); display: grid; gap: 10px; overflow: hidden; }
+.fb::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c); box-shadow: 0 0 18px var(--c); }
+.fb .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font: 500 12px var(--mono); color: var(--dim); }
+.fb .kindpill { padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); font: 600 12px var(--sans); }
+.fb .msg { margin: 0; white-space: pre-wrap; word-break: break-word; font-size: 15.5px; line-height: 1.55; }
+.fb .reply { justify-self: start; display: inline-flex; gap: 8px; align-items: center; padding: 6px 12px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line-2); font: 500 13px var(--mono); color: var(--fg); text-decoration: none; cursor: pointer; }
 @media (max-width: 980px) {
   .hero { grid-template-columns: 1fr; }
   .share { grid-template-columns: 1fr; }
@@ -238,6 +250,21 @@ footer a:hover { color: var(--fg); }
       <div class="legend"><span><i style="background:var(--heic)"></i>visitors</span><span><i style="background:var(--jpg)"></i>download clicks</span></div>
     </div>
     <div class="days" id="days"></div>
+  </section>
+
+  <section class="section" id="inbox">
+    <div class="section-head">
+      <h2>Feedback <span class="serif">inbox.</span></h2>
+      <div class="legend" id="fbCounts"></div>
+    </div>
+    <div class="fbtabs" id="fbTabs" role="tablist">
+      <button class="fbtab" role="tab" aria-selected="true" data-f="all" type="button">All</button>
+      <button class="fbtab" role="tab" aria-selected="false" data-f="idea" type="button">💡 Ideas</button>
+      <button class="fbtab" role="tab" aria-selected="false" data-f="bug" type="button">🐞 Bugs</button>
+      <button class="fbtab" role="tab" aria-selected="false" data-f="love" type="button">❤️ Love</button>
+      <button class="fbtab" role="tab" aria-selected="false" data-f="other" type="button">💬 Other</button>
+    </div>
+    <div class="fblist" id="fbList"><p class="fbempty">No feedback yet. Share <b>tapformat.com/feedback</b> and messages will appear here.</p></div>
   </section>
 
   <section class="section" id="share">
@@ -525,6 +552,45 @@ footer a:hover { color: var(--fg); }
   }, "image/png"));
   $("copy").addEventListener("click", async () => { try { await navigator.clipboard.writeText($("text").value); toast("Copied"); } catch { $("text").select(); toast("Press ⌘C to copy"); } });
 
+  // ── Feedback inbox ─────────────────────────────────────────
+  const FB_API = "https://tapformat.smit-jsv.workers.dev/feedback";
+  const FB_KIND = { idea: ["💡 Idea", "#fab81f"], bug: ["🐞 Bug", "#ff6b66"], love: ["❤️ Love", "#ff549e"], other: ["💬 Other", "#3885ff"] };
+  let fbItems = [], fbFilter = "all";
+  const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function renderFeedback() {
+    const counts = { idea: 0, bug: 0, love: 0, other: 0 };
+    fbItems.forEach((f) => { counts[f.type] = (counts[f.type] || 0) + 1; });
+    $("fbCounts").innerHTML = fbItems.length ? `<span>${fbItems.length} total</span><span>💡 ${counts.idea}</span><span>🐞 ${counts.bug}</span><span>❤️ ${counts.love}</span>` : "";
+    const shown = fbItems.filter((f) => fbFilter === "all" || f.type === fbFilter);
+    if (!shown.length) { $("fbList").innerHTML = `<p class="fbempty">${fbItems.length ? "Nothing in this tab yet." : "No feedback yet. Share <b>tapformat.com/feedback</b> and messages will appear here."}</p>`; return; }
+    $("fbList").innerHTML = shown.map((f) => {
+      const [label, c] = FB_KIND[f.type] || FB_KIND.other;
+      const when = new Date(f.at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+      const where = [f.from === "app" ? `from the app${f.version ? " " + esc(f.version) : ""}` : "from the website", f.country].filter(Boolean).join(" · ");
+      return `<article class="fb" style="--c:${c}"><div class="meta"><span class="kindpill">${label}</span><span>${when}</span><span>${where}</span></div>
+        <p class="msg">${esc(f.message)}</p>
+        ${f.email ? `<button class="reply" type="button" data-email="${esc(f.email)}">✉︎ ${esc(f.email)} · copy</button>` : ""}</article>`;
+    }).join("");
+  }
+  $("fbList").addEventListener("click", async (e) => {
+    const b = e.target.closest(".reply"); if (!b) return;
+    try { await navigator.clipboard.writeText(b.dataset.email); toast("Email copied"); } catch { toast(b.dataset.email); }
+  });
+  $("fbTabs").addEventListener("click", (e) => {
+    const t = e.target.closest(".fbtab"); if (!t) return;
+    fbFilter = t.dataset.f; $("fbTabs").querySelectorAll(".fbtab").forEach((x) => x.setAttribute("aria-selected", String(x === t)));
+    renderFeedback();
+  });
+  async function loadFeedback() {
+    try {
+      const r = await fetch(FB_API, { cache: "no-store", headers: { Authorization: "Bearer " + getKey() } });
+      if (!r.ok) return;
+      const before = fbItems.length; fbItems = (await r.json()).items || [];
+      renderFeedback();
+      if (before && fbItems.length > before) toast("💬 New feedback");
+    } catch {}
+  }
+
   // ── Load + poll ────────────────────────────────────────────
   async function load() {
     try {
@@ -559,8 +625,9 @@ footer a:hover { color: var(--fg); }
   layout();
   requestAnimationFrame(() => ring.classList.add("ready"));
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(layout, 150); });
-  document.fonts.load("600 300px Geist").then(() => document.fonts.load("italic 400 120px 'Instrument Serif'")).then(() => document.fonts.load("500 26px 'Geist Mono'")).finally(() => { draw(); if (getKey()) load(); });
+  document.fonts.load("600 300px Geist").then(() => document.fonts.load("italic 400 120px 'Instrument Serif'")).then(() => document.fonts.load("500 26px 'Geist Mono'")).finally(() => { draw(); if (getKey()) { load(); loadFeedback(); } });
   setInterval(() => { if (getKey()) load(); }, 15000);
+  setInterval(() => { if (getKey()) loadFeedback(); }, 30000);
 })();
 </script>
 </body>

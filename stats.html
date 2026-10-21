@@ -295,7 +295,7 @@ footer a:hover { color: var(--fg); }
   const COLORS = ["#ff8f2e", "#9e61ff", "#3885ff", "#29c770", "#ff549e", "#f5454d"];
   let data = null, edited = false, seen = null;
 
-  const todayKey = () => new Date().toISOString().slice(0, 10);
+  const todayKey = () => (data && data.today) || new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10); // India time, same as the counter
   // Public launch day counts as Day 1 (the first release went up the evening before, for testing).
   const LAUNCH_DAY = "2026-10-21";
   const dayNumber = () => Math.max(1, Math.round((Date.parse(todayKey()) - Date.parse(LAUNCH_DAY)) / 864e5) + 1);

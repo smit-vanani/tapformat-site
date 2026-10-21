@@ -3,13 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tapformat Open Stats</title>
+<title>Tapformat Stats</title>
 <meta name="description" content="Live downloads and visitors for Tapformat, the free Mac app that converts any file with ⇧⌘. Building in public.">
 <meta name="theme-color" content="#050507">
-<meta property="og:title" content="Tapformat · Open stats">
-<meta property="og:description" content="Every download and visit, live. Building in public.">
-<meta property="og:image" content="https://smit-vanani.github.io/tapformat-site/og.png">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,6 +156,18 @@ footer a:hover { color: var(--fg); }
 .toast { position: fixed; left: 50%; bottom: 24px; z-index: 90; opacity: 0; transform: translate(-50%, 150%); padding: 12px 20px; border-radius: 999px; background: #fff; color: #000; font-weight: 560; transition: transform 0.5s var(--spring), opacity 0.3s; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+.lock { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 16px; background: rgba(5,5,7,0.82); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.lock[hidden] { display: none; }
+.lock-card { width: min(420px, 100%); display: grid; gap: 16px; justify-items: center; text-align: center; padding: 34px 28px; border-radius: 28px; background: #111115; border: 1px solid var(--line-2); box-shadow: 0 50px 140px rgba(0,0,0,.8), 0 0 100px -30px rgba(158,97,255,.5); }
+.lock-card svg { width: 44px; height: 44px; color: var(--heic); filter: drop-shadow(0 0 16px rgba(158,97,255,.7)); }
+.lock-card h2 { margin: 0; font-size: 26px; letter-spacing: -0.03em; }
+.lock-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.lock-card input { width: 100%; height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04); color: var(--fg); font: 500 15px var(--mono); outline: none; }
+.lock-card input:focus { border-color: var(--heic); }
+.lock-card .err { color: #ff6b66; font-size: 13px; min-height: 1.2em; }
+.tabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); width: max-content; max-width: 100%; overflow-x: auto; }
+.tab { border: 0; cursor: pointer; padding: 8px 16px; border-radius: 999px; background: transparent; color: var(--muted); font: 560 14px var(--sans); white-space: nowrap; }
+.tab[aria-selected="true"] { background: #fff; color: #08080a; }
 @media (max-width: 980px) {
   .hero { grid-template-columns: 1fr; }
   .share { grid-template-columns: 1fr; }
@@ -186,8 +195,8 @@ footer a:hover { color: var(--fg); }
 
   <section class="hero">
     <div class="title">
-      <h1>Open <span class="serif">stats.</span></h1>
-      <p>Every download and every visit, live, the moment it happens. Building Tapformat in public.</p>
+      <h1>Your <span class="serif">stats.</span></h1>
+      <p>Every download and every visit, live, the moment it happens. Private to you: only your devices with the key can see this.</p>
     </div>
 
     <div>
@@ -225,13 +234,19 @@ footer a:hover { color: var(--fg); }
 
   <section class="section" id="share">
     <div class="section-head">
-      <h2>Post it on <span class="serif">X.</span></h2>
-      <p>The card is the image you post. It updates with the numbers, so it's always today's.</p>
+      <h2>Post your <span class="serif">numbers.</span></h2>
+      <p>Save the card as an image, pick a platform, and post. The text links people to the download page.</p>
     </div>
     <div class="share">
       <div class="cardwrap"><canvas id="card" width="1600" height="900" aria-label="Tapformat stats card"></canvas></div>
       <div class="share-side">
-        <button class="btn x" id="shareBtn" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Share on X</button>
+        <div class="tabs" role="tablist" id="tabs">
+          <button class="tab" role="tab" data-p="x" aria-selected="true" type="button">X</button>
+          <button class="tab" role="tab" data-p="linkedin" aria-selected="false" type="button">LinkedIn</button>
+          <button class="tab" role="tab" data-p="threads" aria-selected="false" type="button">Threads · Instagram</button>
+          <button class="tab" role="tab" data-p="whatsapp" aria-selected="false" type="button">WhatsApp</button>
+        </div>
+        <button class="btn x" id="shareBtn" type="button">Share on X</button>
         <div class="btnrow">
           <button class="btn ghost" id="save" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10"/></svg>Save image</button>
           <button class="btn ghost" id="copy" type="button">Copy text</button>
@@ -239,18 +254,28 @@ footer a:hover { color: var(--fg); }
         <div class="post">
           <label for="text">Your post</label>
           <textarea id="text" spellcheck="true"></textarea>
-          <div class="meta"><span>Edit before sharing</span><span id="count">0 / 280</span></div>
+          <div class="meta"><span>Edit before sharing · attach the saved image</span><span id="count">0</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <footer>
-    <span>© 2026 Tapformat · <a href="./">Get the app</a></span>
+    <span>© 2026 Tapformat · <a href="./">Get the app</a> · <a href="#" id="forget">Lock this device</a></span>
     <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</a>
   </footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="lock" id="lock" hidden>
+  <form class="lock-card" id="lockForm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    <h2>Private stats</h2>
+    <p>Enter your stats key. This device will remember it.</p>
+    <input id="keyInput" type="password" autocomplete="off" placeholder="Stats key" aria-label="Stats key">
+    <button class="btn x" type="submit" style="width:100%">Unlock</button>
+    <span class="err" id="keyErr"></span>
+  </form>
+</div>
 
 <script>
 (() => {
@@ -453,14 +478,36 @@ footer a:hover { color: var(--fg); }
     ctx.fillStyle = "#c9c9d2"; ctx.font = "500 30px Geist"; ctx.fillText("Free Mac app · select a file, tap ⇧⌘, convert anything", 80, 846);
     ctx.fillStyle = "#8b8b96"; ctx.font = "500 24px 'Geist Mono'"; const tag = "@SmitVanani06"; ctx.fillText(tag, W - 80 - ctx.measureText(tag).width, 844);
   }
+  // One post per platform, in that platform's voice. None of them link to this private page.
+  let platform = "x";
+  const LIMIT = { x: 280, linkedin: 3000, threads: 500, whatsapp: 0 };
+  const LABEL = { x: "Share on X", linkedin: "Share on LinkedIn", threads: "Copy for Threads / Instagram", whatsapp: "Share on WhatsApp" };
   function postText() {
-    const d = dayNumber(data.launched), t = today();
-    return `Day ${d} of building Tapformat in public 🚀\n\n📥 ${fmt(downloads())} downloads\n👀 ${fmt(data.visits)} website visitors\n⚡️ ${fmt(t.downloads)} downloads today\n\nA free Mac app: select any file, tap ⇧⌘, convert it.\n\nLive stats 👇\n${SITE}stats`;
+    const d = dayNumber(data.launched), t = today(), n = fmt(downloads()), v = fmt(data.visits);
+    if (platform === "x") return `Day ${d} of building Tapformat in public 🚀\n\n📥 ${n} downloads\n👀 ${v} people checked it out\n⚡️ ${fmt(t.downloads)} downloads today\n\nA free Mac app: select any file, tap ⇧⌘, convert it. No uploads.\n\nTry it 👇\n${SITE}`;
+    if (platform === "linkedin") return `${d === 1 ? "I just launched" : `Day ${d} since I launched`} Tapformat, a free Mac app I built.\n\nThe idea is simple: select any file in Finder, tap ⇧⌘, and pick a format. HEIC to JPG, video to GIF, PNG to PDF, shrink a big video to half its size. Everything runs on your Mac, so nothing gets uploaded to a random converter website.\n\nWhere it stands so far:\n📥 ${n} downloads\n👀 ${v} people visited the site\n⚡️ ${fmt(t.downloads)} downloads today\n\nI'm building it in public and sharing the numbers as they grow. If you're on a Mac, I'd love for you to try it and tell me what's missing.\n\n👉 ${SITE}\n\n#buildinpublic #macos #indiehacker #productivity`;
+    if (platform === "threads") return `day ${d} of building my mac app in public 📈\n\n${n} downloads · ${v} visitors · ${fmt(t.downloads)} today\n\nselect a file → tap ⇧⌘ → convert. free, no uploads.\n\nlink in bio / ${SITE}`;
+    return `Small update on Tapformat 🙌 ${n} downloads and ${v} people have checked it out so far, ${fmt(t.downloads)} downloads just today.\n\nIf you haven't tried it yet: select any file on your Mac, press ⇧⌘, convert it. Free.\n${SITE}`;
   }
-  const setText = () => { if (!edited && data) $("text").value = postText(); $("count").textContent = `${$("text").value.length} / 280`; };
-  $("text").addEventListener("input", () => { edited = true; $("count").textContent = `${$("text").value.length} / 280`; });
+  const counter = () => { const n = $("text").value.length, L = LIMIT[platform]; $("count").textContent = L ? `${n} / ${L}` : `${n}`; $("count").style.color = L && n > L ? "#ff6b66" : ""; };
+  const setText = () => { if (!edited && data) $("text").value = postText(); counter(); };
+  $("text").addEventListener("input", () => { edited = true; counter(); });
+  $("tabs").addEventListener("click", (e) => {
+    const b = e.target.closest(".tab"); if (!b) return;
+    platform = b.dataset.p; edited = false;
+    $("tabs").querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t === b)));
+    $("shareBtn").textContent = LABEL[platform];
+    setText();
+  });
   const toast = (m) => { const el = $("toast"); el.textContent = m; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2600); };
-  $("shareBtn").addEventListener("click", () => window.open("https://x.com/intent/post?text=" + encodeURIComponent($("text").value), "_blank", "noopener"));
+  $("shareBtn").addEventListener("click", async () => {
+    const text = $("text").value, enc = encodeURIComponent(text);
+    if (platform === "x") return window.open("https://x.com/intent/post?text=" + enc, "_blank", "noopener");
+    if (platform === "whatsapp") return window.open("https://wa.me/?text=" + enc, "_blank", "noopener");
+    try { await navigator.clipboard.writeText(text); } catch {}
+    if (platform === "linkedin") { window.open("https://www.linkedin.com/feed/?shareActive=true&text=" + enc, "_blank", "noopener"); toast("Text copied too, in case LinkedIn drops it"); }
+    else toast("Copied. Paste it into Threads or Instagram");
+  });
   $("save").addEventListener("click", () => cv.toBlob((b) => {
     const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `tapformat-stats-day-${data ? dayNumber(data.launched) : 1}.png`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast("Image saved");
@@ -470,7 +517,8 @@ footer a:hover { color: var(--fg); }
   // ── Load + poll ────────────────────────────────────────────
   async function load() {
     try {
-      const r = await fetch(API, { cache: "no-store" });
+      const r = await fetch(API, { cache: "no-store", headers: { Authorization: "Bearer " + getKey() } });
+      if (r.status === 401) { showLock("That key didn't work."); return; }
       const next = await r.json();
       const keys = new Set((next.events || []).map((e) => e.at + e.type));
       const fresh = new Set(seen ? [...keys].filter((k) => !seen.has(k)) : []);
@@ -482,11 +530,25 @@ footer a:hover { color: var(--fg); }
       else if (fresh.size) burst(10);
     } catch { $("updated").textContent = "Reconnecting…"; }
   }
+  // ── Private access: the key arrives once in the link (#k=…), then lives only on this device ──
+  const KEY = "tf-stats-key";
+  const getKey = () => { try { return localStorage.getItem(KEY) || ""; } catch { return ""; } };
+  const setKey = (k) => { try { localStorage.setItem(KEY, k); } catch {} };
+  const m = location.hash.match(/^#k=(.+)$/);
+  if (m) { setKey(decodeURIComponent(m[1])); history.replaceState(null, "", location.pathname); }
+  function showLock(msg) {
+    try { localStorage.removeItem(KEY); } catch {}
+    $("keyErr").textContent = msg || ""; $("lock").hidden = false; setTimeout(() => $("keyInput").focus(), 50);
+  }
+  $("lockForm").addEventListener("submit", (e) => { e.preventDefault(); const k = $("keyInput").value.trim(); if (!k) return; setKey(k); $("lock").hidden = true; load(); });
+  $("forget").addEventListener("click", (e) => { e.preventDefault(); showLock("Locked. Enter the key to open again."); });
+  if (!getKey()) showLock();
+
   layout();
   requestAnimationFrame(() => ring.classList.add("ready"));
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(layout, 150); });
-  document.fonts.load("600 300px Geist").then(() => document.fonts.load("italic 400 120px 'Instrument Serif'")).then(() => document.fonts.load("500 26px 'Geist Mono'")).finally(() => { draw(); load(); });
-  setInterval(load, 15000);
+  document.fonts.load("600 300px Geist").then(() => document.fonts.load("italic 400 120px 'Instrument Serif'")).then(() => document.fonts.load("500 26px 'Geist Mono'")).finally(() => { draw(); if (getKey()) load(); });
+  setInterval(() => { if (getKey()) load(); }, 15000);
 })();
 </script>
 </body>

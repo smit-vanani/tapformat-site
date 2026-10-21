@@ -288,7 +288,9 @@ footer a:hover { color: var(--fg); }
   let data = null, edited = false, seen = null;
 
   const todayKey = () => new Date().toISOString().slice(0, 10);
-  const dayNumber = (launched) => launched ? Math.round((Date.parse(todayKey()) - Date.parse(launched.slice(0, 10))) / 864e5) + 1 : 1;
+  // Public launch day counts as Day 1 (the first release went up the evening before, for testing).
+  const LAUNCH_DAY = "2026-10-21";
+  const dayNumber = () => Math.max(1, Math.round((Date.parse(todayKey()) - Date.parse(LAUNCH_DAY)) / 864e5) + 1);
   const today = () => (data && data.days.length && data.days[data.days.length - 1].day === todayKey()) ? data.days[data.days.length - 1] : { downloads: 0, visits: 0 };
   const downloads = () => Math.max(data.confirmed, data.downloads);
 

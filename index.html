@@ -335,7 +335,15 @@ h2 { margin: 0; font-weight: 600; font-size: clamp(38px, 6vw, 76px); line-height
 /* ── Demo film ───────────────────────────────────────────────── */
 .film { position: relative; border-radius: 28px; padding: 10px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); border: 1px solid var(--line-2);
   box-shadow: 0 60px 160px -40px rgba(158, 97, 255, 0.45); transform: perspective(1400px) rotateX(var(--fx, 18deg)) scale(var(--fs, 0.9)); transform-origin: 50% 0; }
-.film video { width: 100%; border-radius: 20px; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
+.film video { width: 100%; border-radius: 20px; aspect-ratio: 16 / 9; object-fit: cover; background: #000; display: block; }
+.film .sound { position: absolute; right: 26px; bottom: 26px; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.25); background: rgba(10,10,14,0.6); color: #fff; font: 560 14px var(--sans); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background 0.2s, transform 0.2s var(--spring); }
+.film .sound:hover { background: rgba(10,10,14,0.8); transform: translateY(-1px); }
+.film .sound svg { width: 18px; height: 18px; }
+.film .sound .on { display: none; }
+.film .sound[aria-pressed="true"] .on { display: inline; }
+.film .sound[aria-pressed="true"] .off { display: none; }
+@media (max-width: 640px) { .film .sound { right: 14px; bottom: 14px; height: 34px; font-size: 13px; } }
 @media (max-width: 640px) { .film { padding: 6px; border-radius: 18px; } .film video { border-radius: 13px; } }
 
 /* ── FAQ ─────────────────────────────────────────────────────── */
@@ -574,9 +582,10 @@ footer a:hover { color: var(--fg); }
   <div class="wrap">
     <div class="head reveal">
       <span class="kicker" style="--k:var(--gif)">Watch</span>
-      <h2>Thirty seconds, <span class="serif">start to finish.</span></h2>
+      <h2>Watch it <span class="serif">in action.</span></h2>
     </div>
-    <div class="film" id="filmFrame"><video src="tapformat-demo.mp4" poster="poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat demo: select a file, tap ⇧⌘, pick a format"></video></div>
+    <div class="film" id="filmFrame"><video id="filmVideo" src="tapformat-film.mp4" poster="film-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat launch film: select a file, tap ⇧⌘, pick a format"></video>
+      <button class="sound" id="soundBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="M22 9l-6 6M16 9l6 6"/></svg><span>Sound on</span></button></div>
   </div>
 </section>
 
@@ -789,6 +798,16 @@ footer a:hover { color: var(--fg); }
     if (p > 0.86 && !burstDone) { burstDone = true; if (!reduce) burst($("sparks"), out.offsetLeft, out.offsetTop - 20); }
     if (p < 0.8) burstDone = false;
   }
+
+  // Sound toggle: browsers only autoplay muted, so the visitor turns sound on.
+  const filmVideo = $("filmVideo"), soundBtn = $("soundBtn");
+  soundBtn.addEventListener("click", () => {
+    const on = filmVideo.muted;
+    filmVideo.muted = !on;
+    if (on) { filmVideo.currentTime = 0; filmVideo.play().catch(() => {}); }
+    soundBtn.setAttribute("aria-pressed", String(on));
+    soundBtn.querySelector("span").textContent = on ? "Sound off" : "Sound on";
+  });
 
   // Demo film flattens as it scrolls into view
   const film = $("filmFrame");

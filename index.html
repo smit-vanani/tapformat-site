@@ -309,20 +309,20 @@ footer .maker { display: inline-flex; align-items: center; gap: 7px; } footer .m
 /* ── Dock ── */
 .dock { position: fixed; left: 50%; bottom: 8px; z-index: 88; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 4px; padding: 6px 8px 7px; border-radius: 20px;
   background: rgba(70, 60, 110, 0.28); border: 0.5px solid rgba(255,255,255,0.22); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-.dock a { position: relative; width: 54px; height: 54px; cursor: default; display: grid; place-items: center; transform-origin: 50% 100%; transition: transform 0.1s; }
-.dock .di { position: relative; width: 100%; height: 100%; border-radius: 23%; display: grid; place-items: center; color: #fff; background: var(--t, #333); overflow: hidden;
-  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.35), inset 0 -6px 12px rgba(0,0,0,0.18), 0 5px 12px rgba(0,0,0,0.35); }
-.dock .di::before { content: ""; position: absolute; inset: 0 0 48% 0; background: linear-gradient(rgba(255,255,255,0.42), rgba(255,255,255,0.06)); border-radius: 23% 23% 40% 40% / 23% 23% 18% 18%; }
-.dock .di svg { position: relative; width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.35)); }
+.dock a { position: relative; width: 54px; height: 54px; display: grid; place-items: center; transform-origin: 50% 100%; transition: transform 0.1s; }
+.dock .di { width: 100%; height: 100%; border-radius: 23%; display: grid; place-items: center; color: #fff; background: var(--t, #333); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(0,0,0,0.3); }
+.dock .di svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .dock .tip { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 6px; white-space: nowrap; font-size: 12.5px;
   background: rgba(40,40,48,0.85); border: 0.5px solid var(--line-2); opacity: 0; pointer-events: none; transition: opacity 0.1s; }
 .dock a:hover .tip { opacity: 1; }
 .dock a.run::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(255,255,255,0.85); }
+.dock .ico { width: 100%; height: 100%; display: block; }
+.dock .ico svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.32)); }
+.dock #dockApp > svg { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.32)); }
 .dock .sep { width: 1px; align-self: stretch; margin: 6px 4px; background: rgba(255,255,255,0.25); }
 .dock a.bounce { animation: bounce 0.8s var(--ease) 2; }
 @keyframes bounce { 35% { translate: 0 -18px; } 70% { translate: 0 0; } }
-.dock .trash .di { background: linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.12)); }
-.dock .trash.hot .di { background: linear-gradient(rgba(255,95,87,0.7), rgba(255,95,87,0.35)); }
+.dock .trash.hot .ico svg { filter: drop-shadow(0 0 10px rgba(255,95,87,0.9)); }
 
 /* ── First-launch guide ── */
 .guide { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(6px);
@@ -403,18 +403,6 @@ footer .maker { display: inline-flex; align-items: center; gap: 7px; } footer .m
 .intro.fly .mark { opacity: 0; transform: translate(-50%, -50%) scale(1.5); transition: transform 0.8s ease, opacity 0.5s ease; }
 html.intro-on, html.intro-on body { overflow: hidden; }
 
-/* ── OS mode (computers): one desktop, no page scroll; sections are windows you open, drag, close and minimise ── */
-html.os, html.os body { height: 100%; overflow: hidden; }
-html.os .desktop { height: 100vh; min-height: 0; }
-html.os .apps { position: fixed; inset: 30px 0 0 0; padding: 0; z-index: 10; pointer-events: none; }
-html.os .apps footer { display: none; }
-html.os .win { position: absolute; margin: 0; left: var(--wx); top: var(--wy); width: var(--ww); height: var(--wh); display: none; flex-direction: column; pointer-events: auto; opacity: 1; transform: none; transition: none; }
-html.os .win.openw { display: flex; }
-html.os .win .tb { flex: none; }
-html.os .win .wb { flex: 1; overflow: auto; overscroll-behavior: contain; }
-html.os .win.shade { height: auto; }
-html.os .win.zoomed { left: 8px !important; top: 6px !important; width: calc(100vw - 16px) !important; height: calc(100vh - 30px - 96px) !important; }
-html.os .win.dragging { user-select: none; -webkit-user-select: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .pop { opacity: 1; transform: none; } .intro { display: none; } }
 </style>
 </head>
@@ -703,19 +691,47 @@ html.os .win.dragging { user-select: none; -webkit-user-select: none; }
 </main>
 
 <nav class="dock" id="dock" aria-label="Dock">
-  <a href="#top" class="run" style="--t:linear-gradient(#6ec3ff,#1f6fea)"><span class="di"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="3"/><path d="M8 21h8"/></svg></span><span class="tip">Desktop</span></a>
-  <a href="#how" class="run" style="--t:linear-gradient(#ffb862,#ff7a1a)"><span class="di"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span class="tip">How It Works</span></a>
-  <a href="#formats" class="run" style="--t:linear-gradient(#c19bff,#7c3cf0)"><span class="di"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6" fill="#fff"/></svg></span><span class="tip">Get Info: Formats</span></a>
-  <a href="#shrink" class="run opt-hide" style="--t:linear-gradient(#64e8c1,#11a27a)"><span class="di"><svg viewBox="0 0 24 24"><path d="M4 20l6-6M10 14v5M10 14H5M20 4l-6 6M14 10V5M14 10h5"/></svg></span><span class="tip">Activity: Shrink</span></a>
-  <a href="#new" class="run" style="--t:linear-gradient(#fff08a,#f3c700)"><span class="di" style="color:#5a4a00"><svg viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5"/></svg></span><span class="tip">Stickies: New in 1.1</span></a>
-  <a href="#tools" class="run opt-hide" style="--t:linear-gradient(#ffd25e,#f09a00)"><span class="di"><svg viewBox="0 0 24 24"><path d="M6 3v13a2 2 0 0 0 2 2h13M3 6h13a2 2 0 0 1 2 2v13"/></svg></span><span class="tip">Tools</span></a>
-  <a href="#film" class="run opt-hide" style="--t:linear-gradient(#5b5b66,#1d1d22)"><span class="di"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z" fill="#fff"/></svg></span><span class="tip">Film</span></a>
-  <a href="#faq" class="run" style="--t:linear-gradient(#ffe27a,#e0a800)"><span class="di" style="color:#3b2d00"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span><span class="tip">Notes: Questions</span></a>
-  <a href="changelog" style="--t:linear-gradient(#ff86bd,#e6337e)"><span class="di"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 5.6L20 9.3l-4.3 3.9 1.3 5.8L12 16l-5 3 1.3-5.8L4 9.3l5.6-.7z"/></svg></span><span class="tip">What's New</span></a>
-  <a href="feedback" class="opt-hide" style="--t:linear-gradient(#7fd0ff,#2f8cf0)"><span class="di"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span><span class="tip">Feedback</span></a>
+  <a href="#top" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iDk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5cc0ff"/><stop offset="1" stop-color="#1663e6"/></linearGradient>
+<linearGradient id="iDkW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6a2cff"/><stop offset=".5" stop-color="#ff4fa3"/><stop offset="1" stop-color="#ff9a3c"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iDk)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><rect x="17" y="22" width="66" height="44" rx="5" fill="#1b1b22"/><rect x="20" y="25" width="60" height="38" rx="3" fill="url(#iDkW)"/>
+<path d="M20 52 C34 44 46 58 60 50 S76 46 80 48 V63 H20Z" fill="#2f6bff" opacity=".85"/><path d="M42 66h16l3 11H39z" fill="#e9eef7"/><rect x="33" y="76" width="34" height="4" rx="2" fill="#f5f8fc"/></svg></span><span class="tip">Desktop</span></a>
+  <a href="#how" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iHw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6e6ec"/></linearGradient>
+<radialGradient id="iHwB" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff3a3"/><stop offset=".55" stop-color="#ffc93c"/><stop offset="1" stop-color="#ff8f2e"/></radialGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iHw)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><circle cx="50" cy="42" r="22" fill="url(#iHwB)"/><path d="M41 60h18v6H41z" fill="#ffb02e"/><rect x="40" y="66" width="20" height="5" rx="2" fill="#9a9aa6"/><rect x="41" y="72" width="18" height="5" rx="2" fill="#7c7c88"/><rect x="45" y="78" width="10" height="4" rx="2" fill="#5f5f6a"/>
+<path d="M44 52 L50 36 L56 52" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><ellipse cx="42" cy="33" rx="7" ry="4" fill="#fff" opacity=".6" transform="rotate(-30 42 33)"/></svg></span><span class="tip">How It Works</span></a>
+  <a href="#formats" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iFm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafafc"/><stop offset="1" stop-color="#dcdce4"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iFm)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><circle cx="50" cy="50" r="31" fill="#2a2a31"/><g><circle cx="50" cy="27" r="7" fill="#ff8f2e"/><circle cx="70" cy="38.5" r="7" fill="#9e61ff"/><circle cx="70" cy="61.5" r="7" fill="#3885ff"/>
+<circle cx="50" cy="73" r="7" fill="#29c770"/><circle cx="30" cy="61.5" r="7" fill="#ff549e"/><circle cx="30" cy="38.5" r="7" fill="#f5454d"/></g><circle cx="50" cy="50" r="10" fill="#fff"/>
+<circle cx="50" cy="27" r="11" fill="none" stroke="#ff8f2e" stroke-opacity=".35" stroke-width="3"/></svg></span><span class="tip">Get Info: Formats</span></a>
+  <a href="#shrink" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iSh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a42"/><stop offset="1" stop-color="#121216"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iSh)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><g stroke="#2fc79c" stroke-opacity=".18" stroke-width="1"><path d="M14 30H86M14 45H86M14 60H86M14 75H86M30 18V84M50 18V84M70 18V84"/></g>
+<path d="M14 36 L28 40 L38 34 L48 52 L58 46 L68 66 L78 62 L86 74" fill="none" stroke="#3cffbe" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14 36 L28 40 L38 34 L48 52 L58 46 L68 66 L78 62 L86 74 V86 H14Z" fill="#2fc79c" opacity=".18"/></svg></span><span class="tip">Activity: Shrink</span></a>
+  <a href="#new" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iSt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f4f7"/><stop offset="1" stop-color="#d6d6de"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iSt)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><rect x="22" y="24" width="50" height="50" rx="3" fill="#a9d0ff" transform="rotate(-10 47 49)"/><rect x="28" y="22" width="50" height="50" rx="3" fill="#ffaed1" transform="rotate(7 53 47)"/>
+<path d="M24 26h52v40l-12 12H24z" fill="#ffe873"/><path d="M76 66l-12 12V66z" fill="#e9cf4a"/><rect x="24" y="26" width="52" height="8" fill="#f8db55"/>
+<path d="M31 44h36M31 52h36M31 60h24" stroke="#c9ad2e" stroke-width="2.5" stroke-linecap="round"/></svg></span><span class="tip">Stickies: New in 1.1</span></a>
+  <a href="#tools" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iTl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd45e"/><stop offset="1" stop-color="#f29a00"/></linearGradient>
+<linearGradient id="iTlP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".6" stop-color="#f0596b"/><stop offset="1" stop-color="#6a3cff"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iTl)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><rect x="24" y="26" width="52" height="40" rx="3" fill="#fff"/><rect x="27" y="29" width="46" height="34" rx="2" fill="url(#iTlP)"/><circle cx="58" cy="40" r="5" fill="#ffefc4"/>
+<path d="M18 30V76h46M30 20h46v46" fill="none" stroke="#2a2a31" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="tip">Tools</span></a>
+  <a href="#film" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iFl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a54"/><stop offset="1" stop-color="#141418"/></linearGradient>
+<radialGradient id="iFlC" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#9fd0ff"/><stop offset=".5" stop-color="#3885ff"/><stop offset="1" stop-color="#5a2cd6"/></radialGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iFl)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><circle cx="50" cy="50" r="28" fill="url(#iFlC)"/><circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/><path d="M43 37 L64 50 L43 63Z" fill="#fff"/>
+<ellipse cx="42" cy="34" rx="12" ry="6" fill="#fff" opacity=".28" transform="rotate(-25 42 34)"/></svg></span><span class="tip">Film</span></a>
+  <a href="#faq" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iNt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ececf1"/></linearGradient>
+<linearGradient id="iNtH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd93d"/><stop offset="1" stop-color="#f6b900"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iNt)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><path d="M3 25V25C3 13 13 3 25 3H75C87 3 97 13 97 25V30H3Z" fill="url(#iNtH)"/><g fill="#fff" opacity=".7"><circle cx="20" cy="30" r="2"/><circle cx="30" cy="30" r="2"/><circle cx="40" cy="30" r="2"/><circle cx="50" cy="30" r="2"/><circle cx="60" cy="30" r="2"/><circle cx="70" cy="30" r="2"/><circle cx="80" cy="30" r="2"/></g>
+<path d="M16 46H84M16 58H84M16 70H84M16 82H64" stroke="#d8d8df" stroke-width="2"/><text x="18" y="54" font-family="-apple-system,Helvetica" font-weight="700" font-size="14" fill="#2a2a31">?</text></svg></span><span class="tip">Notes: Questions</span></a>
+  <a href="changelog"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iWn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8ac2"/><stop offset=".55" stop-color="#e6337e"/><stop offset="1" stop-color="#8b3cff"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iWn)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><path d="M50 18 C53 38, 62 47, 82 50 C62 53, 53 62, 50 82 C47 62, 38 53, 18 50 C38 47, 47 38, 50 18Z" fill="#fff"/>
+<path d="M74 22 C75 28, 78 31, 84 32 C78 33, 75 36, 74 42 C73 36, 70 33, 64 32 C70 31, 73 28, 74 22Z" fill="#fff" opacity=".8"/><circle cx="27" cy="74" r="4" fill="#fff" opacity=".7"/></svg></span><span class="tip">What's New</span></a>
+  <a href="feedback" class="opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iFb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd0ff"/><stop offset="1" stop-color="#2a6cf0"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#iFb)"/><rect x="3.5" y="3.5" width="93" height="93" rx="21.5" fill="none" stroke="rgba(255,255,255,.35)"/><path d="M50 20 C70 20, 84 32, 84 47 C84 62, 70 74, 50 74 C45 74, 41 73, 37 72 L22 80 L26 67 C19 61, 16 54, 16 47 C16 32, 30 20, 50 20Z" fill="#fff"/>
+<circle cx="36" cy="47" r="5" fill="#ff8f2e"/><circle cx="50" cy="47" r="5" fill="#9e61ff"/><circle cx="64" cy="47" r="5" fill="#29c770"/></svg></span><span class="tip">Feedback</span></a>
   <span class="sep"></span>
   <a href="https://tapformat.smit-jsv.workers.dev/download" data-download id="dockApp"><svg style="width:100%;height:100%" aria-hidden="true"><use href="#logo"/></svg><span class="tip">Download Tapformat</span></a>
-  <a href="#top" class="trash opt-hide" id="trash" aria-label="Trash"><span class="di"><svg viewBox="0 0 24 24"><path d="M5 7h14l-1.2 13H6.2zM9 7V4h6v3M3.5 7h17"/></svg></span><span class="tip">Trash: drag a file here</span></a>
+  <a href="#top" class="trash opt-hide" id="trash" aria-label="Trash"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iTr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(255,255,255,.35)"/><stop offset=".5" stop-color="rgba(255,255,255,.12)"/><stop offset="1" stop-color="rgba(255,255,255,.35)"/></linearGradient><pattern id="iTrM" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M0 0L5 5M5 0L0 5" stroke="rgba(255,255,255,.28)" stroke-width=".8"/></pattern></defs><path d="M22 20 L28 90 Q29 94 33 94 H67 Q71 94 72 90 L78 20Z" fill="url(#iTr)"/><path d="M22 20 L28 90 Q29 94 33 94 H67 Q71 94 72 90 L78 20Z" fill="url(#iTrM)"/><ellipse cx="50" cy="20" rx="29" ry="7" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.7)" stroke-width="2"/><path d="M29 30 L33 88 M71 30 L67 88" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/></svg></span><span class="tip">Trash: drag a file here</span></a>
 </nav>
 
 <div class="notif" id="notif" role="status"><svg><use href="#logo"/></svg><div><b>Tapformat</b><span id="notifText">Sunset.jpg is ready</span></div><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Get the app</a><small>now</small></div>
@@ -1082,7 +1098,7 @@ html.os .win.dragging { user-select: none; -webkit-user-select: none; }
     closeSpot();
     if (it[1] === "#convert") { scrollTo({ top: 0 }); setTimeout(() => openRing(), 300); return; }
     if (it[1].includes("download")) { $("finalDl").click(); return; }
-    if (it[1].startsWith("#")) openWin(document.querySelector(it[1])); else location.href = it[1];
+    if (it[1].startsWith("#")) document.querySelector(it[1]).scrollIntoView({ behavior: "smooth", block: "start" }); else location.href = it[1];
   }
   function openSpot() { spot.classList.add("show"); spotIn.value = ""; renderSpot(); setTimeout(() => spotIn.focus(), 10); }
   function closeSpot() { spot.classList.remove("show"); spotIn.blur(); }
@@ -1095,94 +1111,17 @@ html.os .win.dragging { user-select: none; -webkit-user-select: none; }
   });
   spot.addEventListener("pointerdown", e => { if (!e.target.closest(".box")) closeSpot(); });
 
-  // ── Windows ─────────────────────────────────────────────────
-  // On a computer the site is one desktop: windows open from the Dock, menus and Spotlight, drag by the title bar,
-  // and close or minimise back into the Dock. Phones and tablets get the same windows as a scrolling page.
-  const os = !touch && innerWidth > 900;
-  if (os) document.documentElement.classList.add("os");
+  // ── Windows: focus, collapse, zoom ──────────────────────────
   const wins = [...document.querySelectorAll(".win")];
-  let zTop = 20;
-  const focusWin = w => { wins.forEach(x => x.classList.toggle("active", x === w)); if (os && w) w.style.zIndex = ++zTop; };
-  const SIZE = { how: [900, 560], formats: [960, 600], shrink: [800, 520], new: [900, 500], tools: [920, 600], film: [940, 600], faq: [860, 600], download: [620, 520] };
-  const dockFor = id => document.querySelector(`.dock a[href="#${id}"]`) || $("dockApp");
-  let cascade = 0;
-  function placeWin(w) {
-    if (w.dataset.placed) return;
-    w.dataset.placed = "1";
-    const [W, H] = SIZE[w.id] || [860, 560], vw = innerWidth, vh = innerHeight - 30 - 96;
-    const ww = Math.min(W, vw - 80), wh = Math.min(H, vh - 20), k = cascade++ % 5;
-    w.style.setProperty("--ww", ww + "px"); w.style.setProperty("--wh", wh + "px");
-    w.style.setProperty("--wx", Math.max(20, Math.min(vw - ww - 20, (vw - ww) / 2 - 60 + k * 34)) + "px");
-    w.style.setProperty("--wy", Math.max(8, Math.min(vh - wh, 18 + k * 28)) + "px");
-  }
-  // The window grows out of (or shrinks into) its Dock icon, a light take on the genie effect.
-  function genie(w, icon, opening) {
-    if (reduce || !w.animate) return Promise.resolve();
-    const a = w.getBoundingClientRect(), b = icon.getBoundingClientRect();
-    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
-    const far = { transform: `translate(${dx}px, ${dy}px) scale(0.06, 0.04)`, opacity: 0.2 }, near = { transform: "none", opacity: 1 };
-    return w.animate(opening ? [far, near] : [near, far], { duration: opening ? 420 : 340, easing: opening ? "cubic-bezier(0.2, 0.9, 0.3, 1)" : "cubic-bezier(0.6, 0, 0.8, 0.4)" }).finished.catch(() => {});
-  }
-  function markDock() {
-    document.querySelectorAll(".dock a[href^='#']").forEach(a => {
-      const w = document.getElementById(a.getAttribute("href").slice(1));
-      if (w && w.classList.contains("win")) a.classList.toggle("run", w.classList.contains("openw"));
-    });
-  }
-  function openWin(w) {
-    if (!os) { w.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-    const was = w.classList.contains("openw");
-    placeWin(w); w.classList.add("openw"); w.classList.remove("shade");
-    focusWin(w); show(w); markDock();
-    if (!was) genie(w, dockFor(w.id), true);
-  }
-  async function closeWin(w) {
-    await genie(w, dockFor(w.id), false);
-    w.classList.remove("openw", "active", "zoomed"); markDock();
-  }
+  const focusWin = w => wins.forEach(x => x.classList.toggle("active", x === w));
   wins.forEach(w => {
     w.addEventListener("pointerdown", () => focusWin(w));
     w.querySelectorAll("[data-tl]").forEach(b => b.addEventListener("click", e => {
       e.stopPropagation(); focusWin(w);
-      const t = b.dataset.tl;
-      if (t === "zoom") w.classList.toggle("zoomed");
-      else if (os) closeWin(w);
-      else w.classList.toggle("shade");
+      if (b.dataset.tl === "zoom") w.classList.toggle("zoomed"); else w.classList.toggle("shade");
     }));
-    const tb = w.querySelector(".tb");
-    tb.addEventListener("dblclick", () => os ? w.classList.toggle("zoomed") : w.classList.toggle("shade"));
-    // Drag by the title bar, kept below the menu bar.
-    let drag = null;
-    tb.addEventListener("pointerdown", e => {
-      if (!os || e.target.closest(".tl") || w.classList.contains("zoomed")) return;
-      drag = { x: e.clientX, y: e.clientY, l: w.offsetLeft, t: w.offsetTop }; tb.setPointerCapture(e.pointerId); w.classList.add("dragging");
-    });
-    tb.addEventListener("pointermove", e => {
-      if (!drag) return;
-      w.style.setProperty("--wx", Math.max(-w.offsetWidth + 120, Math.min(innerWidth - 120, drag.l + e.clientX - drag.x)) + "px");
-      w.style.setProperty("--wy", Math.max(0, Math.min(innerHeight - 140, drag.t + e.clientY - drag.y)) + "px");
-    });
-    const end = () => { drag = null; w.classList.remove("dragging"); };
-    tb.addEventListener("pointerup", end); tb.addEventListener("pointercancel", end);
+    w.querySelector(".tb").addEventListener("dblclick", () => w.classList.toggle("shade"));
   });
-  // Every "#section" link (Dock, menus, buttons) opens that window; "#top" is Show Desktop.
-  document.addEventListener("click", e => {
-    const a = e.target.closest('a[href^="#"]');
-    if (!a || !os) return;
-    const id = a.getAttribute("href").slice(1);
-    if (id === "top") { e.preventDefault(); closeMenus(); wins.filter(w => w.classList.contains("openw")).forEach(closeWin); return; }
-    const w = document.getElementById(id);
-    if (w && w.classList.contains("win")) { e.preventDefault(); closeMenus(); openWin(w); }
-  }, true);
-  if (os) {
-    document.querySelectorAll(".dock a.run").forEach(a => a.classList.remove("run"));
-    let introOn = false; try { introOn = !!document.getElementById("intro"); } catch {}
-    let welcomed = false; try { welcomed = !!sessionStorage.getItem("tf-welcomed"); sessionStorage.setItem("tf-welcomed", "1"); } catch {}
-    if (!welcomed) setTimeout(() => {
-      const d = dockFor("how"); d.classList.remove("bounce"); void d.offsetWidth; d.classList.add("bounce");
-      notify("Welcome to Tapformat", "Try the files on the desktop, or open an app from the Dock to explore.");
-    }, introOn ? 4200 : 1400);
-  }
 
   // ── How it works: the little ring keeps aiming ──────────────
   const mini = $("miniRing");
@@ -1290,8 +1229,7 @@ html.os .win.dragging { user-select: none; -webkit-user-select: none; }
     el.classList.add("in");
     el.querySelectorAll(".meter").forEach(m => { m.querySelector(".bars i + i").style.transform = `scaleX(${m.dataset.r})`; });
   };
-  if (os) { /* windows reveal themselves when opened */ }
-  else if ("IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } }), { threshold: 0.08 });
     document.querySelectorAll(".pop").forEach(el => io.observe(el));
     const fo = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) focusWin(en.target); }), { rootMargin: "-45% 0px -45% 0px" });

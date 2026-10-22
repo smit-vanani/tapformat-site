@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tapformat</title>
 <meta name="description" content="Select a file in Finder, tap ⇧⌘, pick a format. Convert, shrink, crop and resize images, PDFs, documents, audio and video on your Mac. Nothing gets uploaded.">
-<meta name="theme-color" content="#1b1040">
+<meta name="theme-color" content="#050507">
 <meta property="og:title" content="Tapformat · Tap ⇧⌘. Convert anything.">
 <meta property="og:description" content="Convert and shrink any file right from Finder. A free Mac app that works offline.">
 <meta property="og:image" content="https://tapformat.com/og-v2.png">
@@ -18,396 +18,424 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
-/* tapformat.com as a Mac. The page behaves like macOS, not a website dressed as one: a working menu bar (menus,
-   status items, the real Tapformat menu-bar panel, Spotlight), an original wave wallpaper, desktop widgets for the
-   headline, files you can rubber-band select and convert with the real ⇧⌘ ring, notifications, Stickies, and every
-   section as an app window you can focus, collapse and zoom. The system font is used, so on a Mac it's SF Pro. */
+/* Cinematic dark: a black stage lit by a slow aurora in the six format colors, the same world as the app's onboarding.
+   The ring is the hero object everywhere: it tilts with the cursor, converts a file as you scroll, and opens at the pointer on ⇧⌘.
+   Deliberately dark-only, like a launch film. */
 :root {
-  --fg: #f5f5f7; --muted: rgba(235, 235, 245, 0.6); --dim: rgba(235, 235, 245, 0.38);
-  --line: rgba(255, 255, 255, 0.09); --line-2: rgba(255, 255, 255, 0.16);
-  --sel: #0a84ff;
+  --bg: #050507;
+  --fg: #f4f4f6;
+  --muted: #8b8b96;
+  --dim: #55555f;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.14);
+  --glass: rgba(255, 255, 255, 0.04);
+  --sel: #3b82ff;
   --jpg: #ff8f2e; --png: #3885ff; --pdf: #f5454d; --heic: #9e61ff; --gif: #ff549e;
-  --mp3: #29c770; --mp4: #735cff; --word: #336bf2; --shrink: #2fc79c;
-  --sunset: radial-gradient(circle at 62% 42%, #ffefc4 0 13%, transparent 14%), linear-gradient(#ffb057, #f0596b 55%, #6a3cff);
-  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Geist", "Helvetica Neue", system-ui, sans-serif;
+  --mp3: #29c770; --m4a: #ff6b66; --mp4: #735cff;
+  --shrink: #2fc79c; --crop: #fab81f; --resize: #1ab8cc; --rotate: #7c6cf0;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
   --serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --mono: ui-monospace, "SF Mono", "Geist Mono", Menlo, monospace;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); --spring: cubic-bezier(0.3, 1.45, 0.5, 1);
-  --vib: rgba(36, 36, 44, 0.55);
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.3, 1.5, 0.5, 1);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { background: #2b2440; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; }
-body { margin: 0; color: var(--fg); font: 400 15px/1.5 var(--ui); -webkit-font-smoothing: antialiased; letter-spacing: -0.005em; }
+html { background: var(--bg); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; color: var(--fg); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: default; padding: 0; }
-a, .btn, summary { cursor: default; }
-::selection { background: rgba(10, 132, 255, 0.5); }
-.serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
-kbd { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em; padding: 0 0.32em; border-radius: 0.32em; font: 600 0.8em var(--ui); color: #1d1d1f;
-  background: linear-gradient(#fff, #dedee3); box-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.5); vertical-align: 0.08em; transition: transform 0.08s, box-shadow 0.08s, background 0.15s; }
-kbd.down { transform: translateY(1.5px); box-shadow: none; background: linear-gradient(#5aa8ff, #0a84ff); color: #fff; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+img, video, svg { display: block; }
+::selection { background: rgba(59, 130, 255, 0.45); }
+.wrap { width: min(1180px, 100% - 32px); margin: 0 auto; }
 
-/* ── Wallpaper: original flowing waves in the format colours ── */
-.wallpaper { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: #2b2440 url(wallpaper.jpg) center 40% / cover no-repeat; }
-@media (max-width: 900px) { .wallpaper { background-image: url(wallpaper-small.jpg); } }
-.wallpaper svg, .intro .screen .wall svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.wallpaper::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.18)); }
-
-/* ── Menu bar ── */
-.menubar { position: fixed; inset: 0 0 auto; z-index: 90; height: 30px; display: flex; align-items: center; padding: 0 8px; font-size: 13.5px; font-weight: 500;
-  background: rgba(24, 24, 26, 0.84); backdrop-filter: blur(30px) saturate(1.6); -webkit-backdrop-filter: blur(30px) saturate(1.6); color: #fff; user-select: none; -webkit-user-select: none; }
-.mb { position: relative; height: 24px; display: flex; align-items: center; padding: 0 9px; border-radius: 5px; white-space: nowrap; }
-.mb.app { font-weight: 700; }
-.mb.logo svg { width: 16px; height: 16px; }
-.mb.open, .mb:active { background: rgba(255,255,255,0.2); }
-.mbright { margin-left: auto; display: flex; align-items: center; }
-.mbright .mb { padding: 0 7px; }
-.mbright svg { width: 17px; height: 17px; fill: none; stroke: #fff; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
-.mbright .tf svg { width: 17px; height: 17px; stroke: none; }
-.mb.clock { font-variant-numeric: tabular-nums; padding: 0 8px; }
-.menu { position: absolute; top: 27px; left: 0; min-width: 230px; padding: 5px; border-radius: 9px; background: rgba(40, 40, 48, 0.88); border: 0.5px solid rgba(255,255,255,0.18);
-  backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8); box-shadow: 0 18px 50px rgba(0,0,0,0.45); display: none; font-weight: 400; z-index: 2; }
-.mb.open .menu { display: block; }
-.menu a, .menu button { display: flex; justify-content: space-between; gap: 30px; width: 100%; padding: 3px 10px; border-radius: 5px; font-size: 13.5px; text-align: left; }
-.menu a:hover, .menu button:hover { background: var(--sel); }
-.menu .k { color: var(--dim); } .menu a:hover .k, .menu button:hover .k { color: rgba(255,255,255,0.8); }
-.menu hr { border: 0; height: 1px; margin: 5px 10px; background: rgba(255,255,255,0.12); }
-.menu.right { left: auto; right: 0; }
-/* The Tapformat menu-bar panel, the same one the app shows */
-.panel { width: 270px; padding: 12px; }
-.panel .ph { display: flex; align-items: center; gap: 10px; padding: 2px 4px 10px; }
-.panel .ph svg { width: 34px; height: 34px; filter: drop-shadow(0 0 10px rgba(158,97,255,0.5)); }
-.panel .ph b { display: block; font-size: 14px; } .panel .ph small { color: var(--muted); font-size: 11.5px; }
-.panel .how { display: flex; align-items: center; gap: 6px; padding: 8px 10px; margin-bottom: 8px; border-radius: 9px; background: rgba(255,255,255,0.07); font-size: 12px; color: var(--muted); }
-.panel .how span { margin-right: auto; }
-.panel .row { justify-content: flex-start !important; gap: 10px !important; padding: 5px 6px !important; border-radius: 8px !important; }
-.panel .row i { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; background: var(--c); font-style: normal; font-size: 12px; }
-
-/* ── Desktop ── */
-.desktop { position: relative; min-height: max(100svh, 760px); padding: 46px 0 120px; }
-.widgets { position: relative; z-index: 3; margin-left: 28px; width: 420px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.widget { border-radius: 22px; padding: 18px; background: var(--vib); backdrop-filter: blur(40px) saturate(1.6); -webkit-backdrop-filter: blur(40px) saturate(1.6);
-  border: 0.5px solid rgba(255,255,255,0.14); box-shadow: 0 10px 40px rgba(0,0,0,0.22); }
-.widget.big { grid-column: 1 / -1; padding: 24px 24px 22px; }
-.widget .wh { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); text-transform: uppercase; }
-.widget .wh svg { width: 16px; height: 16px; }
-.widget h1 { margin: 14px 0 12px; font: 700 clamp(46px, 5.4vw, 66px)/0.95 var(--ui); letter-spacing: -0.045em; }
-.widget h1 .serif { display: block; font-size: 1.12em; letter-spacing: -0.02em; background: linear-gradient(90deg, #ffb35c, #ff5fa8 50%, #b98aff); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 0.06em; }
-.widget p { margin: 0; color: rgba(245,245,247,0.82); font-size: 15px; }
-.dlrow { display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
-.btn { display: inline-flex; align-items: center; gap: 9px; height: 44px; padding: 0 20px; border-radius: 999px; font-weight: 600; font-size: 15px; background: #fff; color: #1d1d1f; cursor: pointer;
-  box-shadow: 0 10px 30px -8px rgba(0,0,0,0.5); transition: transform 0.2s var(--spring); }
-.btn:hover { transform: scale(1.03); }
-.btn svg { width: 15px; height: 15px; }
-.req { color: var(--muted); font-size: 12px; }
-.widget.keys { display: grid; align-content: space-between; min-height: 168px; cursor: pointer; }
-.widget.keys .caps { display: flex; gap: 8px; font-size: 30px; }
-.widget.keys .caps kbd { width: 56px; height: 56px; border-radius: 13px; box-shadow: 0 4px 0 #8f8f98, 0 10px 20px rgba(0,0,0,0.35); }
-.widget.keys .caps kbd.down { box-shadow: 0 0 0 #8f8f98; transform: translateY(4px); }
-.widget small { color: var(--muted); font-size: 12px; }
-.widget.count { min-height: 168px; display: grid; align-content: space-between; }
-.widget.count .n { font: 700 46px/1 var(--ui); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
-.widget.count .dots { display: flex; gap: 5px; }
-.widget.count .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: background 0.3s, box-shadow 0.3s; }
-.widget.count .dots i.on { background: var(--c); box-shadow: 0 0 10px var(--c); }
-
-.icons { position: absolute; inset: 40px 0 0 0; z-index: 2; }
-.dicon { position: absolute; width: 104px; display: grid; justify-items: center; gap: 5px; padding: 6px 3px 5px; border-radius: 7px; touch-action: none; user-select: none; -webkit-user-select: none; outline: none; }
-.dicon.dragging { z-index: 6; opacity: 0.85; }
-.dicon .art { position: relative; width: 66px; height: 66px; display: grid; place-items: center; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); pointer-events: none; }
-.dicon .name { max-width: 100px; padding: 1px 5px; border-radius: 4px; font-size: 12px; font-weight: 500; line-height: 1.3; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.55); overflow-wrap: anywhere; pointer-events: none; }
-.dicon.sel { background: rgba(0,0,0,0.25); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
-.dicon.sel .name { background: var(--sel); text-shadow: none; }
-.dicon.new { animation: land 0.6s var(--spring); }
-.dicon.gone { transition: transform 0.35s ease, opacity 0.35s; transform: scale(0.2); opacity: 0; }
-@keyframes land { from { transform: scale(0.3); opacity: 0; } }
-.doc { position: relative; width: 50px; height: 64px; border-radius: 2px 0 2px 2px; background: linear-gradient(#ffffff, #f0f0f3); clip-path: polygon(0 0, 70% 0, 100% 21%, 100% 100%, 0 100%); }
-.doc::after { content: ""; position: absolute; right: 0; top: 0; width: 30%; height: 21%; background: linear-gradient(225deg, transparent 50%, #cfcfd6 50%, #e4e4ea); border-bottom-left-radius: 2px; }
-.doc .ln { position: absolute; left: 9px; right: 9px; top: 22px; height: 22px; background: repeating-linear-gradient(#c8c8d0 0 1.5px, transparent 1.5px 5px); }
-.doc .hd { position: absolute; left: 9px; top: 11px; width: 18px; height: 6px; border-radius: 1px; background: var(--c); }
-.doc .gl { position: absolute; left: 50%; top: 17px; transform: translateX(-50%); width: 24px; height: 24px; color: var(--c); }
-.doc .gl svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.doc .ex { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font: 700 8.5px/1 var(--ui); letter-spacing: 0.04em; color: #8b8b95; }
-.vthumb { width: 66px; height: 42px; border-radius: 3px; background: linear-gradient(135deg, #2a1f55, #10122e); position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,0.25); }
-.vthumb::before { content: ""; position: absolute; left: 8px; top: 7px; width: 30px; height: 20px; border-radius: 2px; background: linear-gradient(#3b2f7a, #2a2160); box-shadow: 20px 8px 0 -3px #6a3cff; }
-.vthumb::after { content: "0:30"; position: absolute; right: 3px; bottom: 2px; font: 600 7px var(--ui); color: rgba(255,255,255,0.85); }
-.photo { width: 64px; height: 48px; border-radius: 2px; border: 2px solid #fff; background: var(--sunset); }
-.page { width: 50px; height: 64px; border-radius: 4px; background: linear-gradient(#fff, #e9e9ee); position: relative; overflow: hidden; }
-.page::before { content: ""; position: absolute; left: 9px; right: 9px; top: 14px; height: 30px; background: repeating-linear-gradient(#c9c9d3 0 2px, transparent 2px 7px); }
-.page::after { content: ""; position: absolute; right: 0; top: 0; border: 9px solid transparent; border-right-color: #d1d1da; border-top-color: #d1d1da; }
-.tile { width: 58px; height: 58px; border-radius: 13px; display: grid; place-items: center; color: #fff; background: var(--t); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
-.tile svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.rubber { position: absolute; z-index: 5; border: 1px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.14); border-radius: 2px; pointer-events: none; display: none; }
-
-.stickie { position: absolute; z-index: 3; width: 210px; padding: 26px 16px 16px; background: #fdf28b; color: #3b3300; border-radius: 3px; box-shadow: 0 14px 36px rgba(0,0,0,0.35); font: 500 14px/1.5 var(--ui); }
-.stickie::before { content: ""; position: absolute; inset: 0 0 auto; height: 14px; background: #f5e46b; border-radius: 3px 3px 0 0; }
-.stickie b { display: block; margin-bottom: 4px; font-size: 15px; }
-.stickie ol { margin: 0; padding-left: 18px; }
-.stickie kbd { font-size: 0.82em; }
-.stickie .touch { display: none; }
-@media (hover: none) { .stickie .mouse { display: none; } .stickie .touch { display: block; } }
-
-/* ── The ring (shaped like the app's) ── */
-.ring { position: fixed; z-index: 80; left: 0; top: 0; width: 300px; height: 300px; margin: -150px 0 0 -150px; pointer-events: none; opacity: 0; transform: scale(0.6); transition: opacity 0.16s, transform 0.32s var(--spring); --accent: var(--jpg); }
-.ring.open { opacity: 1; transform: none; pointer-events: auto; }
-.ring .disc { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 50% 38%, rgba(44,44,52,0.96), rgba(18,18,22,0.97)); border: 0.5px solid rgba(255,255,255,0.18);
-  box-shadow: 0 40px 90px rgba(0,0,0,0.55), 0 0 120px -20px var(--accent); transition: box-shadow 0.3s; }
-.ring .track { position: absolute; inset: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.07); pointer-events: none; }
-.opt { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px; border-radius: 50%; display: grid; place-items: center; font: 650 13px var(--ui); color: #d4d4dc;
-  background: #2a2a31; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); transform: translate(var(--x), var(--y)) scale(0.5); opacity: 0;
-  transition: transform 0.38s var(--spring) var(--d), opacity 0.2s var(--d), background 0.15s, color 0.15s, box-shadow 0.2s; }
-.ring.open .opt { transform: translate(var(--x), var(--y)); opacity: 1; }
-.ring.open .opt.sel { transform: translate(var(--x), var(--y)) scale(1.18); background: var(--c); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 0 34px var(--c); }
-.ring .hub { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px; border-radius: 50%; background: #19191d; box-shadow: 0 0 0 1px rgba(255,255,255,0.1); display: grid; place-items: center; }
-.ring .hub .thumb { width: 74px; height: 74px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; transition: opacity 0.2s; font: 700 13px var(--ui); }
-.ring .prog { position: absolute; inset: 0; transform: rotate(-90deg); }
-.ring .prog circle { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.9s var(--ease); }
-.ring .check { position: absolute; inset: 9px; border-radius: 50%; display: grid; place-items: center; background: var(--shrink); transform: scale(0); transition: transform 0.4s var(--spring); }
-.ring .check svg { width: 34px; height: 34px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.ring.done .check { transform: scale(1); }
-.ring .cap { position: absolute; left: 50%; top: calc(100% + 12px); transform: translateX(-50%); white-space: nowrap; padding: 6px 13px; border-radius: 999px; font: 500 12px var(--ui);
-  background: rgba(24,24,30,0.9); border: 0.5px solid var(--line-2); color: var(--muted); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-.ring .cap b { color: #fff; font-weight: 600; }
-.sparks span { position: fixed; z-index: 85; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; animation: spark 0.9s var(--ease) forwards; }
-@keyframes spark { to { transform: translate(var(--bx), var(--by)) scale(0.2); opacity: 0; } }
-
-/* ── Notification banner ── */
-.notif { position: fixed; top: 40px; right: 12px; z-index: 95; width: 350px; display: grid; grid-template-columns: 38px 1fr auto; gap: 11px; align-items: center; padding: 12px 14px; border-radius: 16px;
-  background: rgba(44, 44, 52, 0.7); border: 0.5px solid rgba(255,255,255,0.18); backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.35); transform: translateX(120%); transition: transform 0.55s var(--spring); }
-.notif.show { transform: none; }
-.notif svg { width: 38px; height: 38px; }
-.notif b { display: block; font-size: 13px; } .notif span { display: block; font-size: 13px; color: rgba(245,245,247,0.85); line-height: 1.35; }
-.notif small { position: absolute; top: 10px; right: 14px; font-size: 11.5px; color: var(--dim); }
-.notif a { align-self: end; padding: 5px 11px; border-radius: 7px; background: rgba(255,255,255,0.14); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
-
-/* ── Spotlight ── */
-.spot { position: fixed; inset: 0; z-index: 99; display: none; }
-.spot.show { display: block; }
-.spot .box { position: absolute; left: 50%; top: 22%; width: min(640px, calc(100% - 32px)); transform: translateX(-50%); border-radius: 14px; overflow: hidden;
-  background: rgba(40, 40, 48, 0.75); border: 0.5px solid rgba(255,255,255,0.2); backdrop-filter: blur(50px) saturate(1.8); -webkit-backdrop-filter: blur(50px) saturate(1.8); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
-.spot .field { display: flex; align-items: center; gap: 12px; padding: 0 18px; height: 56px; }
-.spot .field svg { width: 22px; height: 22px; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; }
-.spot input { flex: 1; background: none; border: 0; outline: none; color: #fff; font: 400 22px var(--ui); }
-.spot ul { list-style: none; margin: 0; padding: 6px; border-top: 0.5px solid var(--line-2); max-height: 50vh; overflow: auto; }
-.spot ul:empty { display: none; }
-.spot li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 8px; font-size: 14px; cursor: default; }
-.spot li i { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; background: var(--c); font-style: normal; font-size: 13px; flex: none; }
-.spot li small { margin-left: auto; color: var(--dim); font-size: 12px; }
-.spot li.on { background: var(--sel); } .spot li.on small { color: rgba(255,255,255,0.75); }
-
-/* ── App windows scattered on the desktop ── */
-.apps { position: relative; padding: 10px 0 40px; }
-.win { position: relative; width: var(--w, min(940px, calc(100% - 48px))); margin: var(--mt, 40px) var(--mr, auto) 0 var(--ml, auto); border-radius: 12px; overflow: hidden;
-  background: #1f1f24; border: 0.5px solid rgba(255,255,255,0.16); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.65), 0 0 0 0.5px rgba(0,0,0,0.8);
-  transform-origin: 50% 100%; z-index: 1; }
-.win.active { z-index: 4; box-shadow: 0 50px 120px -20px rgba(0,0,0,0.75), 0 0 0 0.5px rgba(0,0,0,0.8); }
-.win .tb { position: relative; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 13px; background: linear-gradient(#34343a, #2c2c32); border-bottom: 0.5px solid rgba(0,0,0,0.6); user-select: none; -webkit-user-select: none; }
-.win .tb .tl { display: flex; gap: 8px; }
-.win .tb .tl button { width: 12px; height: 12px; border-radius: 50%; background: #5a5a60; display: grid; place-items: center; font: 700 9px/1 var(--ui); color: transparent; }
-.win.active .tb .tl button:nth-child(1) { background: #ff5f57; } .win.active .tb .tl button:nth-child(2) { background: #febc2e; } .win.active .tb .tl button:nth-child(3) { background: #28c840; }
-.win .tb .tl:hover button { color: rgba(0,0,0,0.55); }
-.win .tb .t { position: absolute; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.55); white-space: nowrap; display: flex; align-items: center; gap: 6px; }
-.win.active .tb .t { color: rgba(255,255,255,0.88); }
-.win .tb .t svg { width: 15px; height: 15px; }
-.win .wb { transition: opacity 0.25s; }
-.win.shade .wb { display: none; }
-.win.zoomed { --w: calc(100% - 24px) !important; }
-.win .head { padding: 34px 36px 6px; }
-.win .head .k { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.win .head h2 { margin: 6px 0 8px; font: 700 clamp(32px, 4vw, 50px)/1.02 var(--ui); letter-spacing: -0.04em; }
-.win .head p { margin: 0; color: var(--muted); font-size: 16px; max-width: 60ch; }
-.pop { opacity: 0; transform: scale(0.86) translateY(40px); transition: opacity 0.5s var(--ease), transform 0.7s var(--spring); }
-.pop.in { opacity: 1; transform: none; }
-
-.cols { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 22px; border-top: 0.5px solid var(--line); }
-.col { padding: 26px 28px 30px; border-right: 0.5px solid var(--line); display: grid; gap: 10px; align-content: start; }
-.col:last-child { border-right: 0; }
-.col .n { font: 500 12px var(--mono); color: var(--dim); }
-.col h3 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
-.col p { margin: 0; color: var(--muted); font-size: 14.5px; }
-.col .vis { height: 120px; display: grid; place-items: center; }
-.mini-sel { display: grid; justify-items: center; gap: 6px; } .mini-sel .name { padding: 1px 7px; border-radius: 4px; background: var(--sel); font-size: 12px; }
-.mini-ring { position: relative; width: 116px; height: 116px; border-radius: 50%; background: #2a2a30; border: 0.5px solid var(--line-2); }
-.mini-ring i { position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px; border-radius: 50%; background: #3a3a42; transition: background 0.2s, box-shadow 0.2s; }
-.mini-ring i.on { background: var(--jpg); box-shadow: 0 0 18px var(--jpg); }
-.mini-ring b { position: absolute; inset: 39px; border-radius: 50%; background: var(--sunset); }
-
-.info { display: grid; grid-template-columns: 290px 1fr; min-height: 420px; margin-top: 20px; border-top: 0.5px solid var(--line); }
-.kinds { border-right: 0.5px solid var(--line); padding: 10px; display: grid; gap: 2px; align-content: start; background: rgba(0,0,0,0.12); }
-.kind { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 7px; text-align: left; }
-.kind.on { background: rgba(10,132,255,0.85); }
-.kind .ic { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; background: var(--c); font: 700 10.5px var(--ui); }
-.kind b { display: block; font-size: 14px; font-weight: 600; } .kind small { color: var(--muted); font-size: 12px; } .kind.on small { color: rgba(255,255,255,0.8); }
-.kind .cnt { font: 500 11.5px var(--mono); color: var(--dim); }
-.stagecol { display: grid; place-items: center; padding: 30px; }
-.stagecol .ring { position: relative; margin: 0 auto; left: auto; top: auto; z-index: 1; opacity: 1; transform: none; pointer-events: none; }
-.stagecol .label { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); } .stagecol .label b { color: var(--fg); }
-
-.meters { padding: 10px 36px 26px; }
-.meter { display: grid; grid-template-columns: 200px 1fr 150px; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 0.5px solid var(--line); }
-.meter:last-child { border: 0; }
-.meter b { display: block; font-weight: 600; } .meter small { color: var(--muted); font-size: 13px; }
-.meter .bars { display: grid; gap: 6px; }
-.meter .bars i { display: block; height: 9px; border-radius: 99px; background: rgba(255,255,255,0.13); transform-origin: left; }
-.meter .bars i + i { background: linear-gradient(90deg, var(--shrink), #7ef0cd); box-shadow: 0 0 14px rgba(47,199,156,0.5); transition: transform 1.4s var(--ease) 0.2s; }
-.meter .num { text-align: right; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.meter .num em { display: block; font-style: normal; font-size: 26px; font-weight: 700; color: #7ef0cd; letter-spacing: -0.02em; }
-
-.stickies { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; padding: 26px 30px 44px; }
-.stickies .stickie { position: relative; width: 250px; min-height: 210px; font-size: 15px; }
-.stickies .stickie:nth-child(1) { transform: rotate(-2.5deg); }
-.stickies .stickie:nth-child(2) { transform: rotate(1.8deg) translateY(12px); background: #ffc7e1; color: #4a0f2a; } .stickies .stickie:nth-child(2)::before { background: #ffb3d4; }
-.stickies .stickie:nth-child(3) { transform: rotate(-1deg); background: #c7e3ff; color: #0c2a4d; } .stickies .stickie:nth-child(3)::before { background: #b0d6ff; }
-.stickies .stickie b { font-size: 19px; letter-spacing: -0.02em; margin-bottom: 8px; }
-.stickies .doodle { display: flex; gap: 6px; align-items: center; min-height: 40px; margin-bottom: 10px; }
-
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 14px; padding: 22px 30px 30px; }
-.tool { display: grid; justify-items: center; align-content: start; text-align: center; gap: 7px; padding: 14px 8px; border-radius: 10px; }
-.tool:hover { background: rgba(255,255,255,0.05); }
-.tool .tile { width: 64px; height: 64px; border-radius: 15px; }
-.tool b { font-size: 14px; font-weight: 600; } .tool small { color: var(--muted); font-size: 12.5px; line-height: 1.45; max-width: 22ch; }
-
-.player { position: relative; background: #000; margin-top: 18px; }
-.player video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.sound { position: absolute; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(20,20,26,0.6);
-  border: 0.5px solid rgba(255,255,255,0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-weight: 600; font-size: 13px; cursor: pointer; }
-.sound svg { width: 17px; height: 17px; }
-.sound .on { display: none; } .sound[aria-pressed="true"] .on { display: block; } .sound[aria-pressed="true"] .off { display: none; }
-
-.notesapp { display: grid; grid-template-columns: 220px 1fr; min-height: 380px; margin-top: 18px; border-top: 0.5px solid var(--line); }
-.notesapp aside { border-right: 0.5px solid var(--line); padding: 14px 10px; background: rgba(0,0,0,0.14); }
-.notesapp aside b { display: block; padding: 0 8px; font-size: 12px; color: var(--dim); margin-bottom: 8px; }
-.notesapp aside div { padding: 9px 11px; border-radius: 7px; background: #b8860b; font-size: 13.5px; font-weight: 600; } .notesapp aside div small { display: block; font-weight: 400; color: rgba(255,255,255,0.75); font-size: 12px; }
-.faq { padding: 8px 30px 22px; }
-.faq details { border-bottom: 0.5px solid var(--line); }
-.faq summary { list-style: none; cursor: default; padding: 15px 0; font-size: 15.5px; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "›"; color: var(--dim); font-size: 20px; line-height: 1; transition: transform 0.2s; }
-.faq details[open] summary::after { transform: rotate(90deg); }
-.faq details p { margin: 0 0 16px; color: var(--muted); max-width: 64ch; }
-
-.dmgbody { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; gap: 20px; padding: 40px 30px 30px; }
-.dmg-app, .dmg-apps { display: grid; justify-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
-.dmg-app { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; z-index: 2; }
-.dmg-app svg { width: 104px; height: 104px; filter: drop-shadow(0 14px 24px rgba(158,97,255,0.45)); pointer-events: none; }
-.dmg-apps .folder { width: 110px; height: 86px; border-radius: 10px; background: linear-gradient(#69b2ff, #2f7ff0); position: relative; box-shadow: 0 12px 26px rgba(0,0,0,0.35); transition: transform 0.2s var(--spring), box-shadow 0.2s; }
-.dmg-apps .folder::before { content: ""; position: absolute; left: 8px; top: -9px; width: 42px; height: 15px; border-radius: 6px 6px 0 0; background: #5aa8ff; }
-.dmg-apps .folder::after { content: "A"; position: absolute; inset: 0; display: grid; place-items: center; font: 800 32px var(--ui); color: rgba(255,255,255,0.55); }
-.dmg-apps.hot .folder { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 12px 36px rgba(56,133,255,0.8); }
-.dmg-arrow { font-size: 38px; color: var(--dim); animation: nudge 1.6s ease-in-out infinite; }
-@keyframes nudge { 50% { transform: translateX(10px); } }
-.dmghint { text-align: center; color: var(--muted); font-size: 13.5px; padding: 0 30px 18px; }
-.dmgfoot { display: flex; justify-content: center; gap: 12px; align-items: center; flex-wrap: wrap; padding: 0 30px 30px; }
-
-footer { width: min(940px, calc(100% - 48px)); margin: 30px auto 0; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 16px 0 110px; color: rgba(255,255,255,0.65); font-size: 12.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-footer a:hover { color: #fff; }
-footer .maker { display: inline-flex; align-items: center; gap: 7px; } footer .maker svg { width: 12px; height: 12px; }
-
-/* ── Dock ── */
-.dock { position: fixed; left: 50%; bottom: 8px; z-index: 88; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 4px; padding: 6px 8px 7px; border-radius: 20px;
-  background: rgba(70, 60, 110, 0.28); border: 0.5px solid rgba(255,255,255,0.22); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-.dock a { position: relative; width: 54px; height: 54px; display: grid; place-items: center; transform-origin: 50% 100%; transition: transform 0.1s; }
-.dock .di { width: 100%; height: 100%; border-radius: 23%; display: grid; place-items: center; color: #fff; background: var(--t, #333); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(0,0,0,0.3); }
-.dock .di svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.dock .tip { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 6px; white-space: nowrap; font-size: 12.5px;
-  background: rgba(40,40,48,0.85); border: 0.5px solid var(--line-2); opacity: 0; pointer-events: none; transition: opacity 0.1s; }
-.dock a:hover .tip { opacity: 1; }
-.dock a.run::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(255,255,255,0.85); }
-.dock .ico { width: 100%; height: 100%; display: block; }
-.dock .ico svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3)) drop-shadow(0 1px 1px rgba(0,0,0,0.25)); }
-.dock .sep { width: 1px; align-self: stretch; margin: 6px 4px; background: rgba(255,255,255,0.25); }
-.dock a.bounce { animation: bounce 0.8s var(--ease) 2; }
-@keyframes bounce { 35% { translate: 0 -18px; } 70% { translate: 0 0; } }
-.dock .trash.hot .ico svg { filter: drop-shadow(0 0 10px rgba(255,95,87,0.9)); }
-
-/* ── First-launch guide ── */
-.guide { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.guide.show { opacity: 1; pointer-events: auto; }
-.guide-card { width: min(540px, 100%); max-height: calc(100svh - 32px); overflow: auto; border-radius: 14px; padding: 26px; background: rgba(40,40,48,0.92); border: 0.5px solid var(--line-2);
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6); display: grid; gap: 18px; transform: translateY(-20px) scale(0.97); transition: transform 0.4s var(--spring); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); }
-.guide.show .guide-card { transform: none; }
-.guide-card > div:first-child { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; }
-.guide-card > div:first-child svg { width: 56px; height: 56px; }
-.guide h3 { margin: 0; font-size: 17px; } .guide .sub { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
-.gsteps { display: grid; gap: 10px; counter-reset: s; }
-.gstep { display: grid; gap: 10px; padding: 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); counter-increment: s; }
-.gstep b { font-weight: 500; font-size: 14px; display: flex; gap: 10px; }
-.gstep b::before { content: counter(s); flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: #fff; color: #000; }
-.vis2 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.25); font-size: 12.5px; color: var(--muted); }
-.vis2 svg { width: 28px; height: 28px; } .vis2 .folder { width: 32px; height: 25px; border-radius: 5px; background: linear-gradient(#5aa8ff, #2f7ff0); } .vis2 .hot { padding: 3px 10px; border-radius: 6px; background: var(--sel); color: #fff; }
-.guide-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
-.guide-foot button { padding: 6px 18px; border-radius: 7px; background: var(--sel); color: #fff; font-weight: 600; cursor: pointer; }
-
-@media (max-width: 1100px) { .menubar .opt-hide { display: none; } }
-@media (max-width: 900px) {
-  .desktop { padding: 46px 0 40px; min-height: 0; }
-  .widgets { margin: 0 16px; width: auto; }
-  .icons { position: relative; inset: auto; height: 260px; margin: 22px 16px 0; }
-  .desktop .stickie { display: none; }
-  .info, .notesapp { grid-template-columns: 1fr; }
-  .kinds { border-right: 0; border-bottom: 0.5px solid var(--line); grid-template-columns: repeat(2, 1fr); }
-  .grid { grid-template-columns: repeat(2, 1fr); }
-  .meter { grid-template-columns: 1fr 120px; } .meter .bars { grid-column: 1 / -1; grid-row: 2; }
-  .win { --w: calc(100% - 24px) !important; --ml: auto !important; --mr: auto !important; --mt: 26px !important; }
+/* ── Stage: aurora + grain + cursor light ─────────────────────── */
+.stage { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.aurora { position: absolute; inset: -20%; filter: blur(100px) saturate(1.3); opacity: 0.7; }
+.aurora i { position: absolute; width: 46vmax; height: 46vmax; border-radius: 50%; mix-blend-mode: screen; animation: drift 26s ease-in-out infinite alternate; }
+.aurora i:nth-child(1) { background: var(--heic); left: 4%; top: -14%; opacity: 0.7; }
+.aurora i:nth-child(2) { background: var(--png); right: 0%; top: -4%; opacity: 0.6; animation-duration: 31s; animation-delay: -8s; }
+.aurora i:nth-child(3) { background: var(--jpg); left: 30%; top: 40%; opacity: 0.3; animation-duration: 37s; animation-delay: -15s; }
+.aurora i:nth-child(4) { background: var(--shrink); right: 26%; bottom: -20%; opacity: 0.2; animation-duration: 29s; animation-delay: -4s; }
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6vw, 5vh) scale(1.12); }
+  100% { transform: translate(-5vw, 9vh) scale(0.94); }
 }
+.stage .fade { position: absolute; inset: 0; background: radial-gradient(130% 90% at 50% 10%, transparent 35%, rgba(5,5,7,.85) 85%); }
+.grain { position: fixed; inset: -50%; z-index: 100; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite; }
+@keyframes grain { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -4%); } 60% { transform: translate(-4%, -1%); } 80% { transform: translate(3%, 3%); } }
+.cursor-light { position: fixed; width: 560px; height: 560px; left: 0; top: 0; z-index: 0; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.055), transparent 62%); }
+@media (hover: none) { .cursor-light { display: none; } }
+
+/* ── Nav ──────────────────────────────────────────────────────── */
+.nav { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 50; width: min(720px, 100% - 24px);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 7px 7px 14px; border-radius: 999px;
+  background: rgba(14, 14, 18, 0.62); border: 1px solid var(--line); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  animation: navIn 0.9s var(--ease) 0.2s both; }
+@keyframes navIn { from { opacity: 0; transform: translate(-50%, -16px); } }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -0.01em; }
+.brand svg { width: 24px; height: 24px; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a:not(.btn) { padding: 7px 12px; border-radius: 999px; color: var(--muted); font-size: 14px; transition: color 0.2s, background 0.2s; }
+.nav-links a:not(.btn):hover { color: var(--fg); background: var(--glass); }
+@media (max-width: 620px) { .nav-links a:not(.btn) { display: none; } }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn { position: relative; display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 24px; border-radius: 999px;
+  font-weight: 560; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; isolation: isolate; transition: transform 0.25s var(--spring); }
+.btn svg { width: 17px; height: 17px; }
+.btn:active { transform: scale(0.97); }
+.btn.small { height: 36px; padding: 0 16px; font-size: 14px; gap: 7px; }
+.btn.small svg { width: 14px; height: 14px; }
+.btn.primary { color: #08080a; background: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 10px 40px -8px rgba(160, 140, 255, 0.55); }
+.btn.primary:hover { transform: translateY(-1px); }
+/* Glowing conic rim that rotates behind the big button */
+@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes spin { to { --a: 360deg; } }
+.btn.glow { background: transparent; box-shadow: 0 14px 60px -10px rgba(158, 97, 255, 0.7); }
+.btn.glow::before { content: ""; position: absolute; inset: -2px; z-index: -2; border-radius: inherit;
+  background: conic-gradient(from var(--a), var(--jpg), var(--heic), var(--png), var(--shrink), var(--gif), var(--jpg)); animation: spin 4s linear infinite; }
+.btn.glow::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: #fff; }
+
+kbd { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 0.3em; border-radius: 0.3em; font: 500 0.82em var(--sans);
+  color: var(--fg); background: linear-gradient(#24242b, #17171c); border: 1px solid rgba(255, 255, 255, 0.12); border-bottom-width: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); transition: transform 0.08s, border-bottom-width 0.08s, background 0.15s, box-shadow 0.15s; }
+kbd.down { transform: translateY(2px); border-bottom-width: 1px; background: linear-gradient(#3b82ff, #2563eb); box-shadow: 0 0 24px rgba(59, 130, 255, 0.7); }
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero { position: relative; overflow-x: clip; min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 120px 0 60px; }
+.hero-inner { display: grid; justify-items: center; gap: 26px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px; font-size: 13px; color: var(--muted);
+  background: var(--glass); border: 1px solid var(--line); animation: fadeUp 1s var(--ease) both; }
+.pill b { color: #08080a; background: linear-gradient(90deg, #c4b5ff, #9ad0ff); padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 11px; letter-spacing: 0.02em; }
+h1 { margin: 0; font-weight: 600; font-size: clamp(48px, 9.4vw, 128px); line-height: 0.92; letter-spacing: -0.055em; }
+h1 .row { display: block; overflow: hidden; padding: 0.04em 0.06em 0.1em; }
+h1 .row > span { display: inline-block; animation: rise 1.1s var(--ease) both; }
+h1 .row:nth-child(2) > span { animation-delay: 0.12s; }
+h1 kbd { font-size: 0.62em; vertical-align: 0.12em; margin: 0 0.04em; border-radius: 0.22em; }
+.serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
+.shine { background: linear-gradient(100deg, #fff 0%, #fff 35%, #d8ccff 45%, #a5d0ff 52%, #fff 62%, #fff 100%); background-size: 260% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: rise 1.1s var(--ease) 0.12s both, shine 6s var(--ease) 1.4s infinite; }
+@keyframes shine { 0% { background-position: 100% 0; } 45%, 100% { background-position: 0 0; } }
+@keyframes rise { from { transform: translateY(105%); opacity: 0; } }
+.lede { margin: 0; max-width: 560px; color: var(--muted); font-size: clamp(16px, 1.6vw, 19px); animation: fadeUp 1s var(--ease) 0.35s both; }
+.lede b { color: var(--fg); font-weight: 500; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } }
+.cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; animation: fadeUp 1s var(--ease) 0.5s both; }
+.req { color: var(--dim); font-size: 13px; }
+
+/* The big ring */
+.hero-ring { position: relative; margin-top: 22px; perspective: 1100px; animation: ringIn 1.4s var(--spring) 0.6s both; }
+@keyframes ringIn { from { opacity: 0; transform: scale(0.6) translateY(40px); filter: blur(12px); } }
+.tilt { transform-style: preserve-3d; transform: rotateX(var(--rx, 12deg)) rotateY(var(--ry, 0deg)); transition: transform 0.6s var(--ease); }
+.hero-ring .halo { position: absolute; inset: -25%; border-radius: 50%; background: radial-gradient(circle, var(--accent, var(--jpg)) 0%, transparent 60%);
+  opacity: 0.3; filter: blur(40px); transition: background 0.6s; pointer-events: none; }
+.hero-ring .floor { position: absolute; left: 50%; bottom: -60px; width: 110%; height: 80px; transform: translateX(-50%); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.8), transparent); filter: blur(8px); z-index: -1; }
+
+/* Ring primitive, shared by the hero, the scroll story, the wheel and the overlay */
+.disc { --R: 150px; --btn: 78px; --hub: 112px; position: relative; width: calc(2 * var(--R) + var(--btn) + 34px); aspect-ratio: 1; }
+.disc-bg { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #1f1f25, #0c0c0f 72%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 40px 120px -20px rgba(0, 0, 0, 0.9); }
+.disc-bg::after { content: ""; position: absolute; inset: 0; border-radius: 50%; padding: 1.5px;
+  background: conic-gradient(from var(--a), transparent 0 62%, var(--accent, #fff) 85%, transparent 100%); opacity: 0.8;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: spin 6s linear infinite; }
+.opt { position: absolute; left: 50%; top: 50%; width: var(--btn); height: var(--btn); margin: calc(var(--btn) / -2) 0 0 calc(var(--btn) / -2); border-radius: 50%;
+  display: grid; place-items: center; font: 600 calc(var(--btn) * 0.2) var(--sans); letter-spacing: -0.01em; color: #c9c9d2;
+  background: #222228; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transform: translate(0, 0) scale(0.3); opacity: 0;
+  transition: transform 0.55s var(--spring) var(--d, 0s), opacity 0.3s var(--d, 0s), background 0.2s, color 0.2s, box-shadow 0.25s; }
+.open .opt { transform: translate(var(--x), var(--y)) scale(1); opacity: 1; }
+.opt.sel { color: #fff; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 28%, transparent), 0 0 40px color-mix(in srgb, var(--c) 70%, transparent); }
+.open .opt.sel { transform: translate(var(--x), var(--y)) scale(1.1); transition-delay: 0s; }
+.hub { position: absolute; left: 50%; top: 50%; width: var(--hub); height: var(--hub); transform: translate(-50%, -50%); border-radius: 50%;
+  display: grid; place-items: center; background: #0a0a0d; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.hub .thumb { width: 64%; height: 64%; border-radius: 22%; overflow: hidden; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6); }
+.sunset { width: 100%; height: 100%; background: radial-gradient(circle at 50% 70%, #ffe07a 0 14%, transparent 15%), linear-gradient(#ff7a59, #ff4f8b 55%, #6a3cff); position: relative; }
+.sunset::after { content: ""; position: absolute; inset: 62% 0 0; background: linear-gradient(#1b1340, #0b0920); }
+.hub svg.prog { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); transform: rotate(-90deg); fill: none; stroke: var(--accent, #fff); stroke-width: 3; stroke-linecap: round; }
+.hub .check { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; background: var(--accent, var(--shrink)); opacity: 0; transform: scale(0.5); transition: 0.45s var(--spring); }
+.hub .check svg { width: 42%; height: 42%; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.done .hub .check { opacity: 1; transform: scale(1); }
+
+.ring-caption { --accent: var(--jpg); margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 999px; font: 500 13px var(--mono);
+  color: var(--muted); background: rgba(10, 10, 14, 0.7); border: 1px solid var(--line); backdrop-filter: blur(10px); max-width: 100%; }
+.ring-caption .to { color: var(--accent); transition: color 0.3s; white-space: nowrap; }
+.ring-caption .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.try { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; align-items: center; color: var(--dim); font-size: 14px; }
+.try kbd { font-size: 13px; }
+.try button { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--dim); }
 @media (max-width: 640px) {
-  .mb:not(.logo):not(.app):not(.keep), .mb.clock { display: none; }
-  .widget h1 { font-size: 46px; }
-  .cols { grid-template-columns: 1fr; } .col { border-right: 0; border-bottom: 0.5px solid var(--line); }
-  .notesapp aside { display: none; } .kinds { grid-template-columns: 1fr; }
-  .stagecol .ring { transform: scale(0.85); }
-  .dock a { width: 40px; height: 40px; } .dock .opt-hide { display: none; }
-  .win .head { padding: 26px 20px 4px; } .meters { padding: 6px 20px 20px; } .faq { padding: 6px 20px 18px; } .grid { padding: 16px; }
-  .dmgbody { grid-template-columns: 1fr; } .dmg-arrow { rotate: 90deg; animation: none; }
-  .notif { left: 12px; right: 12px; width: auto; }
+  .hero-ring .disc { --R: 104px; --btn: 58px; --hub: 80px; }
+  .try .k { display: none; }
 }
-/* ── Intro: a MacBook opens and the camera flies into its screen (first visit per session) ── */
-.intro { position: fixed; inset: 0; z-index: 200; background: radial-gradient(80% 60% at 50% 70%, #101016, #000 70%); display: grid; place-items: center; overflow: hidden;
-  perspective: 1900px; perspective-origin: 50% 30%; cursor: pointer; transition: opacity 0.5s ease; }
-.intro.gone { opacity: 0; pointer-events: none; }
-.intro .laptop { position: relative; width: min(720px, 84vw); transform-style: preserve-3d; transform: translateY(4vh) scale(0.92); transition: transform 1.05s cubic-bezier(0.7, 0, 0.2, 1); }
-/* The lid hinges on its bottom edge. Closed, it lies face-down on the keyboard (deck is at 80°, so the lid is at −100°). */
-.intro .lid { position: relative; width: 100%; aspect-ratio: 16 / 10.4; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateX(-97deg); transition: transform 1.5s cubic-bezier(0.35, 0.8, 0.25, 1); }
-.intro .front, .intro .back { position: absolute; inset: 0; border-radius: 20px 20px 6px 6px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.intro .front { padding: 2.2%; background: linear-gradient(#26262c, #101013); box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset; }
-.intro .back { transform: rotateX(180deg); background: linear-gradient(160deg, #4a4a52, #2a2a30 45%, #1c1c21); box-shadow: 0 0 0 1px rgba(255,255,255,0.12) inset; display: grid; place-items: center; }
-.intro .back svg { width: 13%; height: auto; aspect-ratio: 1; opacity: 0.85; filter: drop-shadow(0 0 18px rgba(158,97,255,0.6)); }
-.intro .screen { position: relative; width: 100%; height: 100%; border-radius: 12px 12px 3px 3px; overflow: hidden; background: #000; }
-.intro .screen .wall { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; background: #2b2440 url(wallpaper-small.jpg) center 40% / cover; }
-.intro .screen .mark { position: absolute; left: 50%; top: 50%; width: 15%; aspect-ratio: 1; transform: translate(-50%, -50%) scale(0.6); opacity: 0; transition: transform 0.7s var(--spring), opacity 0.4s;
-  filter: drop-shadow(0 0 30px rgba(158,97,255,0.9)); }
-.intro .screen .mark svg { width: 100%; height: 100%; }
-.intro .screen .notch { position: absolute; left: 50%; top: 0; width: 13%; height: 3.4%; transform: translateX(-50%); background: #000; border-radius: 0 0 8px 8px; z-index: 2; }
-/* The keyboard deck: hangs from the hinge and tilts towards you, so it reads as the laptop's body seen from above. */
-.intro .deck { position: relative; width: 100%; aspect-ratio: 16 / 10.4; transform-origin: 50% 0; transform: rotateX(80deg); border-radius: 4px 4px 22px 22px;
-  background: linear-gradient(#3a3a41, #24242a 70%, #1a1a1f); box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 60px 80px rgba(0,0,0,0.7); transition: opacity 0.4s; }
-.intro .deck .keys { position: absolute; left: 7%; right: 7%; top: 7%; height: 46%; border-radius: 6px; background-color: #0d0d10;
-  background-image: linear-gradient(90deg, transparent 0 88%, #2a2a31 88% 100%), linear-gradient(transparent 0 82%, #2a2a31 82% 100%); background-size: 6.25% 16.6%; opacity: 0.9; }
-.intro .deck .pad { position: absolute; left: 33%; right: 33%; top: 60%; height: 32%; border-radius: 8px; background: linear-gradient(#2e2e35, #26262c); box-shadow: 0 0 0 1px rgba(255,255,255,0.07) inset; }
-.intro .glow { position: absolute; left: 50%; top: 45%; width: 70vmax; height: 70vmax; transform: translate(-50%, -50%); border-radius: 50%; opacity: 0; transition: opacity 0.9s;
-  background: radial-gradient(circle, rgba(158,97,255,0.24), transparent 60%); pointer-events: none; }
-.intro .skip { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font: 500 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
-.intro.open .lid { transform: rotateX(0deg); }
-.intro.wake .wall { opacity: 1; }
-.intro.wake .mark { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.intro.wake .glow { opacity: 1; }
-.intro.fly .laptop { transform: translateY(var(--fy, 0)) scale(var(--zoom, 2.6)); }
-.intro.fly .deck, .intro.fly .skip { opacity: 0; }
-.intro.fly .mark { opacity: 0; transform: translate(-50%, -50%) scale(1.5); transition: transform 0.8s ease, opacity 0.5s ease; }
-html.intro-on, html.intro-on body { overflow: hidden; }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .pop { opacity: 1; transform: none; } .intro { display: none; } }
+/* ── Marquee ─────────────────────────────────────────────────── */
+.marquee { position: relative; padding: 26px 0; border-block: 1px solid var(--line); overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.marquee-track { display: flex; gap: 46px; width: max-content; animation: marquee 40s linear infinite; }
+.tick { display: inline-flex; align-items: center; gap: 12px; font: 500 15px var(--mono); color: var(--muted); white-space: nowrap; }
+.tick i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); }
+.tick b { color: var(--fg); font-weight: 500; }
+@keyframes marquee { to { transform: translateX(calc(-50% - 23px)); } }
+
+/* ── Section scaffolding ─────────────────────────────────────── */
+section { position: relative; }
+.head { display: grid; justify-items: center; text-align: center; gap: 16px; margin-bottom: 64px; }
+.kicker { font: 500 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: inline-flex; align-items: center; gap: 10px; }
+.kicker::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--k, var(--heic)); box-shadow: 0 0 12px var(--k, var(--heic)); }
+h2 { margin: 0; font-weight: 600; font-size: clamp(38px, 6vw, 76px); line-height: 0.98; letter-spacing: -0.045em; max-width: 14ch; }
+.head p { margin: 0; max-width: 540px; color: var(--muted); font-size: 17px; }
+.head code { font: 500 0.9em var(--mono); color: var(--fg); }
+.reveal { opacity: 0; transform: translateY(28px); filter: blur(6px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease), filter 0.9s var(--ease); }
+.reveal.in { opacity: 1; transform: none; filter: none; }
+.pad { padding: 150px 0; }
+@media (max-width: 640px) { .pad { padding: 100px 0; } .head { margin-bottom: 44px; } }
+
+/* ── Scroll story: Select → Tap → Done ───────────────────────── */
+.story { height: 360vh; }
+.story-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: 1fr 1.25fr; align-items: center; gap: 40px; }
+.steps { display: grid; gap: 34px; }
+.step { display: grid; gap: 6px; opacity: 0.2; transform: translateX(-8px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+.step.on { opacity: 1; transform: none; }
+.step .n { font: 500 13px var(--mono); color: var(--muted); }
+.step h3 { margin: 0; font-weight: 600; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: -0.045em; }
+.step p { margin: 0; color: var(--muted); max-width: 34ch; }
+.step h3 kbd { font-size: 0.6em; vertical-align: 0.14em; }
+.scene { position: relative; height: min(560px, 70svh); border-radius: 28px; overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)); border: 1px solid var(--line); }
+.scene::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px); background-size: 22px 22px;
+  -webkit-mask: radial-gradient(circle at 50% 50%, #000, transparent 75%); mask: radial-gradient(circle at 50% 50%, #000, transparent 75%); }
+.scene .bar { position: absolute; top: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; gap: 7px; padding: 0 16px; border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, 0.02); }
+.scene .bar i { width: 11px; height: 11px; border-radius: 50%; background: #2a2a31; }
+.scene .bar span { margin-left: 10px; font: 500 12px var(--mono); color: var(--dim); }
+.file { position: absolute; width: 132px; display: grid; justify-items: center; gap: 10px; text-align: center; transform: translate(-50%, -50%); }
+.file .icon { position: relative; width: 104px; height: 104px; border-radius: 18px; overflow: hidden; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55); outline: 3px solid transparent; outline-offset: 5px; transition: outline-color 0.3s; }
+.file .name { font: 500 13px var(--sans); padding: 2px 8px; border-radius: 6px; transition: background 0.3s; white-space: nowrap; }
+.file .size { font: 500 12px var(--mono); color: var(--muted); margin-top: -6px; }
+.file.selected .icon { outline-color: rgba(59, 130, 255, 0.85); }
+.file.selected .name { background: var(--sel); }
+.file .badge { position: absolute; right: 6px; bottom: 6px; padding: 2px 6px; border-radius: 5px; font: 700 10px var(--sans); color: #fff; background: var(--b); }
+#src { left: 17%; top: 52%; }
+#out { left: 83%; top: 52%; opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+#out .icon { box-shadow: 0 0 0 1px rgba(255, 143, 46, 0.4), 0 20px 60px -10px rgba(255, 143, 46, 0.6); }
+.scene .disc { --R: 92px; --btn: 52px; --hub: 72px; position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%) scale(var(--s, 0.6)); opacity: var(--o, 0); }
+.scene .keys { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; gap: 8px; font-size: 22px; transition: opacity 0.3s; }
+.scene .saved { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); font: 500 13px var(--mono); color: var(--shrink); opacity: 0; white-space: nowrap; }
+.sparks span { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; animation: spark 0.9s var(--ease) forwards; }
+@keyframes spark { from { transform: translate(-50%, -50%); opacity: 1; } to { transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(0.3); opacity: 0; } }
+@media (max-width: 860px) {
+  .story { height: 330vh; }
+  .story-pin { grid-template-columns: 1fr; align-content: center; gap: 22px; }
+  .steps { gap: 0; position: relative; min-height: 150px; }
+  .step { position: absolute; inset: 0 0 auto; transform: translateY(10px); opacity: 0; }
+  .step.on { transform: none; }
+  .scene { height: 52svh; }
+  .file { width: 100px; }
+  .file .icon { width: 64px; height: 64px; border-radius: 14px; }
+  .file .name { font-size: 11px; }
+  #src { left: 27%; top: 24%; } #out { left: 73%; top: 24%; }
+  .scene .disc { --R: 70px; --btn: 42px; --hub: 56px; top: 63%; }
+  .scene .keys, .scene .saved { bottom: 16px; }
+}
+
+/* ── Formats: the ring only shows what makes sense ───────────── */
+.wheel { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+.tabs { display: grid; gap: 8px; }
+.tab { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px; padding: 12px 16px 12px 12px; border-radius: 18px; text-align: left;
+  border: 1px solid transparent; transition: background 0.25s, border-color 0.25s; }
+.tab:hover { background: var(--glass); }
+.tab.on { background: rgba(255, 255, 255, 0.05); border-color: var(--line-2); }
+.tab .ic { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font: 700 11px var(--sans); color: #fff;
+  background: color-mix(in srgb, var(--c) 22%, #121216); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent); transition: background 0.25s, box-shadow 0.25s; }
+.tab.on .ic { background: var(--c); box-shadow: 0 0 26px color-mix(in srgb, var(--c) 60%, transparent); }
+.tab b { display: block; font-weight: 560; }
+.tab .sub { font-size: 13px; color: var(--muted); }
+.tab .to { font: 500 12px var(--mono); color: var(--dim); }
+.wheel-stage { display: grid; justify-items: center; gap: 18px; position: relative; }
+.wheel-stage::before { content: ""; position: absolute; width: 70%; aspect-ratio: 1; top: 8%; border-radius: 50%; background: var(--accent); filter: blur(80px); opacity: 0.25; transition: background 0.5s; }
+.wheel-stage .disc { --R: 120px; --btn: 64px; --hub: 92px; }
+.wheel-label { font: 500 13px var(--mono); color: var(--muted); text-align: center; min-height: 2.8em; }
+.wheel-label b { color: var(--fg); font-weight: 500; }
+@media (max-width: 860px) { .wheel { grid-template-columns: 1fr; } .wheel-stage { order: -1; } }
+@media (max-width: 520px) { .wheel-stage .disc { --R: 96px; --btn: 54px; --hub: 76px; } .tab .to { display: none; } .tab { grid-template-columns: 46px 1fr; } }
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.card { position: relative; border-radius: 26px; padding: 30px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line); overflow: hidden; isolation: isolate; }
+.card::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 0.4s;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.07), transparent 60%); }
+.card:hover::before { opacity: 1; }
+
+/* ── Shrink ──────────────────────────────────────────────────── */
+.shrink-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.counter .what { font-weight: 560; }
+.counter .detail { color: var(--muted); font-size: 14px; margin-left: 8px; }
+.counter .nums { display: flex; align-items: baseline; gap: 14px; margin: 26px 0 18px; flex-wrap: wrap; }
+.counter .num { font-weight: 600; font-size: clamp(48px, 6vw, 72px); letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.counter .from { font: 500 15px var(--mono); color: var(--dim); text-decoration: line-through; }
+.counter .pct { margin-left: auto; font: 600 13px var(--mono); color: var(--shrink); padding: 5px 10px; border-radius: 999px; background: rgba(47, 199, 156, 0.12); }
+.counter .track { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.counter .track i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--shrink), #7cf0c9); box-shadow: 0 0 18px rgba(47, 199, 156, 0.6); transition: width 1.4s var(--ease); }
+@media (max-width: 760px) { .shrink-grid { grid-template-columns: 1fr; } .card { padding: 24px; } }
+
+/* ── Tools bento ─────────────────────────────────────────────── */
+.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+.bento .card { grid-column: span 2; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; }
+.bento .card.w3 { grid-column: span 3; }
+.bento .card.w2 { grid-column: span 3; }
+.bento h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.025em; }
+.bento p { margin: 0; color: var(--muted); font-size: 15px; }
+.bento code { font: 500 0.88em var(--mono); color: var(--fg); padding: 1px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); }
+.art { flex: 1; display: grid; place-items: center; margin-bottom: 16px; min-height: 150px; }
+.crop { position: relative; width: 150px; height: 150px; }
+.crop .ph { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; }
+.crop .frame { position: absolute; left: 50%; top: 50%; border: 2px solid var(--crop); border-radius: 8px; box-shadow: 0 0 0 999px rgba(5, 5, 7, 0.5), 0 0 24px rgba(250, 184, 31, 0.5);
+  transform: translate(-50%, -50%); animation: crop 8s var(--ease) infinite; }
+.crop > span { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font: 600 11px var(--mono); color: var(--crop); white-space: nowrap; }
+.crop > span::after { content: "1:1"; animation: cropLabel 8s steps(1) infinite; }
+@keyframes cropLabel { 0% { content: "1:1"; } 25% { content: "4:5"; } 50% { content: "16:9"; } 75% { content: "9:16"; } }
+@keyframes crop {
+  0%, 20% { width: 120px; height: 120px; } 25%, 45% { width: 104px; height: 130px; } 50%, 70% { width: 150px; height: 84px; } 75%, 95% { width: 76px; height: 136px; } 100% { width: 120px; height: 120px; }
+}
+.resize { display: flex; align-items: flex-end; gap: 14px; padding-bottom: 24px; }
+.resize i { display: block; border-radius: 10px; background: linear-gradient(135deg, var(--resize), #0c5d68); box-shadow: 0 0 30px rgba(26, 184, 204, 0.3); position: relative;
+  animation: pop 4s var(--spring) infinite; animation-delay: calc(var(--i) * 0.25s); }
+.resize i::after { content: attr(data-l); position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); font: 500 11px var(--mono); color: var(--muted); white-space: nowrap; }
+@keyframes pop { 0%, 60%, 100% { transform: none; } 70% { transform: scale(1.08); } }
+.rotate .sq { width: 92px; height: 92px; border-radius: 22px; background: linear-gradient(135deg, var(--rotate), #3c2f9e); box-shadow: 0 0 40px rgba(124, 108, 240, 0.45);
+  animation: rot 5s var(--spring) infinite; display: grid; place-items: center; font: 700 30px var(--sans); }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 30%, 50% { transform: rotate(90deg); } 60%, 80% { transform: rotate(180deg); } 90%, 100% { transform: rotate(360deg); } }
+.mute { display: flex; align-items: center; gap: 4px; height: 80px; }
+.mute i { width: 5px; border-radius: 4px; background: var(--m4a); animation: wave 1.1s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.09s); transition: background 0.4s; }
+@keyframes wave { from { transform: scaleY(0.15); } to { transform: scaleY(1); } }
+.card:hover .mute i { animation: none; transform: scaleY(0.06); background: var(--dim); }
+.merge { position: relative; width: 140px; height: 120px; }
+.merge i { position: absolute; width: 72px; height: 94px; border-radius: 10px; background: linear-gradient(#fafafa, #d9d9e0); top: 12px; left: 34px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.merge i::before { content: "PDF"; position: absolute; left: 8px; bottom: 8px; font: 800 10px var(--sans); color: #fff; background: var(--pdf); padding: 2px 5px; border-radius: 4px; }
+.merge i:nth-child(1) { animation: m1 4s var(--ease) infinite; } .merge i:nth-child(3) { animation: m3 4s var(--ease) infinite; }
+@keyframes m1 { 0%, 15% { transform: translateX(-46px) rotate(-10deg); } 45%, 85% { transform: none; } 100% { transform: translateX(-46px) rotate(-10deg); } }
+@keyframes m3 { 0%, 15% { transform: translateX(46px) rotate(10deg); } 45%, 85% { transform: none; } 100% { transform: translateX(46px) rotate(10deg); } }
+.menu { width: 220px; padding: 6px; border-radius: 12px; background: rgba(36, 36, 42, 0.92); border: 1px solid var(--line-2); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); font-size: 13px; }
+.menu div { padding: 5px 10px; border-radius: 6px; color: #d4d4dc; }
+.menu hr { border: 0; height: 1px; background: var(--line-2); margin: 5px 6px; }
+.menu .hot { background: var(--sel); color: #fff; }
+.undo { display: flex; gap: 10px; font-size: 38px; }
+.dropzone { width: 170px; height: 120px; border-radius: 18px; border: 1.5px dashed rgba(255,255,255,0.35); display: grid; place-items: center; background: rgba(255,255,255,0.03); }
+.dropzone .file-chip { width: 54px; height: 54px; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,0.5); animation: dropin 2.6s var(--ease) infinite; }
+@keyframes dropin { 0% { transform: translate(40px, -60px) rotate(12deg); opacity: 0; } 30%, 80% { transform: none; opacity: 1; } 100% { transform: none; opacity: 0; } }
+.found { display: grid; justify-items: center; gap: 10px; }
+.found .ic { width: 70px; height: 70px; border-radius: 14px; overflow: hidden; outline: 3px solid rgba(59,130,255,0.85); outline-offset: 4px; }
+.found span { font-size: 14px; padding: 2px 10px; border-radius: 6px; background: var(--sel); color: #fff; }
+.dropzone .sunset, .found .sunset { width: 100%; height: 100%; }
+.offline { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+.offline::before, .offline::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(47, 199, 156, 0.45); animation: ping 3s var(--ease) infinite; }
+.offline::after { animation-delay: 1.5s; }
+@keyframes ping { from { transform: scale(0.5); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+.offline svg { width: 54px; height: 54px; color: var(--shrink); filter: drop-shadow(0 0 16px rgba(47, 199, 156, 0.7)); }
+@media (max-width: 900px) { .bento .card, .bento .card.w3, .bento .card.w2 { grid-column: span 3; } }
+@media (max-width: 620px) { .bento { grid-template-columns: 1fr; } .bento .card, .bento .card.w3, .bento .card.w2 { grid-column: auto; min-height: 260px; } }
+
+/* ── Demo film ───────────────────────────────────────────────── */
+.film { position: relative; border-radius: 28px; padding: 10px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); border: 1px solid var(--line-2);
+  box-shadow: 0 60px 160px -40px rgba(158, 97, 255, 0.45); transform: perspective(1400px) rotateX(var(--fx, 18deg)) scale(var(--fs, 0.9)); transform-origin: 50% 0; }
+.film video { width: 100%; border-radius: 20px; aspect-ratio: 16 / 9; object-fit: cover; background: #000; display: block; }
+.film .sound { position: absolute; right: 26px; bottom: 26px; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.25); background: rgba(10,10,14,0.6); color: #fff; font: 560 14px var(--sans); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background 0.2s, transform 0.2s var(--spring); }
+.film .sound:hover { background: rgba(10,10,14,0.8); transform: translateY(-1px); }
+.film .sound svg { width: 18px; height: 18px; }
+.film .sound .on { display: none; }
+.film .sound[aria-pressed="true"] .on { display: inline; }
+.film .sound[aria-pressed="true"] .off { display: none; }
+@media (max-width: 640px) { .film .sound { right: 14px; bottom: 14px; height: 34px; font-size: 13px; } }
+@media (max-width: 640px) { .film { padding: 6px; border-radius: 18px; } .film video { border-radius: 13px; } }
+
+/* ── FAQ ─────────────────────────────────────────────────────── */
+.faq { max-width: 780px; margin: 0 auto; display: grid; gap: 10px; }
+.faq details { border-radius: 18px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.025); transition: background 0.3s, border-color 0.3s; }
+.faq details[open] { background: rgba(255, 255, 255, 0.05); border-color: var(--line-2); }
+.faq summary { list-style: none; cursor: pointer; padding: 20px 56px 20px 22px; position: relative; font-weight: 520; font-size: 17px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font: 300 24px var(--sans); color: var(--muted); transition: transform 0.3s var(--spring); }
+.faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+.faq p { margin: 0; padding: 0 22px 22px; color: var(--muted); }
+
+/* ── Closing ─────────────────────────────────────────────────── */
+.closing { text-align: center; display: grid; justify-items: center; gap: 26px; padding: 170px 16px 140px; overflow: hidden; }
+.closing h2 { max-width: 12ch; font-size: clamp(44px, 8vw, 110px); }
+.closing p { margin: 0; color: var(--muted); }
+.orbit { position: relative; width: 240px; height: 240px; display: grid; place-items: center; }
+.orbit .sq { width: 120px; height: 120px; border-radius: 30px; background: linear-gradient(#2b2c30, #121315); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 30px 90px rgba(0, 0, 0, 0.8), 0 0 120px rgba(158, 97, 255, 0.35); }
+.orbit .core { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 0 40px #fff; }
+.orbit .spin { position: absolute; inset: 0; animation: orbit 14s linear infinite; }
+.orbit .d { position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; margin: -7.5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 18px var(--c);
+  transform: rotate(var(--a)) translateY(-36px); animation: breathe 3.2s ease-in-out infinite; }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes breathe { 50% { transform: rotate(var(--a)) translateY(-104px); } }
+footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
+footer { align-items: center; }
+footer a:hover { color: var(--fg); }
+.maker { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--muted); }
+.maker kbd { font-size: 11px; margin: 0 1px; }
+.maker:hover kbd { border-bottom-width: 1px; transform: translateY(2px); background: linear-gradient(#3b82ff, #2563eb); box-shadow: 0 0 16px rgba(59, 130, 255, 0.7); }
+.maker .handle { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 999px; color: var(--fg); font-weight: 560;
+  background: var(--glass); border: 1px solid var(--line-2); transition: background 0.25s, border-color 0.25s, transform 0.25s var(--spring); }
+.maker .handle svg { width: 13px; height: 13px; }
+.maker:hover .handle { background: #fff; color: #08080a; border-color: #fff; transform: translateY(-1px); }
+
+/* ── ⇧⌘ overlay ring ─────────────────────────────────────────── */
+#overlay { position: fixed; inset: 0; z-index: 80; pointer-events: none; transition: background 0.3s; }
+#overlay.open { pointer-events: auto; background: rgba(0, 0, 0, 0.4); }
+#overlay .disc { --R: 94px; --btn: 56px; --hub: 78px; position: absolute; transform: translate(-50%, -50%) scale(0.75); opacity: 0; transition: transform 0.4s var(--spring), opacity 0.2s; }
+#overlay .disc.open { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+#overlay .cap { position: absolute; left: 50%; top: calc(100% + 14px); transform: translateX(-50%); white-space: nowrap; font: 500 13px var(--mono); color: var(--muted);
+  padding: 6px 12px; border-radius: 999px; background: rgba(10, 10, 14, 0.85); border: 1px solid var(--line); }
+#overlay .cap b { color: var(--fg); font-weight: 500; }
+.spinner { width: 40%; height: 40%; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #fff; animation: rotate 0.7s linear infinite; }
+@keyframes rotate { to { transform: rotate(360deg); } }
+.toast { position: fixed; left: 50%; bottom: 24px; z-index: 90; display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 18px; border-radius: 999px; font-size: 14px;
+  background: rgba(20, 20, 26, 0.9); border: 1px solid var(--line-2); backdrop-filter: blur(16px); transform: translate(-50%, 160%); transition: transform 0.5s var(--spring); width: max-content; max-width: calc(100% - 32px); }
+.toast.show { transform: translate(-50%, 0); }
+.toast a { flex: none; padding: 8px 14px; border-radius: 999px; background: #fff; color: #08080a; font-weight: 560; }
+
+/* ── First-launch guide ─────────────────────────────────────── */
+.guide { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.guide.show { opacity: 1; pointer-events: auto; }
+.guide-card { width: min(560px, 100%); max-height: calc(100svh - 32px); overflow: auto; border-radius: 28px; padding: 30px; background: #111115; border: 1px solid var(--line-2);
+  box-shadow: 0 50px 140px rgba(0, 0, 0, 0.8), 0 0 100px -30px rgba(158, 97, 255, 0.5); display: grid; gap: 22px; transform: translateY(20px) scale(0.97); transition: transform 0.45s var(--spring); }
+.guide.show .guide-card { transform: none; }
+.guide h3 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.03em; }
+.guide .sub { margin: 0; color: var(--muted); font-size: 15px; }
+.gsteps { display: grid; gap: 12px; counter-reset: s; }
+.gstep { display: grid; gap: 12px; padding: 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); counter-increment: s; }
+.gstep b { font-weight: 520; font-size: 15px; display: flex; gap: 12px; }
+.gstep b::before { content: counter(s); flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--mono); background: #fff; color: #000; }
+.vis { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px; border-radius: 12px; background: #1b1b21; font-size: 13px; color: var(--muted); }
+.vis svg { width: 30px; height: 30px; }
+.vis .folder { width: 34px; height: 26px; border-radius: 5px; background: linear-gradient(#5aa8ff, #2f7ff0); }
+.vis .hot { padding: 4px 12px; border-radius: 7px; background: var(--sel); color: #fff; }
+.vis .row { display: flex; gap: 8px; margin-left: auto; }
+.vis .row .no { padding: 4px 12px; border-radius: 7px; background: #2b2b33; color: #ddd; }
+.guide-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 14px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  .reveal { opacity: 1; transform: none; filter: none; }
+}
 </style>
 </head>
 <body>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2b30"/><stop offset="1" stop-color="#121214"/></linearGradient>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34353a"/><stop offset="1" stop-color="#151619"/></linearGradient>
     <symbol id="logo" viewBox="0 0 64 64">
       <rect x="1" y="1" width="62" height="62" rx="14.5" fill="url(#lg)"/>
       <rect x="1.5" y="1.5" width="61" height="61" rx="14" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -416,319 +444,257 @@ html.intro-on, html.intro-on body { overflow: hidden; }
       <circle cx="16.5" cy="41" r="3.85" fill="#ff549e"/><circle cx="16.5" cy="23" r="3.85" fill="#f5454d"/>
       <circle cx="32" cy="32" r="7.7" fill="#fff"/>
     </symbol>
-    <symbol id="dots" viewBox="0 0 18 18">
-      <circle cx="9" cy="9" r="3" fill="#fff"/>
-      <circle cx="9" cy="2.4" r="1.5" fill="#fff"/><circle cx="14.7" cy="5.7" r="1.5" fill="#fff"/><circle cx="14.7" cy="12.3" r="1.5" fill="#fff"/>
-      <circle cx="9" cy="15.6" r="1.5" fill="#fff"/><circle cx="3.3" cy="12.3" r="1.5" fill="#fff"/><circle cx="3.3" cy="5.7" r="1.5" fill="#fff"/>
-    </symbol>
-    <path id="sq" d="M96.00 50.00 L95.97 64.13 L95.90 68.64 L95.77 71.90 L95.60 74.54 L95.37 76.79 L95.09 78.76 L94.75 80.51 L94.37 82.10 L93.92 83.54 L93.43 84.86 L92.87 86.07 L92.26 87.19 L91.59 88.22 L90.85 89.17 L90.05 90.05 L89.17 90.85 L88.22 91.59 L87.19 92.26 L86.07 92.87 L84.86 93.43 L83.54 93.92 L82.10 94.37 L80.51 94.75 L78.76 95.09 L76.79 95.37 L74.54 95.60 L71.90 95.77 L68.64 95.90 L64.13 95.97 L50.00 96.00 L35.87 95.97 L31.36 95.90 L28.10 95.77 L25.46 95.60 L23.21 95.37 L21.24 95.09 L19.49 94.75 L17.90 94.37 L16.46 93.92 L15.14 93.43 L13.93 92.87 L12.81 92.26 L11.78 91.59 L10.83 90.85 L9.95 90.05 L9.15 89.17 L8.41 88.22 L7.74 87.19 L7.13 86.07 L6.57 84.86 L6.08 83.54 L5.63 82.10 L5.25 80.51 L4.91 78.76 L4.63 76.79 L4.40 74.54 L4.23 71.90 L4.10 68.64 L4.03 64.13 L4.00 50.00 L4.03 35.87 L4.10 31.36 L4.23 28.10 L4.40 25.46 L4.63 23.21 L4.91 21.24 L5.25 19.49 L5.63 17.90 L6.08 16.46 L6.57 15.14 L7.13 13.93 L7.74 12.81 L8.41 11.78 L9.15 10.83 L9.95 9.95 L10.83 9.15 L11.78 8.41 L12.81 7.74 L13.93 7.13 L15.14 6.57 L16.46 6.08 L17.90 5.63 L19.49 5.25 L21.24 4.91 L23.21 4.63 L25.46 4.40 L28.10 4.23 L31.36 4.10 L35.87 4.03 L50.00 4.00 L64.13 4.03 L68.64 4.10 L71.90 4.23 L74.54 4.40 L76.79 4.63 L78.76 4.91 L80.51 5.25 L82.10 5.63 L83.54 6.08 L84.86 6.57 L86.07 7.13 L87.19 7.74 L88.22 8.41 L89.17 9.15 L90.05 9.95 L90.85 10.83 L91.59 11.78 L92.26 12.81 L92.87 13.93 L93.43 15.14 L93.92 16.46 L94.37 17.90 L94.75 19.49 L95.09 21.24 L95.37 23.21 L95.60 25.46 L95.77 28.10 L95.90 31.36 L95.97 35.87Z"/>
-    <clipPath id="sqc"><use href="#sq"/></clipPath>
-    <linearGradient id="gGloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".48" stop-color="#fff" stop-opacity=".06"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    <linearGradient id="gShade" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient>
-    <linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f5f8"/><stop offset=".5" stop-color="#b9bcc6"/><stop offset="1" stop-color="#8a8e99"/></linearGradient>
-    <filter id="fDs" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#000" flood-opacity=".35"/></filter>
-    <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2"/></filter>
-    <radialGradient id="sO" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffd2a3"/><stop offset=".55" stop-color="#ff8f2e"/><stop offset="1" stop-color="#c94f00"/></radialGradient><radialGradient id="sV" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#dcc6ff"/><stop offset=".55" stop-color="#9e61ff"/><stop offset="1" stop-color="#5a24c4"/></radialGradient><radialGradient id="sB" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#b9d6ff"/><stop offset=".55" stop-color="#3885ff"/><stop offset="1" stop-color="#1446b8"/></radialGradient>
-    <radialGradient id="sG" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#b6f5cd"/><stop offset=".55" stop-color="#29c770"/><stop offset="1" stop-color="#0f7d3f"/></radialGradient><radialGradient id="sP" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffc2dd"/><stop offset=".55" stop-color="#ff549e"/><stop offset="1" stop-color="#c21863"/></radialGradient><radialGradient id="sR" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffb8bb"/><stop offset=".55" stop-color="#f5454d"/><stop offset="1" stop-color="#b0141c"/></radialGradient><radialGradient id="sW" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#f0f0f4"/><stop offset="1" stop-color="#b8b8c4"/></radialGradient>
     <symbol id="dl" viewBox="0 0 16 16"><path d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M3 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <linearGradient id="w0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#190c3d"/><stop offset="0.55" stop-color="#3a1670"/><stop offset="1" stop-color="#0d1846"/></linearGradient>
-    <linearGradient id="w1" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#6a2cff"/><stop offset="0.5" stop-color="#b44dff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
-    <linearGradient id="w2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff6a3d"/><stop offset="0.45" stop-color="#ff9a3c"/><stop offset="1" stop-color="#ff4f7b"/></linearGradient>
-    <linearGradient id="w3" x1="0" y1="0" x2="1" y2="0.2"><stop offset="0" stop-color="#1f5bff"/><stop offset="0.6" stop-color="#3f9bff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient>
-    <linearGradient id="w4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14185a"/><stop offset="1" stop-color="#070a26"/></linearGradient>
-    <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
-    <symbol id="wallsvg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
-      <rect width="1600" height="1000" fill="url(#w0)"/>
-      <g filter="url(#soft)">
-        <path d="M-50 380 C 260 250, 560 560, 900 440 S 1420 260, 1650 360 L1650 1050 L-50 1050Z" fill="url(#w1)" opacity="0.92"/>
-        <path d="M-50 540 C 330 430, 690 720, 1020 590 S 1470 460, 1650 560 V1050 H-50Z" fill="url(#w2)" opacity="0.9"/>
-        <path d="M-50 690 C 380 600, 820 840, 1170 710 S 1500 640, 1650 700 V1050 H-50Z" fill="url(#w3)" opacity="0.92"/>
-        <path d="M-50 850 C 460 770, 930 950, 1650 820 V1050 H-50Z" fill="url(#w4)"/>
-      </g>
-      <path d="M-50 380 C 260 250, 560 560, 900 440 S 1420 260, 1650 360" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
-      <path d="M-50 540 C 330 430, 690 720, 1020 590 S 1470 460, 1650 560" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
-      <path d="M-50 690 C 380 600, 820 840, 1170 710 S 1500 640, 1650 700" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
-    </symbol>
   </defs>
 </svg>
 
-<div class="intro" id="intro" aria-hidden="true">
-  <div class="glow"></div>
-  <div class="laptop" id="laptop">
-    <div class="lid">
-      <div class="front"><div class="screen" id="introScreen"><div class="wall"></div><div class="notch"></div><div class="mark"><svg><use href="#logo"/></svg></div></div></div>
-      <div class="back"><svg><use href="#logo"/></svg></div>
-    </div>
-    <div class="deck"><div class="keys"></div><div class="pad"></div></div>
-  </div>
-  <span class="skip">Click to skip</span>
-</div>
-<script>
-// Runs before the page paints: show the intro only on the first visit of a session, never with reduced motion.
-(() => {
-  let seen = false;
-  try { seen = !!sessionStorage.getItem("tf-intro"); sessionStorage.setItem("tf-intro", "1"); } catch {}
-  const el = document.getElementById("intro");
-  if (seen || matchMedia("(prefers-reduced-motion: reduce)").matches) { el.remove(); return; }
-  document.documentElement.classList.add("intro-on");
-  const timers = [];
-  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
-  const finish = () => {
-    timers.forEach(clearTimeout);
-    el.classList.add("gone");
-    document.documentElement.classList.remove("intro-on");
-    setTimeout(() => el.remove(), 550);
-  };
-  // Zoom until the laptop's screen covers the window, centred on it.
-  const fit = () => {
-    const sr = document.getElementById("introScreen").getBoundingClientRect(), lr = document.getElementById("laptop").getBoundingClientRect();
-    // The deck's 3D box inflates the laptop's rect; its layout centre is the lid's bottom edge (lid and deck are the same height).
-    const k = 0.92; // the resting scale the laptop is measured at
-    const z = Math.max(innerWidth / (sr.width / k), innerHeight / (sr.height / k)) * 1.04;
-    const lid = document.querySelector(".intro .lid").getBoundingClientRect();
-    const d = (sr.top + sr.height / 2 - lid.bottom) / k; // screen centre relative to the laptop's layout centre (the hinge)
-    el.style.setProperty("--zoom", z.toFixed(3));
-    el.style.setProperty("--fy", (-d * z).toFixed(0) + "px");
-  };
-  at(500, () => el.classList.add("open"));
-  at(1650, () => el.classList.add("wake"));
-  at(2550, () => { fit(); el.classList.add("fly"); });
-  at(3300, finish);
-  el.addEventListener("click", finish);
-  addEventListener("keydown", function k() { finish(); removeEventListener("keydown", k); });
-})();
-</script>
+<div class="stage" aria-hidden="true"><div class="aurora"><i></i><i></i><i></i><i></i></div><div class="fade"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor-light" id="cursorLight" aria-hidden="true"></div>
 
-<div class="wallpaper" aria-hidden="true"></div>
-
-<nav class="menubar" id="menubar" aria-label="Menu bar">
-  <div class="mb logo" data-menu tabindex="0" aria-label="Tapformat menu"><svg><use href="#logo"/></svg>
-    <div class="menu">
-      <a href="#how">About Tapformat</a><a href="changelog">What's New…</a><hr>
-      <a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download Tapformat…</a><a href="feedback">Send Feedback…</a><hr>
-      <a href="https://x.com/SmitVanani06" target="_blank" rel="noopener">Follow @SmitVanani06 <span class="k">↗</span></a>
-    </div></div>
-  <div class="mb app" data-menu tabindex="0">Tapformat
-    <div class="menu">
-      <a href="#how">About Tapformat</a><a href="changelog">What's New <span class="k">1.1</span></a><hr>
-      <button type="button" data-act="open">Convert Selection <span class="k">⇧⌘</span></button>
-      <button type="button" data-act="spot">Search… <span class="k">/</span></button><hr>
-      <button type="button" data-act="quit">Quit Tapformat <span class="k">⌘Q</span></button>
-    </div></div>
-  <div class="mb" data-menu tabindex="0">File
-    <div class="menu">
-      <button type="button" data-act="open">New Conversion <span class="k">⇧⌘</span></button>
-      <button type="button" data-act="selectall">Select All Files <span class="k">⌘A</span></button><hr>
-      <a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download Tapformat… <span class="k">26 MB</span></a>
-    </div></div>
-  <div class="mb" data-menu tabindex="0">View
-    <div class="menu"><a href="#how">How It Works</a><a href="#formats">Formats</a><a href="#shrink">Shrink</a><a href="#tools">Tools</a><a href="#film">Watch the Film</a></div></div>
-  <div class="mb opt-hide" data-menu tabindex="0">Window
-    <div class="menu"><a href="#top">Desktop</a><a href="#new">Stickies: New in 1.1</a><a href="#faq">Notes: Questions</a><a href="#download">Installer</a></div></div>
-  <div class="mb opt-hide" data-menu tabindex="0">Help
-    <div class="menu"><button type="button" data-act="spot">Search <span class="k">/</span></button><a href="#faq">Tapformat Help</a><a href="feedback">Send Feedback…</a></div></div>
-  <div class="mbright">
-    <div class="mb tf keep" data-menu tabindex="0" aria-label="Tapformat menu bar item"><svg><use href="#dots"/></svg>
-      <div class="menu right panel">
-        <div class="ph"><svg><use href="#logo"/></svg><div><b>Tapformat</b><small id="panelSub">Version <span data-version>1.1</span></small></div></div>
-        <div class="how"><span>Select files in Finder, tap</span><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></div>
-        <button type="button" class="row" data-act="open"><i style="--c:var(--png)">⟳</i>Convert files…</button>
-        <a class="row" href="https://tapformat.smit-jsv.workers.dev/download" data-download><i style="--c:var(--shrink)">↓</i>Download Tapformat</a>
-        <a class="row" href="changelog"><i style="--c:var(--gif)">★</i>What's New</a>
-        <a class="row" href="feedback"><i style="--c:var(--heic)">✎</i>Send Feedback</a>
-      </div></div>
-    <span class="mb opt-hide" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="3"/><path d="M22 11v2"/><rect x="4" y="9" width="14" height="6" rx="1.5" fill="#fff" stroke="none"/></svg></span>
-    <span class="mb opt-hide" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="#fff"/></svg></span>
-    <button class="mb keep" type="button" data-act="spot" aria-label="Spotlight search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
-    <span class="mb opt-hide" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="5" rx="2.5"/><rect x="13" y="14" width="8" height="5" rx="2.5"/><circle cx="17" cy="7.5" r="2.5"/><circle cx="7" cy="16.5" r="2.5"/></svg></span>
-    <span class="mb clock" id="clock"></span>
+<nav class="nav">
+  <a class="brand" href="#top" aria-label="Tapformat home"><svg aria-hidden="true"><use href="#logo"/></svg>Tapformat</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#formats">Formats</a>
+    <a href="#tools">Tools</a>
+    <a href="#faq">FAQ</a>
+    <a href="feedback">Feedback</a>
+    <a class="btn primary small" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download</a>
   </div>
 </nav>
 
-<header class="desktop" id="top">
-  <div class="widgets">
-    <section class="widget big" aria-label="Tapformat">
-      <div class="wh"><svg><use href="#logo"/></svg>Tapformat · free for Mac</div>
-      <h1>Every file.<span class="serif">One tap.</span></h1>
-      <p>Select a file in Finder, tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd>, and a ring of formats opens right at your pointer. Nothing gets uploaded.</p>
-      <div class="dlrow"><a class="btn" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
-        <span class="req">macOS 15+ · Apple silicon &amp; Intel · 26 MB</span></div>
-    </section>
-    <button class="widget keys" type="button" id="tryBtn" aria-label="Open the ring for the selected file">
-      <div class="wh">Shortcut</div>
-      <div class="caps"><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></div>
-      <small>Tap on your keyboard, or click here</small>
-    </button>
-    <section class="widget count" aria-label="Files converted on this page">
-      <div class="wh">Converted here</div>
-      <div><div class="n" id="countN">0</div><small id="countSub">files · 0 bytes uploaded</small></div>
-      <div class="dots" id="countDots"><i style="--c:var(--jpg)"></i><i style="--c:var(--heic)"></i><i style="--c:var(--png)"></i><i style="--c:var(--mp3)"></i><i style="--c:var(--gif)"></i><i style="--c:var(--pdf)"></i></div>
-    </section>
-  </div>
-  <div class="icons" id="icons" aria-label="Files on the desktop. Click one, then tap Shift Command">
-    <div class="rubber" id="rubber"></div>
-  </div>
-  <div class="stickie" id="stickie">
-    <b>Try it right here</b>
-    <ol class="mouse"><li>Click a file (or drag to select a few)</li><li>Tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></li><li>Pick a format</li></ol>
-    <div class="touch">Tap any file to open the ring.</div>
+<header class="hero" id="top">
+  <div class="wrap hero-inner">
+    <span class="pill"><b>NEW</b>Free for Mac · works offline</span>
+    <h1>
+      <span class="row"><span>Tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd>.</span></span>
+      <span class="row"><span class="shine">Convert <span class="serif">anything.</span></span></span>
+    </h1>
+    <p class="lede">Select a file in Finder and tap <b>⇧⌘</b>. A ring opens at your pointer with only the formats that make sense. <b>Point, click, saved.</b></p>
+    <div class="cta">
+      <a class="btn primary glow" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
+      <span class="req">macOS 15+ · Apple silicon &amp; Intel · 26 MB</span>
+    </div>
+
+    <div class="hero-ring" id="heroRing">
+      <div class="halo"></div>
+      <div class="tilt" id="tilt">
+        <div class="disc open" id="heroDisc"><div class="disc-bg"></div><div id="heroOpts"></div>
+          <div class="hub"><div class="thumb"><div class="sunset"></div></div></div>
+        </div>
+      </div>
+      <div class="floor"></div>
+    </div>
+    <div class="ring-caption" id="heroCap"><span class="dot"></span><span>Sunset.heic</span><span>→</span><span class="to" id="heroTo">Sunset.jpg</span></div>
+    <div class="try"><span class="k">Try it: press</span><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd><span class="k">anywhere on this page</span><button type="button" id="tryBtn">or tap here</button></div>
   </div>
 </header>
 
-<div class="ring" id="ring" role="dialog" aria-label="Pick a format">
-  <div class="disc"></div><div class="track"></div><div id="ringOpts"></div>
-  <div class="hub"><div class="thumb" id="ringThumb"></div>
-    <svg class="prog" viewBox="0 0 92 92"><circle id="ringProg" cx="46" cy="46" r="43" stroke-dasharray="270.2" stroke-dashoffset="270.2"/></svg>
-    <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
-  </div>
-  <div class="cap" id="ringCap"></div>
-</div>
-<div class="sparks" id="sparks"></div>
+<div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
 
-<main class="apps">
-  <section class="win pop" id="how" style="--w:min(900px,calc(100% - 48px));--ml:8vw;--mr:auto;--mt:20px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">How It Works</span></div>
-    <div class="wb">
-      <div class="head"><span class="k">How it works</span><h2>Three steps. <span class="serif">One second.</span></h2></div>
-      <div class="cols">
-        <div class="col"><div class="vis"><div class="mini-sel"><div class="photo"></div><span class="name">Sunset.heic</span></div></div><span class="n">01</span><h3>Select a file.</h3><p>Any photo, PDF, document, song or video in Finder. Or select fifty.</p></div>
-        <div class="col"><div class="vis" style="font-size:42px;display:flex;gap:10px;justify-content:center"><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></div><span class="n">02</span><h3>Tap ⇧⌘.</h3><p>Tap both keys and let go. The ring opens right where your pointer is. Or pick your own shortcut.</p></div>
-        <div class="col"><div class="vis"><div class="mini-ring" id="miniRing"></div></div><span class="n">03</span><h3>Done.</h3><p>The new file lands next to the original and gets selected for you. The original is never touched.</p></div>
-      </div>
+<section class="story" id="how">
+  <div class="wrap story-pin">
+    <div class="steps">
+      <div class="step on" data-s="0"><span class="n">01</span><h3>Select a file.</h3><p>Any photo, PDF, document, song or video in Finder. Or select fifty.</p></div>
+      <div class="step" data-s="1"><span class="n">02</span><h3>Tap <kbd>⇧</kbd><kbd>⌘</kbd>.</h3><p>Just tap both keys and let go. The ring opens right where your pointer is.</p></div>
+      <div class="step" data-s="2"><span class="n">03</span><h3><span style="color:var(--jpg)">Done.</span></h3><p>The new file lands next to the original. The original is never touched.</p></div>
     </div>
-  </section>
-
-  <section class="win pop" id="formats" style="--w:min(980px,calc(100% - 48px));--ml:auto;--mr:6vw;--mt:-30px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">Get Info</span></div>
-    <div class="wb">
-      <div class="head"><span class="k">The ring</span><h2>Only what <span class="serif">makes sense.</span></h2><p>The ring reads your file and offers only what it can actually become. No list of twenty options.</p></div>
-      <div class="info">
-        <div class="kinds" id="kinds" role="tablist"></div>
-        <div class="stagecol"><div><div class="ring open" id="infoRing"><div class="disc"></div><div class="track"></div><div id="infoOpts"></div><div class="hub"><div class="thumb" id="infoThumb"></div></div></div><div class="label" id="infoLabel"></div></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="win pop" id="shrink" style="--w:min(860px,calc(100% - 48px));--ml:12vw;--mr:auto;--mt:-20px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">Activity: Shrink</span></div>
-    <div class="wb">
-      <div class="head"><span class="k">Shrink</span><h2>Same file. <span class="serif">A fraction</span> of the size.</h2><p>Shrink keeps the format and saves <b>name (smaller)</b> next to the original. Real results from our tests on the Balanced setting.</p></div>
-      <div class="meters" id="meters"></div>
-    </div>
-  </section>
-
-  <section class="win pop" id="new" style="--w:min(920px,calc(100% - 48px));--ml:auto;--mr:10vw;--mt:-20px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">Stickies</span></div>
-    <div class="wb" style="background:linear-gradient(#26262c,#1f1f24)">
-      <div class="head"><span class="k">New in 1.1</span><h2>Made to feel <span class="serif">like yours.</span></h2><p><a href="changelog" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">See everything new in 1.1</a></p></div>
-      <div class="stickies">
-        <div class="stickie"><div class="doodle"><kbd style="font-size:21px">⌥</kbd><kbd style="font-size:21px;min-width:3em">Space</kbd></div><b>Your shortcut.</b>Keep ⇧⌘ or record any combination you like.</div>
-        <div class="stickie"><div class="doodle"><span class="photo" style="width:42px;height:32px;transform:rotate(-8deg)"></span><span style="font-size:24px">→</span><span style="width:52px;height:36px;border:2px dashed currentColor;border-radius:8px;opacity:.6"></span></div><b>Drag &amp; drop.</b>Drop files on the Tapformat window and the ring opens right there.</div>
-        <div class="stickie"><div class="doodle"><span style="padding:2px 8px;border-radius:4px;background:var(--sel);color:#fff;font-size:13px">Sunset.jpg</span></div><b>Finds your file.</b>The new file is selected in Finder the moment it's ready.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="win pop" id="tools" style="--w:min(960px,calc(100% - 48px));--ml:7vw;--mr:auto;--mt:-20px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">Tools</span></div>
-    <div class="wb">
-      <div class="head"><span class="k">Tools</span><h2>Not just <span class="serif">formats.</span></h2><p>Crop, resize, rotate, mute, merge. All in the same ring, so you never open another app.</p></div>
-      <div class="grid" id="toolGrid"></div>
-    </div>
-  </section>
-
-  <section class="win pop" id="film" style="--w:min(1000px,calc(100% - 48px));--ml:auto;--mr:auto;--mt:-10px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">tapformat-film.mp4</span></div>
-    <div class="wb">
-      <div class="head" style="padding-bottom:0"><span class="k">Watch</span><h2>See it <span class="serif">in action.</span></h2></div>
-      <div class="player"><video id="filmVideo" src="tapformat-film.mp4" poster="film-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat launch film: select a file, tap ⇧⌘, pick a format"></video>
-        <button class="sound" id="soundBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="M22 9l-6 6M16 9l6 6"/></svg><span>Sound on</span></button></div>
-    </div>
-  </section>
-
-  <section class="win pop" id="faq" style="--w:min(900px,calc(100% - 48px));--ml:auto;--mr:9vw;--mt:-10px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t">Notes</span></div>
-    <div class="wb">
-      <div class="head"><span class="k">Questions</span><h2>Before you <span class="serif">download.</span></h2></div>
-      <div class="notesapp">
-        <aside><b>iCloud · Notes</b><div>Tapformat FAQ<small>9 answers · today</small></div></aside>
-        <div class="faq">
-          <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
-          <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
-          <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
-          <details><summary>Why does it ask about my Desktop and Documents folders?</summary><p>Tapformat saves the converted file right next to the original, so macOS asks once per folder before it can write there. The welcome guide asks for all of them in one go. To never see a folder prompt, turn on Tapformat in System Settings → Privacy &amp; Security → Full Disk Access (optional; Settings → Your Mac has a shortcut).</p></details>
-          <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
-          <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → Your Mac → Share anonymous usage count.</p></details>
-          <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
-          <details><summary>Can I change the shortcut?</summary><p>Yes, to anything you like. Pick ⌥⌘ or ⌃⌥ in Settings, or click <b>Record your own</b> and press any combination: a tap like ⌃⇧, or keys like ⌥Space or ⌃⌘K. It only listens while Finder is in front, so other apps keep their shortcuts.</p></details>
-          <details><summary>Can it convert a whole folder of photos?</summary><p>Select as many files as you like and tap ⇧⌘ once. The ring only offers formats every selected file supports, and several images can also become one PDF.</p></details>
+    <div class="scene" id="scene">
+      <div class="bar"><i></i><i></i><i></i><span>~/Desktop</span></div>
+      <div class="file" id="src"><div class="icon"><div class="sunset"></div><span class="badge" style="--b:var(--heic)">HEIC</span></div><span class="name">Sunset.heic</span><span class="size">4.8 MB</span></div>
+      <div class="disc" id="storyDisc"><div class="disc-bg"></div><div id="storyOpts"></div>
+        <div class="hub"><div class="thumb"><div class="sunset"></div></div>
+          <svg class="prog" viewBox="0 0 90 90"><circle id="storyProg" cx="45" cy="45" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
+          <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
         </div>
       </div>
+      <div class="file" id="out"><div class="icon"><div class="sunset"></div><span class="badge" style="--b:var(--jpg)">JPG</span></div><span class="name">Sunset.jpg</span><span class="size">1.2 MB</span></div>
+      <div class="keys" id="storyKeys"><kbd>⇧</kbd><kbd>⌘</kbd></div>
+      <div class="saved" id="storySaved">✓ Saved next to the original</div>
+      <div class="sparks" id="sparks"></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="win pop" id="download" style="--w:min(640px,calc(100% - 48px));--ml:auto;--mr:auto;--mt:0px">
-    <div class="tb"><div class="tl"><button type="button" data-tl="close" aria-label="Collapse">×</button><button type="button" data-tl="min" aria-label="Collapse">−</button><button type="button" data-tl="zoom" aria-label="Zoom">+</button></div>
-      <span class="t"><svg><use href="#logo"/></svg>Tapformat</span></div>
-    <div class="wb">
-      <div class="head" style="text-align:center"><span class="k">Get it</span><h2>Stop opening <span class="serif">converter websites.</span></h2></div>
-      <div class="dmgbody">
-        <div class="dmg-app" id="dmgApp"><svg aria-hidden="true"><use href="#logo"/></svg>Tapformat</div>
-        <div class="dmg-arrow" aria-hidden="true">→</div>
-        <div class="dmg-apps" id="dmgApps"><div class="folder"></div>Applications</div>
+<section class="pad" id="formats">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--png)">The ring</span>
+      <h2>Only what <span class="serif">makes sense.</span></h2>
+      <p>The ring reads your file and shows only the formats it can actually become. You never scroll a list of twenty options.</p>
+    </div>
+    <div class="wheel reveal">
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div class="wheel-stage" id="wheelStage">
+        <div class="disc open" id="wheelDisc"><div class="disc-bg"></div><div id="wheelOpts"></div><div class="hub"><div class="thumb" id="wheelThumb"></div></div></div>
+        <div class="wheel-label" id="wheelLabel"></div>
       </div>
-      <div class="dmghint">Drag Tapformat onto Applications to download it. Yes, really.</div>
-      <div class="dmgfoot"><a class="btn" id="finalDl" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
-        <span class="req">Tapformat <span data-version>1.1</span> · macOS 15 or later · <a href="changelog" style="text-decoration:underline;text-underline-offset:3px">What's new</a></span></div>
     </div>
-  </section>
+  </div>
+</section>
 
+<section class="pad" id="shrink">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--shrink)">Shrink</span>
+      <h2>Same file. <span class="serif">A fraction</span> of the size.</h2>
+      <p>Shrink keeps the format and saves <code>name (smaller)</code> next to the original. These are real results from our tests on the Balanced setting.</p>
+    </div>
+    <div class="shrink-grid" id="counters"></div>
+  </div>
+</section>
+
+<section class="pad" id="new">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--heic)">New in 1.1</span>
+      <h2>Made to feel <span class="serif">like yours.</span></h2>
+      <p>Your own shortcut, drag and drop, and a converted file that's waiting for you, selected. <a href="changelog" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">See everything new</a></p>
+    </div>
+    <div class="bento">
+      <article class="card reveal">
+        <div class="art"><div class="undo"><kbd>⌥</kbd><kbd style="min-width:3.2em">Space</kbd></div></div>
+        <h3>Your shortcut</h3><p>Keep ⇧⌘ or record any combination you like, even ⌥Space.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="dropzone"><div class="file-chip"><div class="sunset"></div></div></div></div>
+        <h3>Drag &amp; drop</h3><p>Drop files on the Tapformat window and the ring opens right there.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="found"><div class="ic"><div class="sunset"></div></div><span>sunset.jpg</span></div></div>
+        <h3>Finds your file</h3><p>The new file is selected in Finder the moment it's ready. No hunting.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="tools">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--crop)">Tools</span>
+      <h2>Not just <span class="serif">formats.</span></h2>
+      <p>Crop, resize, rotate, mute, merge. All of them live in the same ring, so you never open another app.</p>
+    </div>
+    <div class="bento">
+      <article class="card w3 reveal">
+        <div class="art"><div class="crop"><div class="ph"><div class="sunset"></div><div class="frame"></div></div><span></span></div></div>
+        <h3>Crop for every feed</h3><p>1:1, 4:5, 16:9 or 9:16. Smart crop finds the subject and keeps it in frame.</p>
+      </article>
+      <article class="card w3 reveal">
+        <div class="art"><div class="resize"><i style="--i:0;width:30px;height:30px" data-l="50%"></i><i style="--i:1;width:52px;height:52px" data-l="1080"></i><i style="--i:2;width:78px;height:78px" data-l="2048"></i><i style="--i:3;width:108px;height:108px" data-l="4K"></i></div></div>
+        <h3>Resize in one click</h3><p>Half size, 1080px for the web, 2048 or 4K. Your aspect ratio is kept.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="rotate"><div class="sq">↻</div></div></div>
+        <h3>Rotate &amp; flip</h3><p>Photos and PDF pages, upright in a tap.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="mute" id="wave"></div></div>
+        <h3>Mute a video</h3><p>Strip the audio. The video isn't re-encoded, so it's instant.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="merge"><i></i><i></i><i></i></div></div>
+        <h3>Merge PDFs</h3><p>Select several, tap ⇧⌘, pick <code>1 PDF</code>.</p>
+      </article>
+      <article class="card w3 reveal">
+        <div class="art"><div class="offline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div></div>
+        <h3>Never uploaded</h3><p>Everything runs on your Mac's own hardware and works offline. New files never overwrite: you get <code>photo 2.jpg</code>.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="menu"><div>Open</div><div>Get Info</div><hr><div class="hot">Convert with Tapformat</div><div>Shrink with Tapformat</div></div></div>
+        <h3>Right-click too</h3><p>It's in Finder's Services menu.</p>
+      </article>
+      <article class="card w2 reveal">
+        <div class="art"><div class="undo"><kbd>⌘</kbd><kbd>Z</kbd></div></div>
+        <h3>Undo anything</h3><p>Press ⌘Z on the check mark and the new file goes to the Trash.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="film" style="padding-top:40px">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--gif)">Watch</span>
+      <h2>Watch it <span class="serif">in action.</span></h2>
+    </div>
+    <div class="film" id="filmFrame"><video id="filmVideo" src="tapformat-film.mp4" poster="film-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat launch film: select a file, tap ⇧⌘, pick a format"></video>
+      <button class="sound" id="soundBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="M22 9l-6 6M16 9l6 6"/></svg><span>Sound on</span></button></div>
+  </div>
+</section>
+
+<section class="pad" id="faq">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--mp3)">Questions</span>
+      <h2>Before you <span class="serif">download.</span></h2>
+    </div>
+    <div class="faq reveal">
+      <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
+      <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
+      <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
+      <details><summary>Why does it ask about my Desktop and Documents folders?</summary><p>Tapformat saves the converted file right next to the original, so macOS asks once per folder before it can write there. The welcome guide asks for all of them in one go. To never see a folder prompt, turn on Tapformat in System Settings → Privacy &amp; Security → Full Disk Access (optional; Settings → Your Mac has a shortcut).</p></details>
+      <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
+      <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → Your Mac → Share anonymous usage count.</p></details>
+      <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
+      <details><summary>Can I change the shortcut?</summary><p>Yes, to anything you like. Pick ⌥⌘ or ⌃⌥ in Settings, or click <b>Record your own</b> and press any combination: a tap like ⌃⇧, or keys like ⌥Space or ⌃⌘K. It only listens while Finder is in front, so other apps keep their shortcuts.</p></details>
+      <details><summary>Can it convert a whole folder of photos?</summary><p>Select as many files as you like and tap ⇧⌘ once. The ring only offers formats every selected file supports, and several images can also become one PDF.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="closing" id="download">
+  <div class="orbit reveal" aria-hidden="true">
+    <div class="sq"></div>
+    <div class="spin">
+      <span class="d" style="--c:var(--jpg);--a:0deg"></span><span class="d" style="--c:var(--heic);--a:60deg"></span>
+      <span class="d" style="--c:var(--png);--a:120deg"></span><span class="d" style="--c:var(--mp3);--a:180deg"></span>
+      <span class="d" style="--c:var(--gif);--a:240deg"></span><span class="d" style="--c:var(--pdf);--a:300deg"></span>
+    </div>
+    <div class="core"></div>
+  </div>
+  <h2 class="reveal">Stop opening <span class="serif">converter websites.</span></h2>
+  <p class="reveal">Tapformat <span data-version>1.1</span> · macOS 15 or later · Apple silicon &amp; Intel · <a href="changelog" style="text-decoration:underline;text-underline-offset:3px">What's new</a></p>
+  <a class="btn primary glow reveal" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
+</section>
+
+<div class="wrap">
   <footer>
     <span>© 2026 Tapformat · <a href="changelog">What's new</a> · <a href="feedback">Send feedback</a></span>
-    <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener">Made one <kbd>⇧</kbd><kbd>⌘</kbd> at a time by
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</a>
+    <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener">
+      <span class="made">Made one <kbd>⇧</kbd><kbd>⌘</kbd> at a time by</span>
+      <span class="handle"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</span>
+    </a>
   </footer>
-</main>
-
-<nav class="dock" id="dock" aria-label="Dock">
-  <a href="#top" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="d1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fcbff"/><stop offset="1" stop-color="#1557e0"/></linearGradient><linearGradient id="d2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9f5a"/><stop offset=".5" stop-color="#e0568f"/><stop offset="1" stop-color="#5b3fd6"/></linearGradient><linearGradient id="d3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a44"/><stop offset="1" stop-color="#101014"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#d1)"/><g filter="url(#fDs)"><rect x="15" y="22" width="70" height="46" rx="5" fill="url(#d3)"/><rect x="18.5" y="25.5" width="63" height="39" rx="2.5" fill="url(#d2)"/><path d="M18.5 52 C32 45 44 57 58 50 S76 46 81.5 48 V64.5 H18.5Z" fill="#3b2a7a" opacity=".7"/><path d="M18.5 25.5 L48 25.5 L30 64.5 L18.5 64.5Z" fill="#fff" opacity=".12"/><path d="M42 68h16l3.5 11h-23z" fill="url(#gMetal)"/><rect x="31" y="78" width="38" height="4.5" rx="2.2" fill="url(#gMetal)"/></g><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Desktop</span></a>
-  <a href="#how" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe0e7"/></linearGradient><radialGradient id="h2" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".45" stop-color="#ffe066"/><stop offset=".85" stop-color="#ffab2e"/><stop offset="1" stop-color="#f08a00"/></radialGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#h1)"/><circle cx="50" cy="40" r="30" fill="#ffd84d" opacity=".35" filter="url(#fGlow)"/><g filter="url(#fDs)"><path d="M50 15 C64 15 74 26 74 39 C74 48 69 53 65 58 C62 61 61 63 61 66 H39 C39 63 38 61 35 58 C31 53 26 48 26 39 C26 26 36 15 50 15Z" fill="url(#h2)"/><path d="M43 56 L46 38 L50 46 L54 38 L57 56" fill="none" stroke="#e8740a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="38.5" y="65" width="23" height="5.5" rx="2.5" fill="url(#gMetal)"/><rect x="39.5" y="70.5" width="21" height="5" rx="2.5" fill="url(#gMetal)"/><rect x="40.5" y="75.5" width="19" height="5" rx="2.5" fill="url(#gMetal)"/><path d="M44 81h12l-2 4h-8z" fill="#55555f"/></g><ellipse cx="40" cy="29" rx="8" ry="5" fill="#fff" opacity=".75" transform="rotate(-35 40 29)"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">How It Works</span></a>
-  <a href="#formats" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="f1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfbfd"/><stop offset="1" stop-color="#d7d8e0"/></linearGradient><radialGradient id="f2" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="#43434d"/><stop offset="1" stop-color="#121216"/></radialGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#f1)"/><g filter="url(#fDs)"><circle cx="50" cy="50" r="33" fill="url(#f2)"/><circle cx="50" cy="50" r="32.5" fill="none" stroke="rgba(255,255,255,.18)"/><circle cx="50" cy="26" r="7.5" fill="url(#sO)"/><circle cx="70.8" cy="38" r="7.5" fill="url(#sV)"/><circle cx="70.8" cy="62" r="7.5" fill="url(#sB)"/><circle cx="50" cy="74" r="7.5" fill="url(#sG)"/><circle cx="29.2" cy="62" r="7.5" fill="url(#sP)"/><circle cx="29.2" cy="38" r="7.5" fill="url(#sR)"/><circle cx="50" cy="50" r="10.5" fill="url(#sW)"/></g><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Get Info: Formats</span></a>
-  <a href="#shrink" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="a1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a54"/><stop offset="1" stop-color="#17171c"/></linearGradient><linearGradient id="a2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fc79c" stop-opacity=".45"/><stop offset="1" stop-color="#2fc79c" stop-opacity="0"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#a1)"/><rect x="13" y="16" width="74" height="62" rx="6" fill="#07090b" stroke="rgba(255,255,255,.12)"/><g stroke="#2fc79c" stroke-opacity=".16"><path d="M13 31H87M13 47H87M13 63H87M31 16V78M50 16V78M69 16V78"/></g><path d="M15 34 L28 38 L38 30 L48 50 L58 44 L68 62 L77 57 L85 70 V76 H15Z" fill="url(#a2)"/><path d="M15 34 L28 38 L38 30 L48 50 L58 44 L68 62 L77 57 L85 70" fill="none" stroke="#3cffc0" stroke-width="5" opacity=".6" filter="url(#fGlow)"/><path d="M15 34 L28 38 L38 30 L48 50 L58 44 L68 62 L77 57 L85 70" fill="none" stroke="#7dffd8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="13" y="82" width="34" height="5" rx="2.5" fill="#2fc79c" opacity=".8"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Activity: Shrink</span></a>
-  <a href="#new" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="n1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f6f9"/><stop offset="1" stop-color="#d4d5dd"/></linearGradient><linearGradient id="n2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff59a"/><stop offset="1" stop-color="#ffe14d"/></linearGradient><linearGradient id="n3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7b8"/><stop offset="1" stop-color="#d9b92c"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#n1)"/><g filter="url(#fDs)"><rect x="20" y="24" width="52" height="52" rx="2" fill="#9cc8ff" transform="rotate(-11 46 50)"/><rect x="28" y="20" width="52" height="52" rx="2" fill="#ffa8cd" transform="rotate(8 54 46)"/><path d="M22 24h56v42l-12 12H22z" fill="url(#n2)"/><path d="M78 66 L66 78 L66 70 Q66 66 70 66Z" fill="url(#n3)"/><rect x="22" y="24" width="56" height="9" fill="#f6d64a"/></g><path d="M30 44h40M30 52h40M30 60h26" stroke="#c7a827" stroke-width="2.6" stroke-linecap="round"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Stickies: New in 1.1</span></a>
-  <a href="#tools" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd966"/><stop offset="1" stop-color="#f08c00"/></linearGradient><linearGradient id="t2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb057"/><stop offset=".6" stop-color="#f0596b"/><stop offset="1" stop-color="#6a3cff"/></linearGradient><linearGradient id="t3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a5a66"/><stop offset="1" stop-color="#1c1c22"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#t1)"/><g filter="url(#fDs)"><rect x="24" y="27" width="52" height="40" rx="2" fill="#fff"/><rect x="27" y="30" width="46" height="34" fill="url(#t2)"/><circle cx="58" cy="41" r="5.5" fill="#fff1c9"/><path d="M27 56 C36 50 44 60 54 54 S68 50 73 53 V64 H27Z" fill="#3b2a7a" opacity=".75"/></g><g filter="url(#fDs)"><path d="M17 28 V76 H66 V83 H10 V28Z" fill="url(#t3)"/><path d="M83 72 V24 H34 V17 H90 V72Z" fill="url(#t3)"/></g><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Tools</span></a>
-  <a href="#film" class="run opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55555f"/><stop offset="1" stop-color="#141418"/></linearGradient><radialGradient id="m2" cx=".38" cy=".32" r=".78"><stop offset="0" stop-color="#bfe3ff"/><stop offset=".45" stop-color="#3b8cff"/><stop offset="1" stop-color="#2a1696"/></radialGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#m1)"/><circle cx="50" cy="52" r="30" fill="#3b8cff" opacity=".35" filter="url(#fGlow)"/><g filter="url(#fDs)"><circle cx="50" cy="50" r="29" fill="url(#m2)"/><circle cx="50" cy="50" r="28.5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/><path d="M43 36.5 L66 50 L43 63.5Z" fill="#fff"/></g><path d="M28 40 A24 24 0 0 1 58 24 A30 26 0 0 0 28 40Z" fill="#fff" opacity=".45"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Film</span></a>
-  <a href="#faq" class="run"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="q1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eceef2"/></linearGradient><linearGradient id="q2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe065"/><stop offset="1" stop-color="#f2b400"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#q1)"/><rect width="100" height="31" fill="url(#q2)"/><rect y="29" width="100" height="2" fill="#d79e00" opacity=".5"/><g fill="#fff" opacity=".75"><circle cx="18" cy="29" r="1.8"/><circle cx="28" cy="29" r="1.8"/><circle cx="38" cy="29" r="1.8"/><circle cx="48" cy="29" r="1.8"/><circle cx="58" cy="29" r="1.8"/><circle cx="68" cy="29" r="1.8"/><circle cx="78" cy="29" r="1.8"/></g><path d="M14 47H86M14 59H86M14 71H86M14 83H62" stroke="#d3d5dd" stroke-width="1.8"/><path d="M14 47H48" stroke="#9a9aa6" stroke-width="3" stroke-linecap="round"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Notes: Questions</span></a>
-  <a href="changelog"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="w1x" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9ccc"/><stop offset=".5" stop-color="#ec3f87"/><stop offset="1" stop-color="#8a3dff"/></linearGradient><radialGradient id="w2x" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe0f0"/></radialGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#w1x)"/><path d="M50 16 C53 37, 63 47, 84 50 C63 53, 53 63, 50 84 C47 63, 37 53, 16 50 C37 47, 47 37, 50 16Z" fill="#fff" opacity=".6" filter="url(#fGlow)"/><path d="M50 16 C53 37, 63 47, 84 50 C63 53, 53 63, 50 84 C47 63, 37 53, 16 50 C37 47, 47 37, 50 16Z" fill="url(#w2x)" filter="url(#fDs)"/><path d="M75 19 C76 26, 79 29, 86 30 C79 31, 76 34, 75 41 C74 34, 71 31, 64 30 C71 29, 74 26, 75 19Z" fill="#fff" opacity=".9"/><circle cx="26" cy="76" r="4" fill="#fff" opacity=".8"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">What's New</span></a>
-  <a href="feedback" class="opt-hide"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86d6ff"/><stop offset="1" stop-color="#2160ea"/></linearGradient><linearGradient id="b2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3e9f4"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#b1)"/><path filter="url(#fDs)" d="M50 19 C71 19, 85 32, 85 47 C85 62, 71 75, 50 75 C45 75, 41 74, 37 73 L21 81 L25.5 67.5 C18.5 61.5, 15 54.5, 15 47 C15 32, 29 19, 50 19Z" fill="url(#b2)"/><circle cx="36" cy="47" r="5.5" fill="url(#sO)"/><circle cx="50" cy="47" r="5.5" fill="url(#sV)"/><circle cx="64" cy="47" r="5.5" fill="url(#sG)"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg></span><span class="tip">Feedback</span></a>
-  <span class="sep"></span>
-  <a href="https://tapformat.smit-jsv.workers.dev/download" data-download id="dockApp"><span class="ico"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34343b"/><stop offset="1" stop-color="#0f0f12"/></linearGradient></defs><g clip-path="url(#sqc)"><rect width="100" height="100" fill="url(#lgD)"/><rect width="100" height="100" fill="url(#gShade)"/></g><use href="#sq" fill="url(#gGloss)" opacity=".6"/><use href="#sq" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1"/><g filter="url(#fDs)"><circle cx="50" cy="22" r="6.2" fill="url(#sO)"/><circle cx="74.2" cy="36" r="6.2" fill="url(#sV)"/><circle cx="74.2" cy="64" r="6.2" fill="url(#sB)"/><circle cx="50" cy="78" r="6.2" fill="url(#sG)"/><circle cx="25.8" cy="64" r="6.2" fill="url(#sP)"/><circle cx="25.8" cy="36" r="6.2" fill="url(#sR)"/><circle cx="50" cy="50" r="12.5" fill="url(#sW)"/></g></svg></span><span class="tip">Download Tapformat</span></a>
-  <a href="#top" class="trash opt-hide" id="trash" aria-label="Trash"><span class="ico"><svg viewBox="0 0 100 100"><defs><linearGradient id="iTr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(255,255,255,.35)"/><stop offset=".5" stop-color="rgba(255,255,255,.12)"/><stop offset="1" stop-color="rgba(255,255,255,.35)"/></linearGradient><pattern id="iTrM" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M0 0L5 5M5 0L0 5" stroke="rgba(255,255,255,.28)" stroke-width=".8"/></pattern></defs><path d="M22 20 L28 90 Q29 94 33 94 H67 Q71 94 72 90 L78 20Z" fill="url(#iTr)"/><path d="M22 20 L28 90 Q29 94 33 94 H67 Q71 94 72 90 L78 20Z" fill="url(#iTrM)"/><ellipse cx="50" cy="20" rx="29" ry="7" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.7)" stroke-width="2"/><path d="M29 30 L33 88 M71 30 L67 88" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/></svg></span><span class="tip">Trash: drag a file here</span></a>
-</nav>
-
-<div class="notif" id="notif" role="status"><svg><use href="#logo"/></svg><div><b>Tapformat</b><span id="notifText">Sunset.jpg is ready</span></div><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Get the app</a><small>now</small></div>
-
-<div class="spot" id="spot" role="dialog" aria-label="Spotlight">
-  <div class="box"><div class="field"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><input id="spotIn" placeholder="Spotlight Search" autocomplete="off" spellcheck="false"></div><ul id="spotList"></ul></div>
 </div>
+
+<div id="overlay" class="sparks" aria-hidden="true">
+  <div class="disc" id="ovDisc" role="menu" aria-label="Convert to">
+    <div class="disc-bg"></div><div id="ovOpts"></div>
+    <div class="hub">
+      <div class="thumb"><div class="sunset"></div></div>
+      <svg class="prog" viewBox="0 0 90 90"><circle id="ovRing" cx="45" cy="45" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
+      <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
+    </div>
+    <div class="cap"><b id="ovName">Sunset.heic</b> <span id="ovDetail">· aim and click</span></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"><span>That's Tapformat. In Finder it converts the real file.</span><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download</a></div>
 
 <div class="guide" id="guide" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-card">
-    <div><svg aria-hidden="true"><use href="#logo"/></svg><div><h3 id="guideTitle">Your download has started</h3><p class="sub">Two quick steps and you're converting. Tapformat is notarized by Apple, so it opens without any warning.</p></div></div>
+    <div>
+      <h3 id="guideTitle">Your download has started</h3>
+      <p class="sub">Two quick steps and you're converting. Tapformat is notarized by Apple, so it opens without any warning.</p>
+    </div>
     <div class="gsteps">
       <div class="gstep"><b>Open the download and drag Tapformat into Applications</b>
-        <div class="vis2"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
+        <div class="vis"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
       <div class="gstep"><b>Open Tapformat from Applications and follow the 1-minute welcome. Then select any file in Finder and tap ⇧⌘</b>
-        <div class="vis2"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
+        <div class="vis"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
     </div>
-    <div class="guide-foot"><span>Updates install automatically after that.</span><button type="button" id="guideClose">Got It</button></div>
+    <div class="guide-foot"><span>Updates install automatically after that.</span><button class="btn primary small" id="guideClose" type="button">Got it</button></div>
   </div>
 </div>
 
@@ -736,10 +702,9 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 (() => {
   const $ = id => document.getElementById(id);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const touch = matchMedia("(hover: none)").matches;
-  const C = { JPG: "#ff8f2e", PNG: "#3885ff", PDF: "#f5454d", HEIC: "#9e61ff", GIF: "#ff549e", MP3: "#29c770", M4A: "#ff6b66", WAV: "#fab81f", MP4: "#735cff",
+  const C = { JPG: "#ff8f2e", PNG: "#3885ff", PDF: "#f5454d", HEIC: "#9e61ff", GIF: "#ff549e", MP3: "#29c770", M4A: "#ff6b66", WAV: "#fab81f", MP4: "#735cff", MOV: "#33a8ff",
     Word: "#336bf2", Shrink: "#2fc79c", "1 PDF": "#f5454d", Crop: "#fab81f", Resize: "#1ab8cc", Rotate: "#7c6cf0", Mute: "#ff6b66" };
-  const svg = p => `<svg viewBox="0 0 24 24">${p}</svg>`;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
   // Count one visit per browser session on the live counter.
   try {
@@ -749,421 +714,136 @@ html.intro-on, html.intro-on body { overflow: hidden; }
     }
   } catch {}
 
-  // Unique downloads: a device that already downloaded sends ?repeat=1, so the counter skips it.
-  const links = () => document.querySelectorAll("[data-download]");
-  const markRepeat = () => links().forEach(l => { l.href = l.href.split("?")[0] + "?repeat=1"; });
-  try { if (localStorage.getItem("tf-downloaded")) markRepeat(); } catch {}
-  const guide = $("guide");
-  links().forEach(l => l.addEventListener("click", () => {
-    try { if (!localStorage.getItem("tf-downloaded")) { localStorage.setItem("tf-downloaded", new Date().toISOString()); setTimeout(markRepeat, 50); } } catch {}
-    closeMenus();
-    setTimeout(() => guide.classList.add("show"), 350);
-  }));
-  $("guideClose").addEventListener("click", () => guide.classList.remove("show"));
-  guide.addEventListener("click", e => { if (e.target === guide) guide.classList.remove("show"); });
-
-  // ── Menu bar ────────────────────────────────────────────────
-  const clock = $("clock");
-  const tick = () => { const d = new Date(); clock.textContent = d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }) + "  " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); };
-  tick(); setInterval(tick, 15000);
-  const menus = [...document.querySelectorAll("[data-menu]")];
-  let menuOpen = false;
-  function closeMenus() { menus.forEach(m => m.classList.remove("open")); menuOpen = false; }
-  menus.forEach(m => {
-    m.addEventListener("pointerdown", e => {
-      if (e.target.closest(".menu")) return;
-      e.preventDefault(); e.stopPropagation();
-      const was = m.classList.contains("open");
-      closeMenus();
-      if (!was) { m.classList.add("open"); menuOpen = true; }
-    });
-    // Like macOS: once one menu is open, hovering the others switches to them.
-    m.addEventListener("pointerenter", () => { if (menuOpen && !m.classList.contains("open")) { closeMenus(); m.classList.add("open"); menuOpen = true; } });
-    m.querySelectorAll(".menu a").forEach(a => a.addEventListener("click", () => setTimeout(closeMenus, 0)));
-  });
-  addEventListener("pointerdown", e => { if (!e.target.closest("[data-menu]")) closeMenus(); });
-  document.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", e => {
-    e.stopPropagation(); closeMenus();
-    const act = b.dataset.act;
-    if (act === "open") { scrollTo({ top: 0 }); setTimeout(() => openRing(), 250); }
-    if (act === "spot") openSpot();
-    if (act === "selectall") selectAll();
-    if (act === "quit") notify("Nice try", "Tapformat lives in your menu bar, so it's always one tap away.");
-  }));
-
-  // ── Desktop files ───────────────────────────────────────────
-  // Finder-style icons: documents are paper with a folded corner and the type printed small; photos and videos are thumbnails.
-  const ART = {
-    photo: () => `<div class="photo"></div>`,
-    page: ext => `<div class="doc" style="--c:${ext === "pdf" ? "#f5454d" : "#336bf2"}"><i class="hd"></i><i class="ln"></i><span class="ex">${ext.toUpperCase()}</span></div>`,
-    audio: ext => `<div class="doc" style="--c:#1fae5b"><i class="gl">${svg('<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>')}</i><span class="ex">${ext.toUpperCase()}</span></div>`,
-    video: () => `<div class="vthumb"></div>`,
-    logo: () => `<div class="photo" style="background:radial-gradient(circle at 50% 50%,#fff 0 22%,transparent 23%),conic-gradient(#ff8f2e,#9e61ff,#3885ff,#29c770,#ff549e,#f5454d,#ff8f2e)"></div>`,
-  };
-  const artFor = (ext, from) => ({ mp3: "audio", m4a: "audio", wav: "audio", mp4: "video", mov: "video", gif: "video", pdf: "page", docx: "page" })[ext] || (from === "page" || from === "logo" ? "photo" : from);
-  const FILES = [
-    { base: "Sunset", ext: "heic", art: "photo", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize"] },
-    { base: "Invoice", ext: "pdf", art: "page", to: ["JPG", "PNG", "Shrink", "Rotate"] },
-    { base: "Podcast", ext: "wav", art: "audio", to: ["MP3", "M4A", "Shrink"] },
-    { base: "Screen Recording", ext: "mov", art: "video", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"] },
-    { base: "Proposal", ext: "docx", art: "page", to: ["PDF", "Word"] },
-    { base: "Logo", ext: "png", art: "logo", to: ["JPG", "PDF", "Shrink", "Resize", "Rotate"] },
-  ];
-  const EXT = { JPG: "jpg", PNG: "png", PDF: "pdf", MP3: "mp3", M4A: "m4a", MP4: "mp4", GIF: "gif", Word: "docx" };
-  const BADGE = { heic: C.HEIC, pdf: C.PDF, wav: C.WAV, mov: C.MP4, docx: C.Word, png: C.PNG, jpg: C.JPG, mp3: C.MP3, m4a: C.M4A, mp4: C.MP4, gif: C.GIF };
-  const NEXT = { jpg: ["PNG", "PDF", "Shrink", "Crop", "Resize"], png: ["JPG", "PDF", "Shrink", "Resize"], heic: ["JPG", "PNG", "Shrink"], pdf: ["JPG", "PNG", "Shrink", "Rotate"],
-    mp3: ["M4A", "WAV"], m4a: ["MP3", "WAV"], wav: ["MP3", "M4A"], mp4: ["GIF", "MP3", "Shrink", "Mute"], mov: ["MP4", "GIF", "Shrink"], gif: ["MP4", "Shrink"], docx: ["PDF"] };
-  const icons = $("icons"), rubber = $("rubber");
-  const all = () => [...icons.querySelectorAll(".dicon:not(.gone)")];
-  const selection = () => all().filter(d => d.classList.contains("sel"));
-
-  function makeIcon(f, x, y, isNew) {
-    const el = document.createElement("div");
-    el.className = "dicon" + (isNew ? " new" : "");
-    el.tabIndex = 0; el.setAttribute("role", "button"); el.setAttribute("aria-label", `${f.base}.${f.ext}`);
-    el.style.left = x + "px"; el.style.top = y + "px";
-    el.innerHTML = `<div class="art">${ART[f.art](f.ext)}</div><span class="name">${f.base}.${f.ext}</span>`;
-    el._file = f;
-    icons.appendChild(el);
-    wire(el);
-    return el;
-  }
-  // Like Finder's "Snap to Grid", filled from the top-right corner down the right edge.
-  const narrow = () => innerWidth <= 900;
-  function grid() {
-    const w = icons.clientWidth, h = icons.clientHeight;
-    if (narrow()) { const cols = Math.max(3, Math.floor(w / 112)); return { cols, rows: 99, pos: i => [i % cols * (w / cols) + (w / cols - 104) / 2, Math.floor(i / cols) * 118] }; }
-    const rows = Math.max(3, Math.floor((h - 150) / 116)); // starts below where notifications appear
-    return { rows, cols: 99, pos: i => [w - 130 - Math.floor(i / rows) * 118, 96 + (i % rows) * 116] };
-  }
-  function layout() { const g = grid(); all().forEach((el, i) => { const [x, y] = g.pos(i); el.style.left = x + "px"; el.style.top = y + "px"; }); }
-  function freeSpot() {
-    const g = grid(), list = all();
-    for (let i = 0; i < 60; i++) {
-      const [x, y] = g.pos(i);
-      if (x < (narrow() ? 0 : 470)) break;
-      if (y > icons.clientHeight - 100 && narrow()) break;
-      if (list.every(d => Math.abs(d.offsetLeft - x) > 60 || Math.abs(d.offsetTop - y) > 70)) return [x, y];
-    }
-    const old = icons.querySelector(".dicon.new"); if (old) { const p = [old.offsetLeft, old.offsetTop]; old.remove(); return p; }
-    return g.pos(0);
-  }
-  FILES.forEach(f => makeIcon(f, 0, 0));
-  layout();
-  addEventListener("resize", layout);
-  const stickie = $("stickie");
-  const placeStickie = () => { if (narrow()) return; const g = grid(); const [x] = g.pos(g.rows * 2); stickie.style.left = Math.max(470, x - 120) + "px"; stickie.style.top = "120px"; };
-  placeStickie(); addEventListener("resize", placeStickie);
-
-  function select(list, add) {
-    if (!add) all().forEach(d => d.classList.remove("sel"));
-    list.forEach(d => d.classList.add("sel"));
-  }
-  function selectAll() { scrollTo({ top: 0 }); select(all()); }
-
-  function wire(el) {
-    let start = null, moved = false;
-    el.addEventListener("pointerdown", e => {
-      e.stopPropagation();
-      if (ring.classList.contains("open")) closeRing();
-      if (e.metaKey || e.shiftKey) { el.classList.toggle("sel"); return; }
-      if (!el.classList.contains("sel")) select([el]);
-      start = { x: e.clientX, y: e.clientY, l: el.offsetLeft, t: el.offsetTop }; moved = false;
-      el.setPointerCapture(e.pointerId);
-    });
-    el.addEventListener("pointermove", e => {
-      if (!start) return;
-      const dx = e.clientX - start.x, dy = e.clientY - start.y;
-      if (!moved && Math.hypot(dx, dy) < 5) return;
-      moved = true; el.classList.add("dragging");
-      el.style.left = (start.l + dx) + "px"; el.style.top = (start.t + dy) + "px";
-      const t = $("trash").getBoundingClientRect();
-      $("trash").classList.toggle("hot", e.clientX > t.left - 10 && e.clientX < t.right + 10 && e.clientY > t.top - 10 && e.clientY < t.bottom + 10);
-    });
-    const end = () => {
-      if (!start) return;
-      start = null; el.classList.remove("dragging");
-      if ($("trash").classList.contains("hot")) { $("trash").classList.remove("hot"); el.classList.add("gone"); setTimeout(() => el.remove(), 350); notify("Moved to Trash", `${el._file.base}.${el._file.ext}. In Tapformat, ⌘Z undoes a conversion the same way.`); return; }
-      if (!moved && touch) openRing();
-    };
-    el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
-    el.addEventListener("dblclick", () => openRing());
-    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select([el]); openRing(); } });
-  }
-  // Rubber-band selection, like dragging on the real desktop.
-  const desk = $("top");
-  let band = null;
-  desk.addEventListener("pointerdown", e => {
-    if (e.target.closest(".dicon, .widget, .stickie, a, button") || e.button !== 0) return;
-    if (ring.classList.contains("open")) { closeRing(); return; }
-    const r = icons.getBoundingClientRect();
-    band = { x: e.clientX - r.left, y: e.clientY - r.top, add: e.metaKey || e.shiftKey };
-    if (!band.add) select([]);
-    rubber.style.display = "block"; rubber.style.left = band.x + "px"; rubber.style.top = band.y + "px"; rubber.style.width = rubber.style.height = "0px";
-  });
-  addEventListener("pointermove", e => {
-    if (!band) return;
-    const r = icons.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    const L = Math.min(x, band.x), T = Math.min(y, band.y), W = Math.abs(x - band.x), H = Math.abs(y - band.y);
-    Object.assign(rubber.style, { left: L + "px", top: T + "px", width: W + "px", height: H + "px" });
-    all().forEach(d => { const hit = d.offsetLeft < L + W && d.offsetLeft + 104 > L && d.offsetTop < T + H && d.offsetTop + 100 > T; if (hit) d.classList.add("sel"); else if (!band.add) d.classList.remove("sel"); });
-  });
-  addEventListener("pointerup", () => { if (band) { band = null; rubber.style.display = "none"; } });
-
-  // ── The ring ────────────────────────────────────────────────
-  const ring = $("ring"), ringOpts = $("ringOpts"), prog = $("ringProg");
-  let job = null, opts = [], aim = 0, busy = false, center = { x: 0, y: 0 };
-  const R = 104;
-  function place(container, labels, radius) {
+  // Lay option circles around a disc. R comes from the disc's --R, so CSS breakpoints drive the size.
+  const placeOpts = (container, labels) => {
+    const R = parseFloat(getComputedStyle(container.parentElement).getPropertyValue("--R"));
     container.innerHTML = "";
-    return labels.map((label, i) => {
+    labels.forEach((label, i) => {
       const a = i / labels.length * Math.PI * 2;
-      const o = document.createElement("button");
-      o.type = "button"; o.className = "opt"; o.textContent = label; o.tabIndex = -1;
+      const o = document.createElement("div");
+      o.className = "opt";
+      o.textContent = label;
       o.style.setProperty("--c", C[label]);
-      o.style.setProperty("--x", (Math.sin(a) * radius).toFixed(1) + "px"); o.style.setProperty("--y", (-Math.cos(a) * radius).toFixed(1) + "px");
-      o.style.setProperty("--d", (i * 0.035) + "s");
+      o.style.setProperty("--x", (Math.sin(a) * R).toFixed(1) + "px");
+      o.style.setProperty("--y", (-Math.cos(a) * R).toFixed(1) + "px");
+      o.style.setProperty("--d", (i * 0.04) + "s");
       container.appendChild(o);
-      return o;
     });
-  }
-  function outName(f, label) {
-    const tag = { Shrink: "smaller", Crop: "1x1", Resize: "1080", Rotate: "rotated", Mute: "muted" }[label];
-    return tag ? `${f.base} (${tag}).${f.ext}` : `${f.base}.${EXT[label]}`;
-  }
-  function setAim(i) {
-    aim = i;
-    opts.forEach((o, j) => o.classList.toggle("sel", j === i));
-    const label = job.to[i];
-    ring.style.setProperty("--accent", C[label]);
-    $("ringCap").innerHTML = job.files.length > 1
-      ? `<b>${label === "1 PDF" ? "Combined.pdf" : job.files.length + " files → " + label}</b> · click to convert`
-      : `<b>${outName(job.files[0]._file, label)}</b> · click to convert`;
-  }
-  function openRing() {
-    if (busy) return;
-    let files = selection();
-    if (!files.length) { files = [all()[0]]; select(files); }
-    // Several files: only what every one of them can become, plus "1 PDF" for images (like the app).
-    let to = files.map(d => d._file.to).reduce((a, b) => a.filter(x => b.includes(x)));
-    const imgs = files.every(d => ["photo", "logo"].includes(d._file.art));
-    if (files.length > 1 && imgs) to = [...to.filter(x => x !== "PDF"), "1 PDF"];
-    if (!to.length) { notify("Nothing in common", "Those files can't all become the same format. Try selecting files of one kind."); return; }
-    job = { files, to };
-    const r = files[0].querySelector(".art").getBoundingClientRect();
-    center = { x: Math.min(Math.max(r.left + r.width / 2, 160), innerWidth - 160), y: Math.min(Math.max(r.top + r.height / 2, 190), innerHeight - 210) };
-    ring.style.left = center.x + "px"; ring.style.top = center.y + "px";
-    ring.classList.remove("done", "open");
-    prog.style.transition = "none"; prog.style.strokeDashoffset = 270.2;
-    const f = files[0]._file, th = $("ringThumb");
-    th.innerHTML = files.length > 1 ? `<div style="width:100%;height:100%;display:grid;place-items:center;background:var(--sel);font-size:22px">${files.length}</div>`
-      : f.art === "photo" ? `<div style="width:100%;height:100%;background:var(--sunset)"></div>` : `<div style="width:100%;height:100%;display:grid;place-items:center;background:${BADGE[f.ext]}">${f.ext.toUpperCase()}</div>`;
-    th.style.opacity = 1;
-    opts = place(ringOpts, to, R);
-    opts.forEach((o, i) => { o.addEventListener("pointerenter", () => setAim(i)); o.addEventListener("click", e => { e.stopPropagation(); convert(i); }); });
-    setAim(0);
-    requestAnimationFrame(() => requestAnimationFrame(() => ring.classList.add("open")));
-  }
-  function closeRing() { if (!busy) ring.classList.remove("open"); }
-  addEventListener("pointermove", e => {
-    if (!ring.classList.contains("open") || busy || !opts.length) return;
-    const dx = e.clientX - center.x, dy = e.clientY - center.y;
-    if (Math.hypot(dx, dy) < 30) return;
-    const i = Math.round(((Math.atan2(dx, -dy) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2) * opts.length) % opts.length;
-    if (i !== aim) setAim(i);
-  });
-  addEventListener("pointerdown", e => { if (ring.classList.contains("open") && !e.target.closest(".ring, .dicon")) closeRing(); });
-  ring.addEventListener("click", e => { if (!busy && e.target.closest(".disc, .hub")) convert(aim); });
-
-  let converted = 0;
-  function convert(i) {
-    if (busy || !job) return;
-    busy = true;
-    const label = job.to[i];
-    opts.forEach((o, j) => o.style.opacity = j === i ? 1 : 0.25);
-    $("ringCap").innerHTML = `Converting to <b>${label}</b>… on your Mac, nothing uploaded`;
-    $("ringThumb").style.opacity = 0.45;
-    requestAnimationFrame(() => { prog.style.transition = ""; prog.style.strokeDashoffset = 0; });
-    setTimeout(() => {
-      ring.classList.add("done");
-      burst(center.x, center.y);
-      const made = [];
-      const outs = label === "1 PDF" ? [{ base: "Combined", ext: "pdf", art: "page", to: NEXT.pdf }]
-        : job.files.map(d => { const name = outName(d._file, label), ext = name.split(".").pop(); return { base: name.slice(0, -(ext.length + 1)), ext, art: artFor(ext, d._file.art), to: NEXT[ext] || d._file.to }; });
-      outs.forEach(f => { const [x, y] = freeSpot(); made.push(makeIcon(f, x, y, true)); });
-      converted += outs.length;
-      $("countN").textContent = converted;
-      $("countSub").textContent = (converted === 1 ? "file" : "files") + " · 0 bytes uploaded";
-      document.querySelectorAll("#countDots i").forEach((d, j) => d.classList.toggle("on", j < converted));
-      $("ringCap").innerHTML = `<b>✓ ${outs.length > 1 ? outs.length + " files" : outs[0].base + "." + outs[0].ext}</b> · saved next to the original`;
-      setTimeout(() => {
-        busy = false; ring.classList.remove("open"); opts.forEach(o => o.style.opacity = "");
-        select(made);
-        notify(outs.length > 1 ? `${outs.length} files are ready` : `${outs[0].base}.${outs[0].ext} is ready`, "Saved next to the original. Nothing was uploaded.");
-        const d = $("dockApp"); d.classList.remove("bounce"); void d.offsetWidth; d.classList.add("bounce");
-      }, 1000);
-    }, 950);
-  }
-  function burst(x, y, n = 22) {
-    if (reduce) return;
+    return [...container.children];
+  };
+  const select = (opts, i) => opts.forEach((o, j) => o.classList.toggle("sel", j === i));
+  function burst(host, x, y, n = 20) {
     const colors = Object.values(C);
     for (let i = 0; i < n; i++) {
-      const a = i / n * Math.PI * 2, d = 80 + (i * 37) % 80, c = colors[i % colors.length];
+      const a = i / n * Math.PI * 2, d = 70 + (i * 37) % 70, c = colors[i % colors.length];
       const b = document.createElement("span");
       b.style.left = x + "px"; b.style.top = y + "px"; b.style.background = c; b.style.boxShadow = `0 0 10px ${c}`;
-      b.style.setProperty("--bx", (Math.cos(a) * d).toFixed(0) + "px"); b.style.setProperty("--by", (Math.sin(a) * d).toFixed(0) + "px");
-      $("sparks").appendChild(b);
+      b.style.setProperty("--bx", (Math.cos(a) * d).toFixed(0) + "px");
+      b.style.setProperty("--by", (Math.sin(a) * d).toFixed(0) + "px");
+      host.appendChild(b);
       setTimeout(() => b.remove(), 950);
     }
   }
 
-  // ── Notifications ───────────────────────────────────────────
-  let notifTimer;
-  function notify(title, body) {
-    const n = $("notif");
-    n.querySelector("b").textContent = title === "Moved to Trash" || title === "Nice try" || title === "Nothing in common" ? title : "Tapformat";
-    $("notifText").innerHTML = title === "Moved to Trash" || title === "Nice try" || title === "Nothing in common" ? body : `<b style="display:inline">${title}</b><br>${body}`;
-    n.classList.remove("show"); void n.offsetWidth; n.classList.add("show");
-    clearTimeout(notifTimer); notifTimer = setTimeout(() => n.classList.remove("show"), 5200);
+  // Unique downloads: a device that already downloaded sends ?repeat=1, so the counter skips it.
+  try {
+    if (localStorage.getItem("tf-downloaded")) document.querySelectorAll("[data-download]").forEach((l) => { l.href = l.href.split("?")[0] + "?repeat=1"; });
+  } catch {}
+  document.querySelectorAll("[data-download]").forEach((l) => l.addEventListener("click", () => {
+    try {
+      if (!localStorage.getItem("tf-downloaded")) { localStorage.setItem("tf-downloaded", new Date().toISOString()); setTimeout(() => document.querySelectorAll("[data-download]").forEach((x) => { x.href = x.href.split("?")[0] + "?repeat=1"; }), 50); }
+    } catch {}
+  }));
+  // ── Download → first-launch guide ────────────────────────────
+  const guide = $("guide");
+  document.querySelectorAll("[data-download]").forEach(a => a.addEventListener("click", () => setTimeout(() => guide.classList.add("show"), 350)));
+  $("guideClose").addEventListener("click", () => guide.classList.remove("show"));
+  guide.addEventListener("click", e => { if (e.target === guide) guide.classList.remove("show"); });
+
+  // ── Cursor light + hero tilt ────────────────────────────────
+  const light = $("cursorLight"), tilt = $("tilt"), heroRing = $("heroRing");
+  let pointer = { x: innerWidth / 2, y: innerHeight / 2 };
+  const moveLight = () => { light.style.transform = `translate(${pointer.x - 280}px, ${pointer.y - 280}px)`; };
+  moveLight();
+  addEventListener("pointermove", e => {
+    pointer = { x: e.clientX, y: e.clientY };
+    moveLight();
+    if (reduce) return;
+    const r = heroRing.getBoundingClientRect();
+    if (r.bottom < 0) return;
+    const nx = (e.clientX - (r.left + r.width / 2)) / innerWidth, ny = (e.clientY - (r.top + r.height / 2)) / innerHeight;
+    tilt.style.setProperty("--ry", (nx * 26).toFixed(2) + "deg");
+    tilt.style.setProperty("--rx", (6 - ny * 22).toFixed(2) + "deg");
+  }, { passive: true });
+
+  document.querySelectorAll(".card").forEach(card => card.addEventListener("pointermove", e => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    card.style.setProperty("--my", (e.clientY - r.top) + "px");
+  }));
+
+  // Keycaps follow the visitor's real keyboard
+  const setKey = (key, down) => document.querySelectorAll(`kbd[data-key="${key}"]`).forEach(k => k.classList.toggle("down", down));
+
+  // ── Hero ring: aims around the options on its own ───────────
+  const HERO = ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize"];
+  const heroOut = { JPG: "Sunset.jpg", PNG: "Sunset.png", PDF: "Sunset.pdf", Shrink: "Sunset (smaller).heic", Crop: "Sunset (4x5).heic", Resize: "Sunset (1080px).heic" };
+  const heroDisc = $("heroDisc"), heroCap = $("heroCap"), heroTo = $("heroTo");
+  let heroOpts = placeOpts($("heroOpts"), HERO), heroI = 0;
+  const heroAim = () => {
+    select(heroOpts, heroI);
+    const c = C[HERO[heroI]];
+    [heroRing, heroDisc, heroCap].forEach(el => el.style.setProperty("--accent", c));
+    heroTo.textContent = heroOut[HERO[heroI]];
+  };
+  heroAim();
+  setInterval(() => { heroI = (heroI + 1) % HERO.length; heroAim(); }, 1400);
+
+  // ── Marquee ─────────────────────────────────────────────────
+  const ticks = [["HEIC", "JPG", C.JPG], ["PNG", "PDF", C.PDF], ["MOV", "MP4", C.MP4], ["WAV", "MP3", C.MP3], ["PDF", "PNG", C.PNG], ["DOCX", "PDF", C.PDF],
+    ["MOV", "GIF", C.GIF], ["87 MB", "41 MB", C.Shrink], ["3 PDFs", "1 PDF", C.PDF], ["4032px", "1080px", C.Resize], ["16:9", "4:5", C.Crop], ["5.2 MB", "177 KB", C.Shrink]];
+  const tickHTML = ticks.map(([a, b, c]) => `<span class="tick" style="--c:${c}"><i></i>${a} → <b>${b}</b></span>`).join("");
+  $("marquee").innerHTML = tickHTML + tickHTML;
+
+  // ── Scroll story ────────────────────────────────────────────
+  const story = document.querySelector(".story"), steps = [...document.querySelectorAll(".step")];
+  const src = $("src"), out = $("out"), sDisc = $("storyDisc"), sKeys = $("storyKeys"), sSaved = $("storySaved"), sProg = $("storyProg");
+  const S_LABELS = ["JPG", "PNG", "PDF", "Shrink"];
+  let sOpts = placeOpts($("storyOpts"), S_LABELS);
+  const seg = (p, a, b) => clamp((p - a) / (b - a));
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  let burstDone = false;
+  function storyFrame() {
+    const r = story.getBoundingClientRect();
+    const p = clamp(-r.top / (r.height - innerHeight));
+    const step = p < 0.28 ? 0 : p < 0.72 ? 1 : 2;
+    steps.forEach((s, i) => s.classList.toggle("on", i === step));
+    // 1. select the file
+    src.classList.toggle("selected", p > 0.08);
+    // 2. tap the keys, the ring springs open
+    sKeys.style.opacity = (p > 0.2 && p < 0.74) ? 1 : 0;
+    sKeys.querySelectorAll("kbd").forEach(kb => kb.classList.toggle("down", p > 0.29 && p < 0.37));
+    const open = ease(seg(p, 0.34, 0.44)), close = ease(seg(p, 0.8, 0.88));
+    sDisc.style.setProperty("--s", (0.6 + 0.4 * open - 0.25 * close).toFixed(3));
+    sDisc.style.setProperty("--o", (open * (1 - close)).toFixed(3));
+    sDisc.classList.toggle("open", open > 0.15);
+    // aim sweeps PNG → PDF → JPG, then converts
+    const aimIdx = p < 0.5 ? 1 : p < 0.56 ? 2 : 0;
+    select(sOpts, aimIdx);
+    sDisc.style.setProperty("--accent", C[S_LABELS[aimIdx]]);
+    sProg.style.strokeDashoffset = (263.9 * (1 - seg(p, 0.6, 0.74))).toFixed(1);
+    sDisc.classList.toggle("done", p > 0.74);
+    // 3. the converted file lands
+    const o = ease(seg(p, 0.8, 0.9));
+    out.style.opacity = o;
+    out.style.transform = `translate(-50%, -50%) translateX(${(-60 * (1 - o)).toFixed(1)}px) scale(${(0.6 + 0.4 * o).toFixed(3)})`;
+    src.style.opacity = 1 - 0.45 * o;
+    sSaved.style.opacity = seg(p, 0.86, 0.92);
+    if (p > 0.86 && !burstDone) { burstDone = true; if (!reduce) burst($("sparks"), out.offsetLeft, out.offsetTop - 20); }
+    if (p < 0.8) burstDone = false;
   }
 
-  // ── Keyboard: the real ⇧⌘ tap, Spotlight, ⌘A ───────────────
-  const setKey = (k, d) => document.querySelectorAll(`kbd[data-key="${k}"]`).forEach(x => x.classList.toggle("down", d));
-  const held = new Set();
-  let armed = false, spoiled = false;
-  addEventListener("keydown", e => {
-    if (spot.classList.contains("show")) return;
-    if (e.key === "Escape") { closeRing(); closeMenus(); return; }
-    if (ring.classList.contains("open") && !busy && !held.size) {
-      if (e.key === "Enter") { e.preventDefault(); convert(aim); return; }
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); setAim((aim + 1) % opts.length); return; }
-      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); setAim((aim - 1 + opts.length) % opts.length); return; }
-    }
-    if ((e.key === "/" && !e.metaKey) || (e.key.toLowerCase() === "k" && e.metaKey)) { e.preventDefault(); openSpot(); return; }
-    if (e.key.toLowerCase() === "a" && e.metaKey && scrollY < innerHeight * 0.6 && !e.target.closest("input")) { e.preventDefault(); select(all()); return; }
-    if (e.key === "Shift" || e.key === "Meta") { held.add(e.key); setKey(e.key, true); if (held.size === 2) { armed = true; spoiled = false; } }
-    else if (held.size) spoiled = true;
-  });
-  addEventListener("keyup", e => {
-    if (e.key !== "Shift" && e.key !== "Meta") return;
-    held.delete(e.key); setKey(e.key, false);
-    if (!held.size) { if (armed && !spoiled) { if (ring.classList.contains("open")) closeRing(); else openRing(); } armed = false; }
-  });
-  addEventListener("blur", () => { held.clear(); armed = false; setKey("Shift", false); setKey("Meta", false); });
-  $("tryBtn").addEventListener("click", e => { e.stopPropagation(); openRing(); });
-
-  // ── Spotlight ───────────────────────────────────────────────
-  const spot = $("spot"), spotIn = $("spotIn"), spotList = $("spotList");
-  const ENTRIES = [
-    ["How it works", "#how", "→", "#ff8f2e", "steps select tap done"], ["Formats: what can a file become?", "#formats", "◎", "#9e61ff", "jpg png pdf heic webp mp3 mp4 gif word docx wav m4a mov formats convert"],
-    ["Shrink: real results", "#shrink", "⤡", "#2fc79c", "shrink compress smaller size"], ["Tools: crop, resize, rotate, mute, merge", "#tools", "✂", "#fab81f", "crop resize rotate flip mute merge undo right-click"],
-    ["New in 1.1", "#new", "★", "#ff549e", "new shortcut drag drop select"], ["Watch the film", "#film", "▶", "#735cff", "video film watch"],
-    ["Questions", "#faq", "?", "#e0a800", "faq free safe accessibility permission folders track privacy shortcut macs"],
-    ["Download Tapformat", "https://tapformat.smit-jsv.workers.dev/download", "↓", "#3885ff", "download install get app dmg"],
-    ["What's new (changelog)", "changelog", "✦", "#ff549e", "changelog release version updates"], ["Send feedback", "feedback", "✎", "#0a84ff", "feedback bug idea contact"],
-    ["Convert a file on this page", "#convert", "⟳", "#ff8f2e", "try demo convert ring"],
-  ];
-  let spotSel = 0, spotItems = [];
-  function renderSpot() {
-    const q = spotIn.value.trim().toLowerCase();
-    spotItems = ENTRIES.filter(([t, , , , k]) => !q || (t + " " + k).toLowerCase().includes(q)).slice(0, 7);
-    spotSel = 0;
-    spotList.innerHTML = spotItems.map(([t, h, ic, c], i) => `<li data-i="${i}" class="${i === 0 ? "on" : ""}"><i style="--c:${c}">${ic}</i>${t}<small>${h.startsWith("#") ? "Tapformat" : "Website"}</small></li>`).join("");
-    spotList.querySelectorAll("li").forEach(li => { li.addEventListener("pointerenter", () => markSpot(+li.dataset.i)); li.addEventListener("click", () => goSpot(+li.dataset.i)); });
-  }
-  const markSpot = i => { spotSel = i; spotList.querySelectorAll("li").forEach((li, j) => li.classList.toggle("on", j === i)); };
-  function goSpot(i) {
-    const it = spotItems[i]; if (!it) return;
-    closeSpot();
-    if (it[1] === "#convert") { scrollTo({ top: 0 }); setTimeout(() => openRing(), 300); return; }
-    if (it[1].includes("download")) { $("finalDl").click(); return; }
-    if (it[1].startsWith("#")) document.querySelector(it[1]).scrollIntoView({ behavior: "smooth", block: "start" }); else location.href = it[1];
-  }
-  function openSpot() { spot.classList.add("show"); spotIn.value = ""; renderSpot(); setTimeout(() => spotIn.focus(), 10); }
-  function closeSpot() { spot.classList.remove("show"); spotIn.blur(); }
-  spotIn.addEventListener("input", renderSpot);
-  spotIn.addEventListener("keydown", e => {
-    if (e.key === "Escape") closeSpot();
-    if (e.key === "ArrowDown") { e.preventDefault(); markSpot(Math.min(spotSel + 1, spotItems.length - 1)); }
-    if (e.key === "ArrowUp") { e.preventDefault(); markSpot(Math.max(spotSel - 1, 0)); }
-    if (e.key === "Enter") goSpot(spotSel);
-  });
-  spot.addEventListener("pointerdown", e => { if (!e.target.closest(".box")) closeSpot(); });
-
-  // ── Windows: focus, collapse, zoom ──────────────────────────
-  const wins = [...document.querySelectorAll(".win")];
-  const focusWin = w => wins.forEach(x => x.classList.toggle("active", x === w));
-  wins.forEach(w => {
-    w.addEventListener("pointerdown", () => focusWin(w));
-    w.querySelectorAll("[data-tl]").forEach(b => b.addEventListener("click", e => {
-      e.stopPropagation(); focusWin(w);
-      if (b.dataset.tl === "zoom") w.classList.toggle("zoomed"); else w.classList.toggle("shade");
-    }));
-    w.querySelector(".tb").addEventListener("dblclick", () => w.classList.toggle("shade"));
-  });
-
-  // ── How it works: the little ring keeps aiming ──────────────
-  const mini = $("miniRing");
-  for (let i = 0; i < 6; i++) { const d = document.createElement("i"), a = i / 6 * Math.PI * 2; d.style.transform = `translate(${Math.sin(a) * 42}px, ${-Math.cos(a) * 42}px)`; mini.appendChild(d); }
-  mini.appendChild(document.createElement("b"));
-  let mi = 0; setInterval(() => { [...mini.querySelectorAll("i")].forEach((d, j) => d.classList.toggle("on", j === mi)); mi = (mi + 1) % 6; }, 900);
-
-  // ── Formats: Get Info ───────────────────────────────────────
-  const KINDS = [
-    { name: "Image", from: "HEIC · PNG · JPG · WebP", ic: "IMG", color: C.HEIC, file: "IMG_2041.heic", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize", "Rotate"] },
-    { name: "PDF", from: ".pdf", ic: "PDF", color: C.PDF, file: "Report.pdf", to: ["JPG", "PNG", "Shrink", "Rotate"] },
-    { name: "Several PDFs", from: "select 2 or more", ic: "2×", color: C.PDF, file: "3 PDFs", to: ["JPG", "PNG", "1 PDF", "Shrink"] },
-    { name: "Document", from: "Word · RTF · Markdown", ic: "DOC", color: C.Word, file: "Proposal.docx", to: ["PDF", "Word"] },
-    { name: "Audio", from: "WAV · M4A · FLAC · AIFF", ic: "AUD", color: C.MP3, file: "Voice memo.wav", to: ["MP3", "M4A", "WAV"] },
-    { name: "Video", from: "MOV · MP4 · MKV · WebM", ic: "VID", color: C.MP4, file: "Screen Recording.mov", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"] },
-  ];
-  const kinds = $("kinds"), infoRing = $("infoRing");
-  let infoTimer;
-  function showKind(k) {
-    [...kinds.children].forEach((t, i) => { t.classList.toggle("on", i === k); t.setAttribute("aria-selected", String(i === k)); });
-    const kind = KINDS[k];
-    $("infoThumb").innerHTML = `<div style="width:100%;height:100%;display:grid;place-items:center;background:${kind.color}">${kind.ic}</div>`;
-    $("infoLabel").innerHTML = `<b>${kind.file}</b> → ${kind.to.join(" · ")}`;
-    const o = place($("infoOpts"), kind.to, R);
-    let i = 0;
-    const light = () => { o.forEach((x, j) => x.classList.toggle("sel", j === i)); infoRing.style.setProperty("--accent", C[kind.to[i]]); };
-    light(); clearInterval(infoTimer); infoTimer = setInterval(() => { i = (i + 1) % o.length; light(); }, 1100);
-  }
-  KINDS.forEach((kind, i) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "kind"; b.setAttribute("role", "tab");
-    b.innerHTML = `<span class="ic" style="--c:${kind.color}">${kind.ic}</span><span><b>${kind.name}</b><small>${kind.from}</small></span><span class="cnt">${kind.to.length}</span>`;
-    b.addEventListener("click", () => showKind(i));
-    kinds.appendChild(b);
-  });
-  showKind(0);
-
-  // ── Shrink results (real tests, Balanced) ───────────────────
-  const MB = 1024 * 1024;
-  const fmt = b => b >= MB ? (b / MB).toFixed(1).replace(/\.0$/, "") + " MB" : Math.round(b / 1024) + " KB";
-  const results = [
-    { what: "Screen recording", detail: "30 s, Retina", before: 87.0 * MB, after: 41.2 * MB },
-    { what: "Photo", detail: "4032 × 3024 JPG", before: 5.2 * MB, after: 1.2 * MB },
-    { what: "Scanned PDF", detail: "3 pages", before: 5.2 * MB, after: 0.177 * MB },
-    { what: "1080p video", detail: "4 s, MOV", before: 112 * MB, after: 4.6 * MB },
-  ];
-  $("meters").innerHTML = results.map(r => `<div class="meter" data-r="${(r.after / r.before).toFixed(4)}"><div><b>${r.what}</b><small>${r.detail}</small></div>
-    <div class="bars"><i></i><i></i></div><div class="num"><em>−${Math.round((1 - r.after / r.before) * 100)}%</em>${fmt(r.before)} → ${fmt(r.after)}</div></div>`).join("");
-
-  // ── Tools: icon view ────────────────────────────────────────
-  const TOOLS = [
-    ["Crop for every feed", "1:1, 4:5, 16:9 or 9:16. Smart crop keeps the subject in frame.", "#fab81f", '<path d="M6 3v13a2 2 0 0 0 2 2h13M3 6h13a2 2 0 0 1 2 2v13"/>'],
-    ["Resize in one click", "Half size, 1080px, 2048 or 4K. Aspect ratio kept.", "#1ab8cc", '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>'],
-    ["Rotate &amp; flip", "Photos and PDF pages, upright in a tap.", "#7c6cf0", '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>'],
-    ["Mute a video", "Strip the audio instantly. No re-encoding.", "#ff6b66", '<path d="M11 5L6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6"/>'],
-    ["Merge PDFs", "Select several, tap ⇧⌘, pick 1 PDF.", "#f5454d", '<path d="M8 3h8l4 4v10H8zM4 7v14h12"/>'],
-    ["Undo anything", "⌘Z on the check mark sends the new file to the Trash.", "#8e8e98", '<path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/>'],
-    ["Right-click too", "Convert or Shrink from Finder's Services menu.", "#3885ff", '<path d="M5 3l14 8-6 2-2 6z"/>'],
-    ["Never uploaded", "Runs on your Mac and works offline. Never overwrites: you get photo 2.jpg.", "#2fc79c", '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'],
-  ];
-  $("toolGrid").innerHTML = TOOLS.map(([t, d, c, p]) => `<div class="tool"><div class="tile" style="--t:linear-gradient(${c},color-mix(in srgb,${c} 68%,#000))">${svg(p)}</div><b>${t}</b><small>${d}</small></div>`).join("");
-
-  // ── Film sound: browsers only autoplay muted ────────────────
+  // Sound toggle: browsers only autoplay muted, so the visitor turns sound on.
   const filmVideo = $("filmVideo"), soundBtn = $("soundBtn");
   soundBtn.addEventListener("click", () => {
     const on = filmVideo.muted;
@@ -1173,47 +853,188 @@ html.intro-on, html.intro-on body { overflow: hidden; }
     soundBtn.querySelector("span").textContent = on ? "Sound off" : "Sound on";
   });
 
-  // ── Installer: drag the app onto Applications to download ───
-  const app = $("dmgApp"), apps = $("dmgApps"), finalDl = $("finalDl");
-  let ds = null;
-  app.addEventListener("pointerdown", e => { ds = { x: e.clientX, y: e.clientY }; app.setPointerCapture(e.pointerId); });
-  app.addEventListener("pointermove", e => {
-    if (!ds) return;
-    app.style.transform = `translate(${e.clientX - ds.x}px, ${e.clientY - ds.y}px)`;
-    const r = apps.getBoundingClientRect();
-    apps.classList.toggle("hot", e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom);
-  });
-  const drop = () => {
-    if (!ds) return;
-    ds = null;
-    const hit = apps.classList.contains("hot");
-    apps.classList.remove("hot");
-    app.style.transition = "transform 0.4s var(--spring)"; app.style.transform = ""; setTimeout(() => app.style.transition = "", 400);
-    if (hit) { const r = apps.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + 40); finalDl.click(); }
-  };
-  app.addEventListener("pointerup", drop); app.addEventListener("pointercancel", drop);
+  // Demo film flattens as it scrolls into view
+  const film = $("filmFrame");
+  function filmFrame() {
+    const r = film.getBoundingClientRect();
+    const t = clamp(1 - (r.top - innerHeight * 0.15) / (innerHeight * 0.7));
+    film.style.setProperty("--fx", (18 * (1 - t)).toFixed(2) + "deg");
+    film.style.setProperty("--fs", (0.9 + 0.1 * t).toFixed(3));
+  }
+  let ticking = false;
+  const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { storyFrame(); filmFrame(); ticking = false; }); };
+  addEventListener("scroll", onScroll, { passive: true });
+  storyFrame(); filmFrame();
 
-  // ── Dock magnification ──────────────────────────────────────
-  const dock = $("dock"), dockItems = [...dock.querySelectorAll("a")];
-  if (!touch && !reduce) {
-    dock.addEventListener("pointermove", e => dockItems.forEach(a => {
-      const r = a.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2));
-      a.style.transform = `scale(${(1 + Math.max(0, 1 - d / 140) * 0.6).toFixed(3)})`;
-    }));
-    dock.addEventListener("pointerleave", () => dockItems.forEach(a => a.style.transform = ""));
+  // ── Format wheel ────────────────────────────────────────────
+  const KINDS = [
+    { name: "Image", from: "HEIC · PNG · JPG · WebP", ic: "IMG", color: C.HEIC, file: "IMG_2041.heic", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize", "Rotate"] },
+    { name: "PDF", from: ".pdf", ic: "PDF", color: C.PDF, file: "Report.pdf", to: ["JPG", "PNG", "Shrink", "Rotate"] },
+    { name: "Several PDFs", from: "select 2 or more", ic: "2×", color: C.PDF, file: "3 PDFs", to: ["JPG", "PNG", "1 PDF", "Shrink"] },
+    { name: "Document", from: "Word · RTF · Markdown", ic: "DOC", color: C.Word, file: "Proposal.docx", to: ["PDF", "Word"] },
+    { name: "Audio", from: "WAV · M4A · FLAC · AIFF", ic: "AUD", color: C.MP3, file: "Voice memo.wav", to: ["MP3", "M4A", "WAV"] },
+    { name: "Video", from: "MOV · MP4 · MKV · WebM", ic: "VID", color: C.MP4, file: "Screen Recording.mov", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"] },
+  ];
+  const tabs = $("tabs"), wheelDisc = $("wheelDisc"), stage = $("wheelStage");
+  let wheelTimer, kindIdx = 0;
+  function showKind(k) {
+    kindIdx = k;
+    [...tabs.children].forEach((t, i) => { t.classList.toggle("on", i === k); t.setAttribute("aria-selected", String(i === k)); });
+    const kind = KINDS[k];
+    stage.style.setProperty("--accent", kind.color);
+    wheelDisc.style.setProperty("--accent", kind.color);
+    $("wheelThumb").innerHTML = `<div style="width:100%;height:100%;display:grid;place-items:center;background:${kind.color};color:#fff;font:700 13px var(--sans)">${kind.ic}</div>`;
+    $("wheelLabel").innerHTML = `<b>${kind.file}</b><br>→ ${kind.to.join(" · ")}`;
+    wheelDisc.classList.remove("open");
+    const opts = placeOpts($("wheelOpts"), kind.to);
+    requestAnimationFrame(() => requestAnimationFrame(() => wheelDisc.classList.add("open")));
+    let i = 0;
+    select(opts, i);
+    clearInterval(wheelTimer);
+    wheelTimer = setInterval(() => { i = (i + 1) % opts.length; select(opts, i); }, 1100);
+  }
+  KINDS.forEach((kind, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab");
+    b.innerHTML = `<span class="ic" style="--c:${kind.color}">${kind.ic}</span><span><b>${kind.name}</b><span class="sub">${kind.from}</span></span><span class="to">${kind.to.length} options</span>`;
+    b.addEventListener("click", () => showKind(i));
+    tabs.appendChild(b);
+  });
+  showKind(0);
+
+  // Ring sizes change at breakpoints, so re-place the circles on resize.
+  let resizeT;
+  addEventListener("resize", () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => { heroOpts = placeOpts($("heroOpts"), HERO); heroAim(); sOpts = placeOpts($("storyOpts"), S_LABELS); storyFrame(); filmFrame(); showKind(kindIdx); }, 150);
+  });
+
+  // ── Mute waveform bars ──────────────────────────────────────
+  $("wave").innerHTML = Array.from({ length: 22 }, (_, i) => `<i style="--i:${i};height:${30 + (i * 53) % 70}%"></i>`).join("");
+
+  // ── Shrink counters ─────────────────────────────────────────
+  const MB = 1e6;
+  const fmt = b => b >= MB ? (b / MB).toFixed(b >= 10 * MB ? 0 : 1) + " MB" : Math.round(b / 1000) + " KB";
+  const results = [
+    { what: "Screen recording", detail: "30 s, Retina", before: 87.0 * MB, after: 41.2 * MB },
+    { what: "Photo", detail: "4032 × 3024 JPG", before: 5.2 * MB, after: 1.2 * MB },
+    { what: "Scanned PDF", detail: "3 pages", before: 5.2 * MB, after: 0.177 * MB },
+    { what: "1080p video", detail: "4 s, MOV", before: 112 * MB, after: 4.6 * MB },
+  ];
+  $("counters").innerHTML = results.map((r, i) => `<div class="card counter reveal" data-i="${i}">
+      <span class="what">${r.what}</span><span class="detail">${r.detail}</span>
+      <div class="nums"><span class="num">${fmt(r.before)}</span><span class="from">${fmt(r.before)}</span><span class="pct">−${Math.round((1 - r.after / r.before) * 100)}%</span></div>
+      <div class="track"><i></i></div></div>`).join("");
+  const runCounter = el => {
+    const r = results[el.dataset.i], num = el.querySelector(".num"), bar = el.querySelector(".track i");
+    bar.style.width = (Math.max(r.after / r.before, 0.035) * 100).toFixed(1) + "%";
+    if (reduce) { num.textContent = fmt(r.after); return; }
+    const t0 = performance.now();
+    const stepFn = now => {
+      const p = Math.min(1, (now - t0) / 1400), e = 1 - Math.pow(1 - p, 3);
+      num.textContent = fmt(r.before + (r.after - r.before) * e);
+      if (p < 1) requestAnimationFrame(stepFn);
+    };
+    requestAnimationFrame(stepFn);
+  };
+
+  // ── Reveal on scroll ────────────────────────────────────────
+  const show = el => { el.classList.add("in"); if (el.classList.contains("counter")) setTimeout(() => runCounter(el), 250); };
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      io.unobserve(en.target);
+      const grid = en.target.closest(".bento, .shrink-grid");
+      setTimeout(() => show(en.target), grid ? ([...grid.children].indexOf(en.target) % 3) * 90 : 0);
+    }), { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll(".reveal").forEach(show);
   }
 
-  // ── Windows open as they scroll in; the one in view gets focus ─
-  const show = el => {
-    el.classList.add("in");
-    el.querySelectorAll(".meter").forEach(m => { m.querySelector(".bars i + i").style.transform = `scaleX(${m.dataset.r})`; });
-  };
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } }), { threshold: 0.08 });
-    document.querySelectorAll(".pop").forEach(el => io.observe(el));
-    const fo = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) focusWin(en.target); }), { rootMargin: "-45% 0px -45% 0px" });
-    wins.forEach(w => fo.observe(w));
-  } else document.querySelectorAll(".pop").forEach(show);
+  // ── ⇧⌘ anywhere: the ring opens at the pointer ─────────────
+  const overlay = $("overlay"), disc = $("ovDisc"), ring = $("ovRing"), toast = $("toast");
+  const LABELS = ["JPG", "PNG", "PDF", "Shrink"], LEN = 263.9;
+  let ovOpts = [], center = { x: 0, y: 0 }, choice = 0, phase = "closed";
+  addEventListener("pointermove", e => { if (phase === "choosing") aim(e.clientX, e.clientY); }, { passive: true });
+  function openRing(x, y) {
+    if (phase !== "closed") return;
+    const half = 94 + 28 + 17 + 10;
+    center = { x: clamp(x, half, innerWidth - half), y: clamp(y, half + 64, innerHeight - half - 40) };
+    disc.style.left = center.x + "px"; disc.style.top = center.y + "px";
+    disc.classList.remove("done", "open");
+    ovOpts = placeOpts($("ovOpts"), LABELS);
+    choice = 0; ring.style.strokeDashoffset = LEN;
+    $("ovName").textContent = "Sunset.heic"; $("ovDetail").textContent = "· aim and click";
+    phase = "choosing"; highlight();
+    overlay.classList.add("open");
+    requestAnimationFrame(() => requestAnimationFrame(() => disc.classList.add("open")));
+    toast.classList.remove("show");
+  }
+  function closeRing() { disc.classList.remove("open"); overlay.classList.remove("open"); phase = "closed"; }
+  function highlight() { select(ovOpts, choice); disc.style.setProperty("--accent", C[LABELS[choice]]); }
+  function aim(x, y) {
+    const dx = x - center.x, dy = y - center.y;
+    if (Math.hypot(dx, dy) < 39) return false;
+    let a = Math.atan2(dx, -dy); if (a < 0) a += Math.PI * 2;
+    const i = Math.round(a / (Math.PI * 2 / LABELS.length)) % LABELS.length;
+    if (i !== choice) { choice = i; highlight(); }
+    return true;
+  }
+  function convert() {
+    if (phase !== "choosing") return;
+    phase = "working";
+    const label = LABELS[choice], o = ovOpts[choice];
+    o.innerHTML = '<span class="spinner"></span>';
+    const t0 = performance.now();
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / 850);
+      ring.style.strokeDashoffset = LEN * (1 - p);
+      if (p < 1) return requestAnimationFrame(tick);
+      phase = "done";
+      $("ovName").textContent = label === "Shrink" ? "Sunset (smaller).heic" : "Sunset." + label.toLowerCase();
+      $("ovDetail").textContent = "· saved";
+      disc.classList.add("done");
+      if (!reduce) burst(overlay, center.x, center.y, 26);
+      setTimeout(() => { closeRing(); toast.classList.add("show"); }, 1500);
+      setTimeout(() => toast.classList.remove("show"), 6500);
+    };
+    requestAnimationFrame(tick);
+  }
+  disc.addEventListener("click", e => {
+    e.stopPropagation();
+    if (phase === "choosing") { if (aim(e.clientX, e.clientY)) convert(); else closeRing(); }
+    else if (phase === "done") closeRing();
+  });
+  overlay.addEventListener("click", () => { if (phase === "choosing") closeRing(); });
+  $("tryBtn").addEventListener("click", e => { e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); openRing(r.left + r.width / 2, r.top - 170); });
+
+  // The gesture: ⇧ and ⌘ pressed together, released with nothing else in between.
+  const down = new Set();
+  let armed = false, armedAt = 0;
+  addEventListener("keydown", e => {
+    if (e.key === "Escape") guide.classList.remove("show");
+    if (e.key === "Shift" || e.key === "Meta") {
+      setKey(e.key, true); down.add(e.key);
+      if (down.has("Shift") && down.has("Meta")) { armed = true; armedAt = performance.now(); }
+      return;
+    }
+    armed = false;
+    if (phase !== "choosing") return;
+    if (e.key === "Escape") { closeRing(); e.preventDefault(); }
+    else if (e.key === "Enter") { convert(); e.preventDefault(); }
+    else if (e.key === "ArrowRight" || e.key === "ArrowDown") { choice = (choice + 1) % LABELS.length; highlight(); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { choice = (choice + LABELS.length - 1) % LABELS.length; highlight(); e.preventDefault(); }
+  });
+  addEventListener("keyup", e => {
+    if (e.key !== "Shift" && e.key !== "Meta") return;
+    setKey(e.key, false); down.delete(e.key);
+    if (down.size === 0 && armed) {
+      armed = false;
+      if (performance.now() - armedAt < 900) { if (phase === "choosing") closeRing(); else if (phase === "closed") openRing(pointer.x, pointer.y); }
+    }
+  });
+  addEventListener("blur", () => { down.clear(); armed = false; setKey("Shift", false); setKey("Meta", false); });
 })();
 </script>
 </body>

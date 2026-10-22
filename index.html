@@ -18,424 +18,321 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
-/* Cinematic dark: a black stage lit by a slow aurora in the six format colors, the same world as the app's onboarding.
-   The ring is the hero object everywhere: it tilts with the cursor, converts a file as you scroll, and opens at the pointer on ⇧⌘.
-   Deliberately dark-only, like a launch film. */
+/* "The Desktop": the whole site is a Mac desktop on the app's aurora wallpaper. A menu bar on top and a Dock at the
+   bottom are the navigation. The hero is a real desktop of files: click one, tap ⇧⌘ on your own keyboard, and the
+   actual Tapformat ring opens and converts it. Every section below is a window, sticky note or installer sitting on
+   that same desktop. Dark-only, like the app. */
 :root {
-  --bg: #050507;
-  --fg: #f4f4f6;
-  --muted: #8b8b96;
-  --dim: #55555f;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-2: rgba(255, 255, 255, 0.14);
-  --glass: rgba(255, 255, 255, 0.04);
-  --sel: #3b82ff;
+  --bg: #050507; --fg: #f4f4f6; --muted: #8b8b96; --dim: #5c5c66;
+  --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.14);
+  --win: rgba(22, 22, 27, 0.78); --sel: #3b82ff;
   --jpg: #ff8f2e; --png: #3885ff; --pdf: #f5454d; --heic: #9e61ff; --gif: #ff549e;
-  --mp3: #29c770; --m4a: #ff6b66; --mp4: #735cff;
-  --shrink: #2fc79c; --crop: #fab81f; --resize: #1ab8cc; --rotate: #7c6cf0;
+  --mp3: #29c770; --mp4: #735cff; --word: #336bf2;
+  --shrink: #2fc79c; --crop: #fab81f; --resize: #1ab8cc; --rotate: #7c6cf0; --mute: #ff6b66;
+  --sunset: radial-gradient(circle at 62% 42%, #ffefc4 0 13%, transparent 14%), linear-gradient(#ffb057, #f0596b 55%, #6a3cff);
   --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
   --serif: "Instrument Serif", ui-serif, Georgia, serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); --spring: cubic-bezier(0.3, 1.5, 0.5, 1);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html { background: var(--bg); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body { margin: 0; color: var(--fg); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+html { background: var(--bg); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body { margin: 0; color: var(--fg); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
-img, video, svg { display: block; }
 ::selection { background: rgba(59, 130, 255, 0.45); }
-.wrap { width: min(1180px, 100% - 32px); margin: 0 auto; }
-
-/* ── Stage: aurora + grain + cursor light ─────────────────────── */
-.stage { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.aurora { position: absolute; inset: -20%; filter: blur(100px) saturate(1.3); opacity: 0.7; }
-.aurora i { position: absolute; width: 46vmax; height: 46vmax; border-radius: 50%; mix-blend-mode: screen; animation: drift 26s ease-in-out infinite alternate; }
-.aurora i:nth-child(1) { background: var(--heic); left: 4%; top: -14%; opacity: 0.7; }
-.aurora i:nth-child(2) { background: var(--png); right: 0%; top: -4%; opacity: 0.6; animation-duration: 31s; animation-delay: -8s; }
-.aurora i:nth-child(3) { background: var(--jpg); left: 30%; top: 40%; opacity: 0.3; animation-duration: 37s; animation-delay: -15s; }
-.aurora i:nth-child(4) { background: var(--shrink); right: 26%; bottom: -20%; opacity: 0.2; animation-duration: 29s; animation-delay: -4s; }
-@keyframes drift {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(6vw, 5vh) scale(1.12); }
-  100% { transform: translate(-5vw, 9vh) scale(0.94); }
-}
-.stage .fade { position: absolute; inset: 0; background: radial-gradient(130% 90% at 50% 10%, transparent 35%, rgba(5,5,7,.85) 85%); }
-.grain { position: fixed; inset: -50%; z-index: 100; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 1.2s steps(6) infinite; }
-@keyframes grain { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -4%); } 60% { transform: translate(-4%, -1%); } 80% { transform: translate(3%, 3%); } }
-.cursor-light { position: fixed; width: 560px; height: 560px; left: 0; top: 0; z-index: 0; pointer-events: none; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.055), transparent 62%); }
-@media (hover: none) { .cursor-light { display: none; } }
-
-/* ── Nav ──────────────────────────────────────────────────────── */
-.nav { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 50; width: min(720px, 100% - 24px);
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 7px 7px 14px; border-radius: 999px;
-  background: rgba(14, 14, 18, 0.62); border: 1px solid var(--line); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5);
-  animation: navIn 0.9s var(--ease) 0.2s both; }
-@keyframes navIn { from { opacity: 0; transform: translate(-50%, -16px); } }
-.brand { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: -0.01em; }
-.brand svg { width: 24px; height: 24px; }
-.nav-links { display: flex; align-items: center; gap: 4px; }
-.nav-links a:not(.btn) { padding: 7px 12px; border-radius: 999px; color: var(--muted); font-size: 14px; transition: color 0.2s, background 0.2s; }
-.nav-links a:not(.btn):hover { color: var(--fg); background: var(--glass); }
-@media (max-width: 620px) { .nav-links a:not(.btn) { display: none; } }
-
-/* ── Buttons ─────────────────────────────────────────────────── */
-.btn { position: relative; display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 24px; border-radius: 999px;
-  font-weight: 560; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; isolation: isolate; transition: transform 0.25s var(--spring); }
-.btn svg { width: 17px; height: 17px; }
-.btn:active { transform: scale(0.97); }
-.btn.small { height: 36px; padding: 0 16px; font-size: 14px; gap: 7px; }
-.btn.small svg { width: 14px; height: 14px; }
-.btn.primary { color: #08080a; background: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 10px 40px -8px rgba(160, 140, 255, 0.55); }
-.btn.primary:hover { transform: translateY(-1px); }
-/* Glowing conic rim that rotates behind the big button */
-@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes spin { to { --a: 360deg; } }
-.btn.glow { background: transparent; box-shadow: 0 14px 60px -10px rgba(158, 97, 255, 0.7); }
-.btn.glow::before { content: ""; position: absolute; inset: -2px; z-index: -2; border-radius: inherit;
-  background: conic-gradient(from var(--a), var(--jpg), var(--heic), var(--png), var(--shrink), var(--gif), var(--jpg)); animation: spin 4s linear infinite; }
-.btn.glow::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: #fff; }
-
-kbd { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 0.3em; border-radius: 0.3em; font: 500 0.82em var(--sans);
-  color: var(--fg); background: linear-gradient(#24242b, #17171c); border: 1px solid rgba(255, 255, 255, 0.12); border-bottom-width: 3px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); transition: transform 0.08s, border-bottom-width 0.08s, background 0.15s, box-shadow 0.15s; }
-kbd.down { transform: translateY(2px); border-bottom-width: 1px; background: linear-gradient(#3b82ff, #2563eb); box-shadow: 0 0 24px rgba(59, 130, 255, 0.7); }
-
-/* ── Hero ─────────────────────────────────────────────────────── */
-.hero { position: relative; overflow-x: clip; min-height: 100svh; display: grid; place-items: center; text-align: center; padding: 120px 0 60px; }
-.hero-inner { display: grid; justify-items: center; gap: 26px; }
-.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px; font-size: 13px; color: var(--muted);
-  background: var(--glass); border: 1px solid var(--line); animation: fadeUp 1s var(--ease) both; }
-.pill b { color: #08080a; background: linear-gradient(90deg, #c4b5ff, #9ad0ff); padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 11px; letter-spacing: 0.02em; }
-h1 { margin: 0; font-weight: 600; font-size: clamp(48px, 9.4vw, 128px); line-height: 0.92; letter-spacing: -0.055em; }
-h1 .row { display: block; overflow: hidden; padding: 0.04em 0.06em 0.1em; }
-h1 .row > span { display: inline-block; animation: rise 1.1s var(--ease) both; }
-h1 .row:nth-child(2) > span { animation-delay: 0.12s; }
-h1 kbd { font-size: 0.62em; vertical-align: 0.12em; margin: 0 0.04em; border-radius: 0.22em; }
 .serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
-.shine { background: linear-gradient(100deg, #fff 0%, #fff 35%, #d8ccff 45%, #a5d0ff 52%, #fff 62%, #fff 100%); background-size: 260% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent; animation: rise 1.1s var(--ease) 0.12s both, shine 6s var(--ease) 1.4s infinite; }
-@keyframes shine { 0% { background-position: 100% 0; } 45%, 100% { background-position: 0 0; } }
-@keyframes rise { from { transform: translateY(105%); opacity: 0; } }
-.lede { margin: 0; max-width: 560px; color: var(--muted); font-size: clamp(16px, 1.6vw, 19px); animation: fadeUp 1s var(--ease) 0.35s both; }
-.lede b { color: var(--fg); font-weight: 500; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } }
-.cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; animation: fadeUp 1s var(--ease) 0.5s both; }
+kbd { display: inline-grid; place-items: center; min-width: 1.55em; height: 1.55em; padding: 0 0.32em; border-radius: 0.32em; font: 600 0.8em var(--sans); color: #111;
+  background: linear-gradient(#fff, #dcdce2); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55); vertical-align: 0.08em; transition: transform 0.08s, box-shadow 0.08s, background 0.15s; }
+kbd.down { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,.5); background: linear-gradient(#7fb0ff, #3b82ff); color: #fff; }
+
+/* ── Wallpaper ─────────────────────────────────────────────── */
+.wallpaper { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: #050507; }
+.wallpaper i { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(120px); opacity: 0.42; mix-blend-mode: screen; animation: drift 30s ease-in-out infinite alternate; }
+.wallpaper i:nth-child(1) { background: var(--heic); left: -18%; top: -30%; }
+.wallpaper i:nth-child(2) { background: var(--png); right: -22%; top: 10%; opacity: 0.3; animation-delay: -8s; }
+.wallpaper i:nth-child(3) { background: var(--jpg); left: 10%; bottom: -45%; opacity: 0.22; animation-delay: -16s; }
+.wallpaper i:nth-child(4) { background: var(--gif); right: 5%; bottom: -40%; opacity: 0.16; animation-delay: -4s; }
+@keyframes drift { to { transform: translate(6vw, 8vh) scale(1.12); } }
+.grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.5;
+  background-image: radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px); background-size: 22px 22px; }
+
+/* ── Menu bar ──────────────────────────────────────────────── */
+.menubar { position: fixed; inset: 0 0 auto; z-index: 60; height: 34px; display: flex; align-items: center; gap: 4px; padding: 0 10px;
+  background: rgba(18, 18, 24, 0.55); backdrop-filter: blur(24px) saturate(1.6); -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13.5px; }
+.menubar .logo { display: flex; align-items: center; gap: 8px; padding: 0 8px; font-weight: 700; }
+.menubar .logo svg { width: 18px; height: 18px; }
+.menubar .item { padding: 3px 9px; border-radius: 6px; color: rgba(255,255,255,0.86); white-space: nowrap; }
+.menubar .item:hover { background: rgba(255,255,255,0.12); }
+.menubar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.86); white-space: nowrap; }
+.menubar .count { display: none; align-items: center; gap: 6px; font: 500 12px var(--mono); padding: 2px 9px; border-radius: 999px; background: rgba(47,199,156,0.18); color: #7ef0cd; }
+.menubar .count.on { display: inline-flex; }
+.menubar .dl { padding: 4px 12px; border-radius: 999px; background: #fff; color: #08080a; font-weight: 600; font-size: 12.5px; }
+.menubar .clock { font-variant-numeric: tabular-nums; }
+
+/* ── Desktop hero ──────────────────────────────────────────── */
+.desktop { position: relative; min-height: max(100svh, 700px); padding: 90px 48px 150px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; }
+.hello { align-self: center; max-width: 640px; }
+.hello .tag { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.hello .tag b { padding: 1px 8px; border-radius: 999px; background: linear-gradient(90deg, var(--jpg), var(--gif), var(--heic)); color: #fff; font: 600 11px var(--mono); letter-spacing: 0.06em; }
+.hello h1 { margin: 22px 0 18px; font-size: clamp(56px, 8.4vw, 128px); line-height: 0.9; letter-spacing: -0.055em; font-weight: 700; }
+.hello h1 .serif { display: block; font-size: 1.08em; background: linear-gradient(90deg, var(--jpg), var(--gif) 45%, var(--heic)); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 0.08em; }
+.hello p { margin: 0; color: #b9b9c4; font-size: 19px; max-width: 34ch; }
+.cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 30px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px; border-radius: 999px; font-weight: 600; font-size: 16px; transition: transform 0.25s var(--spring); }
+.btn:hover { transform: translateY(-2px); }
+.btn svg { width: 17px; height: 17px; }
+.btn.primary { background: #fff; color: #08080a; box-shadow: 0 16px 50px -12px rgba(158, 97, 255, 0.9); }
 .req { color: var(--dim); font-size: 13px; }
 
-/* The big ring */
-.hero-ring { position: relative; margin-top: 22px; perspective: 1100px; animation: ringIn 1.4s var(--spring) 0.6s both; }
-@keyframes ringIn { from { opacity: 0; transform: scale(0.6) translateY(40px); filter: blur(12px); } }
-.tilt { transform-style: preserve-3d; transform: rotateX(var(--rx, 12deg)) rotateY(var(--ry, 0deg)); transition: transform 0.6s var(--ease); }
-.hero-ring .halo { position: absolute; inset: -25%; border-radius: 50%; background: radial-gradient(circle, var(--accent, var(--jpg)) 0%, transparent 60%);
-  opacity: 0.3; filter: blur(40px); transition: background 0.6s; pointer-events: none; }
-.hero-ring .floor { position: absolute; left: 50%; bottom: -60px; width: 110%; height: 80px; transform: translateX(-50%); border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.8), transparent); filter: blur(8px); z-index: -1; }
+/* Desktop icons: a right-hand column, like a real Mac. Draggable; click selects, ⇧⌘ opens the ring. */
+.icons { position: relative; width: 300px; height: 600px; align-self: center; }
+.dicon { position: absolute; width: 108px; display: grid; justify-items: center; gap: 6px; padding: 8px 4px; border-radius: 10px; cursor: default; touch-action: none; user-select: none; -webkit-user-select: none; transition: background 0.15s; outline: none; }
+.dicon.dragging { z-index: 5; transition: none; }
+.dicon .art { position: relative; width: 68px; height: 68px; display: grid; place-items: center; filter: drop-shadow(0 10px 18px rgba(0,0,0,0.5)); pointer-events: none; }
+.dicon .name { max-width: 104px; padding: 1px 6px; border-radius: 5px; font-size: 12.5px; line-height: 1.3; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); overflow-wrap: anywhere; pointer-events: none; }
+.dicon.sel { background: rgba(255,255,255,0.12); }
+.dicon.sel .name { background: var(--sel); text-shadow: none; }
+.dicon:focus-visible { box-shadow: 0 0 0 2px var(--sel); }
+.dicon.new { animation: land 0.7s var(--spring); }
+@keyframes land { from { transform: scale(0.2) translateY(30px); opacity: 0; } }
+.badge { position: absolute; right: -6px; bottom: 2px; padding: 1px 6px; border-radius: 5px; font: 700 10px var(--sans); color: #fff; background: var(--b); box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+.photo { width: 66px; height: 50px; border-radius: 4px; border: 3px solid #fff; background: var(--sunset); }
+.page { width: 52px; height: 66px; border-radius: 5px; background: linear-gradient(#fdfdfd, #e7e7ec); position: relative; overflow: hidden; }
+.page::before { content: ""; position: absolute; left: 9px; right: 9px; top: 14px; height: 30px; background: repeating-linear-gradient(#c9c9d3 0 2px, transparent 2px 7px); }
+.page::after { content: ""; position: absolute; right: 0; top: 0; border: 9px solid transparent; border-right-color: #cfcfd8; border-top-color: #cfcfd8; }
+.tile { width: 60px; height: 60px; border-radius: 14px; display: grid; place-items: center; color: #fff; background: var(--t); box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
+.tile svg { width: 30px; height: 30px; }
 
-/* Ring primitive, shared by the hero, the scroll story, the wheel and the overlay */
-.disc { --R: 150px; --btn: 78px; --hub: 112px; position: relative; width: calc(2 * var(--R) + var(--btn) + 34px); aspect-ratio: 1; }
-.disc-bg { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #1f1f25, #0c0c0f 72%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 40px 120px -20px rgba(0, 0, 0, 0.9); }
-.disc-bg::after { content: ""; position: absolute; inset: 0; border-radius: 50%; padding: 1.5px;
-  background: conic-gradient(from var(--a), transparent 0 62%, var(--accent, #fff) 85%, transparent 100%); opacity: 0.8;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: spin 6s linear infinite; }
-.opt { position: absolute; left: 50%; top: 50%; width: var(--btn); height: var(--btn); margin: calc(var(--btn) / -2) 0 0 calc(var(--btn) / -2); border-radius: 50%;
-  display: grid; place-items: center; font: 600 calc(var(--btn) * 0.2) var(--sans); letter-spacing: -0.01em; color: #c9c9d2;
-  background: #222228; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  transform: translate(0, 0) scale(0.3); opacity: 0;
-  transition: transform 0.55s var(--spring) var(--d, 0s), opacity 0.3s var(--d, 0s), background 0.2s, color 0.2s, box-shadow 0.25s; }
-.open .opt { transform: translate(var(--x), var(--y)) scale(1); opacity: 1; }
-.opt.sel { color: #fff; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 28%, transparent), 0 0 40px color-mix(in srgb, var(--c) 70%, transparent); }
-.open .opt.sel { transform: translate(var(--x), var(--y)) scale(1.1); transition-delay: 0s; }
-.hub { position: absolute; left: 50%; top: 50%; width: var(--hub); height: var(--hub); transform: translate(-50%, -50%); border-radius: 50%;
-  display: grid; place-items: center; background: #0a0a0d; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
-.hub .thumb { width: 64%; height: 64%; border-radius: 22%; overflow: hidden; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6); }
-.sunset { width: 100%; height: 100%; background: radial-gradient(circle at 50% 70%, #ffe07a 0 14%, transparent 15%), linear-gradient(#ff7a59, #ff4f8b 55%, #6a3cff); position: relative; }
-.sunset::after { content: ""; position: absolute; inset: 62% 0 0; background: linear-gradient(#1b1340, #0b0920); }
-.hub svg.prog { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); transform: rotate(-90deg); fill: none; stroke: var(--accent, #fff); stroke-width: 3; stroke-linecap: round; }
-.hub .check { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; background: var(--accent, var(--shrink)); opacity: 0; transform: scale(0.5); transition: 0.45s var(--spring); }
-.hub .check svg { width: 42%; height: 42%; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.done .hub .check { opacity: 1; transform: scale(1); }
+.note { position: absolute; z-index: 2; width: 210px; padding: 16px 16px 18px; background: linear-gradient(#fff6a8, #ffe873); color: #3b3300; border-radius: 3px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45); transform: rotate(-3deg); font: 500 14px/1.5 var(--sans); }
+.note::before { content: ""; position: absolute; left: 50%; top: -9px; width: 70px; height: 20px; transform: translateX(-50%) rotate(2deg); background: rgba(255,255,255,0.45); }
+.note b { display: block; margin-bottom: 6px; font-size: 16px; }
+.note ol { margin: 0; padding-left: 18px; }
+.note kbd { font-size: 0.85em; }
+.note button { margin-top: 10px; padding: 6px 12px; border-radius: 999px; background: #3b3300; color: #fff6a8; font-weight: 600; font-size: 13px; }
+.note .touch, .tryline .touch { display: none; }
+.tryline { display: none; margin: 0; text-align: center; color: #fff6a8; font-weight: 560; font-size: 15px; }
+@media (hover: none) { .note .mouse, .tryline .mouse { display: none; } .note .touch, .tryline .touch { display: block; } }
 
-.ring-caption { --accent: var(--jpg); margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 999px; font: 500 13px var(--mono);
-  color: var(--muted); background: rgba(10, 10, 14, 0.7); border: 1px solid var(--line); backdrop-filter: blur(10px); max-width: 100%; }
-.ring-caption .to { color: var(--accent); transition: color 0.3s; white-space: nowrap; }
-.ring-caption .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-.try { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; align-items: center; color: var(--dim); font-size: 14px; }
-.try kbd { font-size: 13px; }
-.try button { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--dim); }
-@media (max-width: 640px) {
-  .hero-ring .disc { --R: 104px; --btn: 58px; --hub: 80px; }
-  .try .k { display: none; }
-}
+/* The ring, shaped like the app's */
+.ring { position: fixed; z-index: 70; left: 0; top: 0; width: 300px; height: 300px; margin: -150px 0 0 -150px; pointer-events: none; opacity: 0; transform: scale(0.6); transition: opacity 0.18s, transform 0.35s var(--spring); --accent: var(--jpg); }
+.ring.open { opacity: 1; transform: none; pointer-events: auto; }
+.ring .disc { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 50% 38%, rgba(42,42,50,0.96), rgba(16,16,20,0.97)); border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 40px 90px rgba(0,0,0,0.65), 0 0 120px -20px var(--accent); transition: box-shadow 0.3s; }
+.ring .track { position: absolute; inset: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.07); pointer-events: none; }
+.opt { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px; border-radius: 50%; display: grid; place-items: center; font: 650 13.5px var(--sans); color: #cfcfd8;
+  background: #26262d; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); transform: translate(var(--x), var(--y)) scale(0.5); opacity: 0;
+  transition: transform 0.4s var(--spring) var(--d), opacity 0.2s var(--d), background 0.15s, color 0.15s, box-shadow 0.2s; }
+.ring.open .opt { transform: translate(var(--x), var(--y)); opacity: 1; }
+.ring.open .opt.sel { transform: translate(var(--x), var(--y)) scale(1.18); background: var(--c); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35), 0 0 34px var(--c); }
+.ring .hub { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px; border-radius: 50%; background: #17171b; box-shadow: 0 0 0 1px rgba(255,255,255,0.1); display: grid; place-items: center; }
+.ring .hub .thumb { width: 74px; height: 74px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; transition: opacity 0.2s; }
+.ring .prog { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring .prog circle { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.9s var(--ease); }
+.ring .check { position: absolute; inset: 9px; border-radius: 50%; display: grid; place-items: center; background: var(--shrink); transform: scale(0); transition: transform 0.4s var(--spring); }
+.ring .check svg { width: 34px; height: 34px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.ring.done .check { transform: scale(1); }
+.ring .cap { position: absolute; left: 50%; top: calc(100% + 12px); transform: translateX(-50%); white-space: nowrap; padding: 7px 14px; border-radius: 999px; font: 500 12.5px var(--mono);
+  background: rgba(16,16,20,0.92); border: 1px solid var(--line-2); color: #bdbdc8; }
+.ring .cap b { color: #fff; font-weight: 500; }
+.sparks span { position: fixed; z-index: 75; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; animation: spark 0.9s var(--ease) forwards; }
+@keyframes spark { to { transform: translate(var(--bx), var(--by)) scale(0.2); opacity: 0; } }
 
-/* ── Marquee ─────────────────────────────────────────────────── */
-.marquee { position: relative; padding: 26px 0; border-block: 1px solid var(--line); overflow: hidden;
-  -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.marquee-track { display: flex; gap: 46px; width: max-content; animation: marquee 40s linear infinite; }
-.tick { display: inline-flex; align-items: center; gap: 12px; font: 500 15px var(--mono); color: var(--muted); white-space: nowrap; }
-.tick i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); }
-.tick b { color: var(--fg); font-weight: 500; }
-@keyframes marquee { to { transform: translateX(calc(-50% - 23px)); } }
+/* ── Dock ──────────────────────────────────────────────────── */
+.dock { position: fixed; left: 50%; bottom: 12px; z-index: 60; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 6px; padding: 7px 9px; border-radius: 22px;
+  background: rgba(30, 30, 38, 0.5); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(26px) saturate(1.6); -webkit-backdrop-filter: blur(26px) saturate(1.6); box-shadow: 0 20px 50px rgba(0,0,0,0.45); }
+.dock a { position: relative; width: 50px; height: 50px; display: grid; place-items: center; transform-origin: 50% 100%; transition: transform 0.12s; }
+.dock a .di { width: 100%; height: 100%; border-radius: 12px; display: grid; place-items: center; color: #fff; background: var(--t, #333); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 6px 14px rgba(0,0,0,0.35); }
+.dock a .di svg { width: 26px; height: 26px; }
+.dock a .tip { position: absolute; bottom: calc(100% + 14px); left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 7px; white-space: nowrap; font-size: 12.5px;
+  background: rgba(30,30,38,0.92); border: 1px solid var(--line-2); opacity: 0; pointer-events: none; transition: opacity 0.12s; }
+.dock a:hover .tip { opacity: 1; }
+.dock a::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(255,255,255,0.75); opacity: 0; }
+.dock a.here::after { opacity: 1; }
+.dock .sep { width: 1px; align-self: stretch; margin: 4px 3px; background: rgba(255,255,255,0.18); }
+.dock a.bounce { animation: bounce 0.9s var(--ease) 2; }
+@keyframes bounce { 30% { translate: 0 -18px; } 60% { translate: 0 0; } }
 
-/* ── Section scaffolding ─────────────────────────────────────── */
-section { position: relative; }
-.head { display: grid; justify-items: center; text-align: center; gap: 16px; margin-bottom: 64px; }
-.kicker { font: 500 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: inline-flex; align-items: center; gap: 10px; }
-.kicker::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--k, var(--heic)); box-shadow: 0 0 12px var(--k, var(--heic)); }
-h2 { margin: 0; font-weight: 600; font-size: clamp(38px, 6vw, 76px); line-height: 0.98; letter-spacing: -0.045em; max-width: 14ch; }
-.head p { margin: 0; max-width: 540px; color: var(--muted); font-size: 17px; }
-.head code { font: 500 0.9em var(--mono); color: var(--fg); }
-.reveal { opacity: 0; transform: translateY(28px); filter: blur(6px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease), filter 0.9s var(--ease); }
-.reveal.in { opacity: 1; transform: none; filter: none; }
-.pad { padding: 150px 0; }
-@media (max-width: 640px) { .pad { padding: 100px 0; } .head { margin-bottom: 44px; } }
+/* ── Windows on the desktop ────────────────────────────────── */
+.zone { position: relative; padding: 70px 24px; }
+.zone .title { text-align: center; margin: 0 auto 34px; max-width: 760px; }
+.zone .title .k { font: 500 12px var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.zone h2 { margin: 10px 0 10px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.98; letter-spacing: -0.05em; font-weight: 650; text-wrap: balance; }
+.zone .title p { margin: 0; color: var(--muted); font-size: 17px; }
+.window { width: min(1000px, 100%); margin: 0 auto; border-radius: 16px; background: var(--win); border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(30px) saturate(1.4); -webkit-backdrop-filter: blur(30px) saturate(1.4); box-shadow: 0 50px 120px -30px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(0,0,0,0.6); overflow: hidden; }
+.window .bar { position: relative; height: 42px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.03); }
+.window .bar i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.window .bar i:nth-child(2) { background: #febc2e; } .window .bar i:nth-child(3) { background: #28c840; }
+.window .bar span { position: absolute; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); white-space: nowrap; }
+.window .body { padding: 30px; }
+.reveal { opacity: 0; transform: translateY(40px) scale(0.97); transition: opacity 0.8s var(--ease), transform 0.9s var(--spring); }
+.reveal.in { opacity: 1; transform: none; }
 
-/* ── Scroll story: Select → Tap → Done ───────────────────────── */
-.story { height: 360vh; }
-.story-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: 1fr 1.25fr; align-items: center; gap: 40px; }
-.steps { display: grid; gap: 34px; }
-.step { display: grid; gap: 6px; opacity: 0.2; transform: translateX(-8px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
-.step.on { opacity: 1; transform: none; }
-.step .n { font: 500 13px var(--mono); color: var(--muted); }
-.step h3 { margin: 0; font-weight: 600; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: -0.045em; }
-.step p { margin: 0; color: var(--muted); max-width: 34ch; }
-.step h3 kbd { font-size: 0.6em; vertical-align: 0.14em; }
-.scene { position: relative; height: min(560px, 70svh); border-radius: 28px; overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)); border: 1px solid var(--line); }
-.scene::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px); background-size: 22px 22px;
-  -webkit-mask: radial-gradient(circle at 50% 50%, #000, transparent 75%); mask: radial-gradient(circle at 50% 50%, #000, transparent 75%); }
-.scene .bar { position: absolute; top: 0; left: 0; right: 0; height: 40px; display: flex; align-items: center; gap: 7px; padding: 0 16px; border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, 0.02); }
-.scene .bar i { width: 11px; height: 11px; border-radius: 50%; background: #2a2a31; }
-.scene .bar span { margin-left: 10px; font: 500 12px var(--mono); color: var(--dim); }
-.file { position: absolute; width: 132px; display: grid; justify-items: center; gap: 10px; text-align: center; transform: translate(-50%, -50%); }
-.file .icon { position: relative; width: 104px; height: 104px; border-radius: 18px; overflow: hidden; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55); outline: 3px solid transparent; outline-offset: 5px; transition: outline-color 0.3s; }
-.file .name { font: 500 13px var(--sans); padding: 2px 8px; border-radius: 6px; transition: background 0.3s; white-space: nowrap; }
-.file .size { font: 500 12px var(--mono); color: var(--muted); margin-top: -6px; }
-.file.selected .icon { outline-color: rgba(59, 130, 255, 0.85); }
-.file.selected .name { background: var(--sel); }
-.file .badge { position: absolute; right: 6px; bottom: 6px; padding: 2px 6px; border-radius: 5px; font: 700 10px var(--sans); color: #fff; background: var(--b); }
-#src { left: 17%; top: 52%; }
-#out { left: 83%; top: 52%; opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-#out .icon { box-shadow: 0 0 0 1px rgba(255, 143, 46, 0.4), 0 20px 60px -10px rgba(255, 143, 46, 0.6); }
-.scene .disc { --R: 92px; --btn: 52px; --hub: 72px; position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%) scale(var(--s, 0.6)); opacity: var(--o, 0); }
-.scene .keys { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; gap: 8px; font-size: 22px; transition: opacity 0.3s; }
-.scene .saved { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); font: 500 13px var(--mono); color: var(--shrink); opacity: 0; white-space: nowrap; }
-.sparks span { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; animation: spark 0.9s var(--ease) forwards; }
-@keyframes spark { from { transform: translate(-50%, -50%); opacity: 1; } to { transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(0.3); opacity: 0; } }
-@media (max-width: 860px) {
-  .story { height: 330vh; }
-  .story-pin { grid-template-columns: 1fr; align-content: center; gap: 22px; }
-  .steps { gap: 0; position: relative; min-height: 150px; }
-  .step { position: absolute; inset: 0 0 auto; transform: translateY(10px); opacity: 0; }
-  .step.on { transform: none; }
-  .scene { height: 52svh; }
-  .file { width: 100px; }
-  .file .icon { width: 64px; height: 64px; border-radius: 14px; }
-  .file .name { font-size: 11px; }
-  #src { left: 27%; top: 24%; } #out { left: 73%; top: 24%; }
-  .scene .disc { --R: 70px; --btn: 42px; --hub: 56px; top: 63%; }
-  .scene .keys, .scene .saved { bottom: 16px; }
-}
+/* How it works: three Finder columns */
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); }
+.col { padding: 28px; border-right: 1px solid var(--line); display: grid; gap: 12px; align-content: start; }
+.col:last-child { border-right: 0; }
+.col .n { font: 500 12px var(--mono); color: var(--dim); }
+.col h3 { margin: 0; font-size: 26px; letter-spacing: -0.035em; font-weight: 650; }
+.col p { margin: 0; color: var(--muted); font-size: 15px; }
+.col .vis { height: 130px; display: grid; place-items: center; }
+.mini-sel { display: grid; justify-items: center; gap: 6px; }
+.mini-sel .name { padding: 1px 7px; border-radius: 5px; background: var(--sel); font-size: 12px; }
+.mini-ring { position: relative; width: 120px; height: 120px; border-radius: 50%; background: #1d1d23; border: 1px solid var(--line-2); }
+.mini-ring i { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px; border-radius: 50%; background: #2c2c34; transition: background 0.2s, box-shadow 0.2s; }
+.mini-ring i.on { background: var(--jpg); box-shadow: 0 0 18px var(--jpg); }
+.mini-ring b { position: absolute; inset: 40px; border-radius: 50%; background: var(--sunset); }
 
-/* ── Formats: the ring only shows what makes sense ───────────── */
-.wheel { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-.tabs { display: grid; gap: 8px; }
-.tab { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px; padding: 12px 16px 12px 12px; border-radius: 18px; text-align: left;
-  border: 1px solid transparent; transition: background 0.25s, border-color 0.25s; }
-.tab:hover { background: var(--glass); }
-.tab.on { background: rgba(255, 255, 255, 0.05); border-color: var(--line-2); }
-.tab .ic { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font: 700 11px var(--sans); color: #fff;
-  background: color-mix(in srgb, var(--c) 22%, #121216); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent); transition: background 0.25s, box-shadow 0.25s; }
-.tab.on .ic { background: var(--c); box-shadow: 0 0 26px color-mix(in srgb, var(--c) 60%, transparent); }
-.tab b { display: block; font-weight: 560; }
-.tab .sub { font-size: 13px; color: var(--muted); }
-.tab .to { font: 500 12px var(--mono); color: var(--dim); }
-.wheel-stage { display: grid; justify-items: center; gap: 18px; position: relative; }
-.wheel-stage::before { content: ""; position: absolute; width: 70%; aspect-ratio: 1; top: 8%; border-radius: 50%; background: var(--accent); filter: blur(80px); opacity: 0.25; transition: background 0.5s; }
-.wheel-stage .disc { --R: 120px; --btn: 64px; --hub: 92px; }
-.wheel-label { font: 500 13px var(--mono); color: var(--muted); text-align: center; min-height: 2.8em; }
-.wheel-label b { color: var(--fg); font-weight: 500; }
-@media (max-width: 860px) { .wheel { grid-template-columns: 1fr; } .wheel-stage { order: -1; } }
-@media (max-width: 520px) { .wheel-stage .disc { --R: 96px; --btn: 54px; --hub: 76px; } .tab .to { display: none; } .tab { grid-template-columns: 46px 1fr; } }
+/* Formats: a Get Info window, kinds on the left, the ring on the right */
+.info { display: grid; grid-template-columns: 300px 1fr; min-height: 440px; }
+.kinds { border-right: 1px solid var(--line); padding: 12px; display: grid; gap: 4px; align-content: start; }
+.kind { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; text-align: left; transition: background 0.15s; }
+.kind:hover { background: rgba(255,255,255,0.05); }
+.kind.on { background: rgba(59,130,255,0.22); }
+.kind .ic { width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center; background: var(--c); font: 700 11px var(--sans); }
+.kind b { display: block; font-size: 14.5px; font-weight: 600; }
+.kind small { color: var(--muted); font-size: 12px; }
+.kind .cnt { font: 500 11.5px var(--mono); color: var(--dim); }
+.stagecol { display: grid; place-items: center; padding: 30px; }
+.stagecol .ring { position: relative; margin: 0 auto; left: auto; top: auto; z-index: 1; opacity: 1; transform: none; pointer-events: none; }
+.stagecol .label { margin-top: 26px; text-align: center; font: 500 13px var(--mono); color: var(--muted); }
+.stagecol .label b { color: var(--fg); font-weight: 500; }
 
-/* ── Cards ───────────────────────────────────────────────────── */
-.card { position: relative; border-radius: 26px; padding: 30px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
-  border: 1px solid var(--line); overflow: hidden; isolation: isolate; }
-.card::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 0.4s;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.07), transparent 60%); }
-.card:hover::before { opacity: 1; }
+/* Shrink: before and after bars */
+.meter { display: grid; grid-template-columns: 220px 1fr 160px; align-items: center; gap: 22px; padding: 18px 8px; border-bottom: 1px solid var(--line); }
+.meter:last-child { border: 0; }
+.meter b { display: block; font-weight: 600; }
+.meter small { color: var(--muted); font-size: 13px; }
+.meter .bars { display: grid; gap: 6px; }
+.meter .bars i { display: block; height: 10px; border-radius: 99px; background: rgba(255,255,255,0.14); width: 100%; transform-origin: left; }
+.meter .bars i + i { background: linear-gradient(90deg, var(--shrink), #7ef0cd); box-shadow: 0 0 16px rgba(47,199,156,0.5); transition: transform 1.4s var(--ease) 0.2s; }
+.meter .num { text-align: right; font: 500 13px var(--mono); color: var(--muted); }
+.meter .num em { display: block; font-style: normal; font-size: 26px; color: #7ef0cd; letter-spacing: -0.02em; font-family: var(--sans); font-weight: 700; }
 
-/* ── Shrink ──────────────────────────────────────────────────── */
-.shrink-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.counter .what { font-weight: 560; }
-.counter .detail { color: var(--muted); font-size: 14px; margin-left: 8px; }
-.counter .nums { display: flex; align-items: baseline; gap: 14px; margin: 26px 0 18px; flex-wrap: wrap; }
-.counter .num { font-weight: 600; font-size: clamp(48px, 6vw, 72px); letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; }
-.counter .from { font: 500 15px var(--mono); color: var(--dim); text-decoration: line-through; }
-.counter .pct { margin-left: auto; font: 600 13px var(--mono); color: var(--shrink); padding: 5px 10px; border-radius: 999px; background: rgba(47, 199, 156, 0.12); }
-.counter .track { height: 8px; border-radius: 99px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
-.counter .track i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--shrink), #7cf0c9); box-shadow: 0 0 18px rgba(47, 199, 156, 0.6); transition: width 1.4s var(--ease); }
-@media (max-width: 760px) { .shrink-grid { grid-template-columns: 1fr; } .card { padding: 24px; } }
+/* New in 1.1: sticky notes */
+.notes { display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; padding: 10px 0 20px; }
+.notes .note { position: relative; width: 260px; min-height: 230px; padding: 24px 22px; font-size: 15.5px; }
+.notes .note.reveal { transform: translateY(40px) rotate(0); }
+.notes .note.reveal.in:nth-child(1) { transform: rotate(-4deg); }
+.notes .note.reveal.in:nth-child(2) { transform: rotate(2.5deg) translateY(18px); }
+.notes .note.reveal.in:nth-child(3) { transform: rotate(-1.5deg); }
+.notes .note:nth-child(2) { background: linear-gradient(#ffd1e6, #ffaed1); color: #4a0f2a; }
+.notes .note:nth-child(3) { background: linear-gradient(#cfe6ff, #a9d0ff); color: #0c2a4d; }
+.notes .note b { font-size: 21px; letter-spacing: -0.02em; margin-bottom: 10px; }
+.notes .note .doodle { display: flex; gap: 6px; margin-bottom: 14px; min-height: 40px; align-items: center; }
 
-/* ── Tools bento ─────────────────────────────────────────────── */
-.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
-.bento .card { grid-column: span 2; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; }
-.bento .card.w3 { grid-column: span 3; }
-.bento .card.w2 { grid-column: span 3; }
-.bento h3 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.025em; }
-.bento p { margin: 0; color: var(--muted); font-size: 15px; }
-.bento code { font: 500 0.88em var(--mono); color: var(--fg); padding: 1px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); }
-.art { flex: 1; display: grid; place-items: center; margin-bottom: 16px; min-height: 150px; }
-.crop { position: relative; width: 150px; height: 150px; }
-.crop .ph { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; }
-.crop .frame { position: absolute; left: 50%; top: 50%; border: 2px solid var(--crop); border-radius: 8px; box-shadow: 0 0 0 999px rgba(5, 5, 7, 0.5), 0 0 24px rgba(250, 184, 31, 0.5);
-  transform: translate(-50%, -50%); animation: crop 8s var(--ease) infinite; }
-.crop > span { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font: 600 11px var(--mono); color: var(--crop); white-space: nowrap; }
-.crop > span::after { content: "1:1"; animation: cropLabel 8s steps(1) infinite; }
-@keyframes cropLabel { 0% { content: "1:1"; } 25% { content: "4:5"; } 50% { content: "16:9"; } 75% { content: "9:16"; } }
-@keyframes crop {
-  0%, 20% { width: 120px; height: 120px; } 25%, 45% { width: 104px; height: 130px; } 50%, 70% { width: 150px; height: 84px; } 75%, 95% { width: 76px; height: 136px; } 100% { width: 120px; height: 120px; }
-}
-.resize { display: flex; align-items: flex-end; gap: 14px; padding-bottom: 24px; }
-.resize i { display: block; border-radius: 10px; background: linear-gradient(135deg, var(--resize), #0c5d68); box-shadow: 0 0 30px rgba(26, 184, 204, 0.3); position: relative;
-  animation: pop 4s var(--spring) infinite; animation-delay: calc(var(--i) * 0.25s); }
-.resize i::after { content: attr(data-l); position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); font: 500 11px var(--mono); color: var(--muted); white-space: nowrap; }
-@keyframes pop { 0%, 60%, 100% { transform: none; } 70% { transform: scale(1.08); } }
-.rotate .sq { width: 92px; height: 92px; border-radius: 22px; background: linear-gradient(135deg, var(--rotate), #3c2f9e); box-shadow: 0 0 40px rgba(124, 108, 240, 0.45);
-  animation: rot 5s var(--spring) infinite; display: grid; place-items: center; font: 700 30px var(--sans); }
-@keyframes rot { 0%, 20% { transform: rotate(0); } 30%, 50% { transform: rotate(90deg); } 60%, 80% { transform: rotate(180deg); } 90%, 100% { transform: rotate(360deg); } }
-.mute { display: flex; align-items: center; gap: 4px; height: 80px; }
-.mute i { width: 5px; border-radius: 4px; background: var(--m4a); animation: wave 1.1s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.09s); transition: background 0.4s; }
-@keyframes wave { from { transform: scaleY(0.15); } to { transform: scaleY(1); } }
-.card:hover .mute i { animation: none; transform: scaleY(0.06); background: var(--dim); }
-.merge { position: relative; width: 140px; height: 120px; }
-.merge i { position: absolute; width: 72px; height: 94px; border-radius: 10px; background: linear-gradient(#fafafa, #d9d9e0); top: 12px; left: 34px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
-.merge i::before { content: "PDF"; position: absolute; left: 8px; bottom: 8px; font: 800 10px var(--sans); color: #fff; background: var(--pdf); padding: 2px 5px; border-radius: 4px; }
-.merge i:nth-child(1) { animation: m1 4s var(--ease) infinite; } .merge i:nth-child(3) { animation: m3 4s var(--ease) infinite; }
-@keyframes m1 { 0%, 15% { transform: translateX(-46px) rotate(-10deg); } 45%, 85% { transform: none; } 100% { transform: translateX(-46px) rotate(-10deg); } }
-@keyframes m3 { 0%, 15% { transform: translateX(46px) rotate(10deg); } 45%, 85% { transform: none; } 100% { transform: translateX(46px) rotate(10deg); } }
-.menu { width: 220px; padding: 6px; border-radius: 12px; background: rgba(36, 36, 42, 0.92); border: 1px solid var(--line-2); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); font-size: 13px; }
-.menu div { padding: 5px 10px; border-radius: 6px; color: #d4d4dc; }
-.menu hr { border: 0; height: 1px; background: var(--line-2); margin: 5px 6px; }
-.menu .hot { background: var(--sel); color: #fff; }
-.undo { display: flex; gap: 10px; font-size: 38px; }
-.dropzone { width: 170px; height: 120px; border-radius: 18px; border: 1.5px dashed rgba(255,255,255,0.35); display: grid; place-items: center; background: rgba(255,255,255,0.03); }
-.dropzone .file-chip { width: 54px; height: 54px; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,0.5); animation: dropin 2.6s var(--ease) infinite; }
-@keyframes dropin { 0% { transform: translate(40px, -60px) rotate(12deg); opacity: 0; } 30%, 80% { transform: none; opacity: 1; } 100% { transform: none; opacity: 0; } }
-.found { display: grid; justify-items: center; gap: 10px; }
-.found .ic { width: 70px; height: 70px; border-radius: 14px; overflow: hidden; outline: 3px solid rgba(59,130,255,0.85); outline-offset: 4px; }
-.found span { font-size: 14px; padding: 2px 10px; border-radius: 6px; background: var(--sel); color: #fff; }
-.dropzone .sunset, .found .sunset { width: 100%; height: 100%; }
-.offline { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
-.offline::before, .offline::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(47, 199, 156, 0.45); animation: ping 3s var(--ease) infinite; }
-.offline::after { animation-delay: 1.5s; }
-@keyframes ping { from { transform: scale(0.5); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
-.offline svg { width: 54px; height: 54px; color: var(--shrink); filter: drop-shadow(0 0 16px rgba(47, 199, 156, 0.7)); }
-@media (max-width: 900px) { .bento .card, .bento .card.w3, .bento .card.w2 { grid-column: span 3; } }
-@media (max-width: 620px) { .bento { grid-template-columns: 1fr; } .bento .card, .bento .card.w3, .bento .card.w2 { grid-column: auto; min-height: 260px; } }
+/* Tools: Finder icon view */
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 18px; }
+.tool { display: grid; justify-items: center; align-content: start; text-align: center; gap: 8px; padding: 16px 10px; border-radius: 14px; transition: background 0.15s; }
+.tool:hover { background: rgba(255,255,255,0.05); }
+.tool .tile { width: 66px; height: 66px; border-radius: 16px; }
+.tool b { font-size: 15px; font-weight: 600; }
+.tool small { color: var(--muted); font-size: 13px; line-height: 1.45; max-width: 22ch; }
 
-/* ── Demo film ───────────────────────────────────────────────── */
-.film { position: relative; border-radius: 28px; padding: 10px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); border: 1px solid var(--line-2);
-  box-shadow: 0 60px 160px -40px rgba(158, 97, 255, 0.45); transform: perspective(1400px) rotateX(var(--fx, 18deg)) scale(var(--fs, 0.9)); transform-origin: 50% 0; }
-.film video { width: 100%; border-radius: 20px; aspect-ratio: 16 / 9; object-fit: cover; background: #000; display: block; }
-.film .sound { position: absolute; right: 26px; bottom: 26px; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px; border-radius: 999px; cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.25); background: rgba(10,10,14,0.6); color: #fff; font: 560 14px var(--sans); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background 0.2s, transform 0.2s var(--spring); }
-.film .sound:hover { background: rgba(10,10,14,0.8); transform: translateY(-1px); }
-.film .sound svg { width: 18px; height: 18px; }
-.film .sound .on { display: none; }
-.film .sound[aria-pressed="true"] .on { display: inline; }
-.film .sound[aria-pressed="true"] .off { display: none; }
-@media (max-width: 640px) { .film .sound { right: 14px; bottom: 14px; height: 34px; font-size: 13px; } }
-@media (max-width: 640px) { .film { padding: 6px; border-radius: 18px; } .film video { border-radius: 13px; } }
+/* Film: a QuickTime window */
+.player { position: relative; background: #000; }
+.player video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.sound { position: absolute; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; background: rgba(10,10,14,0.65);
+  border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-weight: 560; font-size: 14px; }
+.sound svg { width: 18px; height: 18px; }
+.sound .on { display: none; } .sound[aria-pressed="true"] .on { display: block; } .sound[aria-pressed="true"] .off { display: none; }
 
-/* ── FAQ ─────────────────────────────────────────────────────── */
-.faq { max-width: 780px; margin: 0 auto; display: grid; gap: 10px; }
-.faq details { border-radius: 18px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.025); transition: background 0.3s, border-color 0.3s; }
-.faq details[open] { background: rgba(255, 255, 255, 0.05); border-color: var(--line-2); }
-.faq summary { list-style: none; cursor: pointer; padding: 20px 56px 20px 22px; position: relative; font-weight: 520; font-size: 17px; }
+/* FAQ: a Notes window */
+.notesapp { display: grid; grid-template-columns: 230px 1fr; min-height: 380px; }
+.notesapp aside { border-right: 1px solid var(--line); padding: 18px 14px; background: rgba(0,0,0,0.15); }
+.notesapp aside b { display: block; font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+.notesapp aside div { padding: 10px 12px; border-radius: 8px; background: rgba(250,184,31,0.22); font-size: 14px; }
+.notesapp aside div small { display: block; color: var(--muted); font-size: 12px; }
+.faq { padding: 14px 30px 24px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; cursor: pointer; padding: 17px 0; font-size: 16.5px; font-weight: 560; display: flex; justify-content: space-between; gap: 16px; }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font: 300 24px var(--sans); color: var(--muted); transition: transform 0.3s var(--spring); }
-.faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
-.faq p { margin: 0; padding: 0 22px 22px; color: var(--muted); }
+.faq summary::after { content: "+"; color: var(--muted); font-size: 22px; line-height: 1; transition: transform 0.25s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin: 0 0 18px; color: var(--muted); max-width: 64ch; }
 
-/* ── Closing ─────────────────────────────────────────────────── */
-.closing { text-align: center; display: grid; justify-items: center; gap: 26px; padding: 170px 16px 140px; overflow: hidden; }
-.closing h2 { max-width: 12ch; font-size: clamp(44px, 8vw, 110px); }
-.closing p { margin: 0; color: var(--muted); }
-.orbit { position: relative; width: 240px; height: 240px; display: grid; place-items: center; }
-.orbit .sq { width: 120px; height: 120px; border-radius: 30px; background: linear-gradient(#2b2c30, #121315); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 30px 90px rgba(0, 0, 0, 0.8), 0 0 120px rgba(158, 97, 255, 0.35); }
-.orbit .core { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 0 40px #fff; }
-.orbit .spin { position: absolute; inset: 0; animation: orbit 14s linear infinite; }
-.orbit .d { position: absolute; left: 50%; top: 50%; width: 15px; height: 15px; margin: -7.5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 18px var(--c);
-  transform: rotate(var(--a)) translateY(-36px); animation: breathe 3.2s ease-in-out infinite; }
-@keyframes orbit { to { transform: rotate(360deg); } }
-@keyframes breathe { 50% { transform: rotate(var(--a)) translateY(-104px); } }
-footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
-footer { align-items: center; }
+/* Download: the installer window. Dragging the app onto Applications starts the download. */
+.dmg { width: min(680px, 100%); }
+.dmg .body { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; gap: 20px; padding: 50px 30px 40px; }
+.dmg .app, .dmg .apps { display: grid; justify-items: center; gap: 10px; font-size: 14px; }
+.dmg .app { position: relative; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.dmg .app svg { width: 110px; height: 110px; filter: drop-shadow(0 18px 30px rgba(158,97,255,0.5)); pointer-events: none; }
+.dmg .app.dragging { cursor: grabbing; z-index: 3; }
+.dmg .apps .folder { width: 116px; height: 92px; border-radius: 12px; background: linear-gradient(#69b2ff, #2f7ff0); position: relative; box-shadow: 0 14px 30px rgba(0,0,0,0.4); transition: transform 0.2s var(--spring), box-shadow 0.2s; }
+.dmg .apps .folder::before { content: ""; position: absolute; left: 8px; top: -10px; width: 44px; height: 16px; border-radius: 6px 6px 0 0; background: #5aa8ff; }
+.dmg .apps .folder::after { content: "A"; position: absolute; inset: 0; display: grid; place-items: center; font: 800 34px var(--sans); color: rgba(255,255,255,0.55); }
+.dmg .apps.hot .folder { transform: scale(1.12); box-shadow: 0 0 0 4px rgba(255,255,255,0.6), 0 14px 40px rgba(56,133,255,0.8); }
+.dmg .arrow { font-size: 40px; color: rgba(255,255,255,0.35); animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateX(10px); } }
+.dmg .hint { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: 14px; }
+.closing { text-align: center; padding-bottom: 60px; }
+.closing .cta { justify-content: center; }
+
+footer { width: min(1000px, 100% - 48px); margin: 0 auto; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 26px 0 110px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
 footer a:hover { color: var(--fg); }
-.maker { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--muted); }
-.maker kbd { font-size: 11px; margin: 0 1px; }
-.maker:hover kbd { border-bottom-width: 1px; transform: translateY(2px); background: linear-gradient(#3b82ff, #2563eb); box-shadow: 0 0 16px rgba(59, 130, 255, 0.7); }
-.maker .handle { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 999px; color: var(--fg); font-weight: 560;
-  background: var(--glass); border: 1px solid var(--line-2); transition: background 0.25s, border-color 0.25s, transform 0.25s var(--spring); }
-.maker .handle svg { width: 13px; height: 13px; }
-.maker:hover .handle { background: #fff; color: #08080a; border-color: #fff; transform: translateY(-1px); }
+footer .maker { display: inline-flex; align-items: center; gap: 8px; }
+footer .maker svg { width: 13px; height: 13px; }
 
-/* ── ⇧⌘ overlay ring ─────────────────────────────────────────── */
-#overlay { position: fixed; inset: 0; z-index: 80; pointer-events: none; transition: background 0.3s; }
-#overlay.open { pointer-events: auto; background: rgba(0, 0, 0, 0.4); }
-#overlay .disc { --R: 94px; --btn: 56px; --hub: 78px; position: absolute; transform: translate(-50%, -50%) scale(0.75); opacity: 0; transition: transform 0.4s var(--spring), opacity 0.2s; }
-#overlay .disc.open { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-#overlay .cap { position: absolute; left: 50%; top: calc(100% + 14px); transform: translateX(-50%); white-space: nowrap; font: 500 13px var(--mono); color: var(--muted);
-  padding: 6px 12px; border-radius: 999px; background: rgba(10, 10, 14, 0.85); border: 1px solid var(--line); }
-#overlay .cap b { color: var(--fg); font-weight: 500; }
-.spinner { width: 40%; height: 40%; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #fff; animation: rotate 0.7s linear infinite; }
-@keyframes rotate { to { transform: rotate(360deg); } }
-.toast { position: fixed; left: 50%; bottom: 24px; z-index: 90; display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 18px; border-radius: 999px; font-size: 14px;
-  background: rgba(20, 20, 26, 0.9); border: 1px solid var(--line-2); backdrop-filter: blur(16px); transform: translate(-50%, 160%); transition: transform 0.5s var(--spring); width: max-content; max-width: calc(100% - 32px); }
-.toast.show { transform: translate(-50%, 0); }
+/* Toast + first-launch guide */
+.toast { position: fixed; left: 50%; bottom: 96px; z-index: 80; display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 18px; border-radius: 999px; font-size: 14px;
+  background: rgba(20,20,26,0.92); border: 1px solid var(--line-2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translate(-50%, 30px); opacity: 0; pointer-events: none;
+  transition: transform 0.5s var(--spring), opacity 0.3s; width: max-content; max-width: calc(100% - 32px); }
+.toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 .toast a { flex: none; padding: 8px 14px; border-radius: 999px; background: #fff; color: #08080a; font-weight: 560; }
-
-/* ── First-launch guide ─────────────────────────────────────── */
 .guide { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .guide.show { opacity: 1; pointer-events: auto; }
-.guide-card { width: min(560px, 100%); max-height: calc(100svh - 32px); overflow: auto; border-radius: 28px; padding: 30px; background: #111115; border: 1px solid var(--line-2);
+.guide-card { width: min(560px, 100%); max-height: calc(100svh - 32px); overflow: auto; border-radius: 22px; padding: 30px; background: #111115; border: 1px solid var(--line-2);
   box-shadow: 0 50px 140px rgba(0, 0, 0, 0.8), 0 0 100px -30px rgba(158, 97, 255, 0.5); display: grid; gap: 22px; transform: translateY(20px) scale(0.97); transition: transform 0.45s var(--spring); }
 .guide.show .guide-card { transform: none; }
 .guide h3 { margin: 0 0 6px; font-size: 24px; letter-spacing: -0.03em; }
 .guide .sub { margin: 0; color: var(--muted); font-size: 15px; }
 .gsteps { display: grid; gap: 12px; counter-reset: s; }
-.gstep { display: grid; gap: 12px; padding: 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); counter-increment: s; }
+.gstep { display: grid; gap: 12px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line); counter-increment: s; }
 .gstep b { font-weight: 520; font-size: 15px; display: flex; gap: 12px; }
 .gstep b::before { content: counter(s); flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--mono); background: #fff; color: #000; }
-.vis { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px; border-radius: 12px; background: #1b1b21; font-size: 13px; color: var(--muted); }
-.vis svg { width: 30px; height: 30px; }
-.vis .folder { width: 34px; height: 26px; border-radius: 5px; background: linear-gradient(#5aa8ff, #2f7ff0); }
-.vis .hot { padding: 4px 12px; border-radius: 7px; background: var(--sel); color: #fff; }
-.vis .row { display: flex; gap: 8px; margin-left: auto; }
-.vis .row .no { padding: 4px 12px; border-radius: 7px; background: #2b2b33; color: #ddd; }
-.guide-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 14px; flex-wrap: wrap; }
+.vis2 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px; border-radius: 12px; background: #1b1b21; font-size: 13px; color: var(--muted); }
+.vis2 svg { width: 30px; height: 30px; }
+.vis2 .folder { width: 34px; height: 26px; border-radius: 5px; background: linear-gradient(#5aa8ff, #2f7ff0); }
+.vis2 .hot { padding: 4px 12px; border-radius: 7px; background: var(--sel); color: #fff; }
+.guide-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; }
+.guide-foot button { padding: 10px 20px; border-radius: 999px; background: #fff; color: #08080a; font-weight: 600; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
-  .reveal { opacity: 1; transform: none; filter: none; }
+@media (max-width: 1000px) {
+  .menubar .item.opt-hide { display: none; }
+  .desktop { grid-template-columns: 1fr; padding: 80px 24px 130px; min-height: 0; }
+  .icons { width: 100%; max-width: 700px; height: 280px; margin: 0 auto; }
+  .tryline { display: block; margin-bottom: -20px; }
+  .info, .notesapp { grid-template-columns: 1fr; }
+  .kinds { border-right: 0; border-bottom: 1px solid var(--line); grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .meter { grid-template-columns: 1fr 120px; } .meter .bars { grid-column: 1 / -1; grid-row: 2; }
 }
+@media (max-width: 700px) {
+  .menubar .item, .menubar .clock { display: none; }
+  .cols { grid-template-columns: 1fr; } .col { border-right: 0; border-bottom: 1px solid var(--line); }
+  .notesapp aside { display: none; }
+  .kinds { grid-template-columns: 1fr; }
+  .stagecol { padding: 30px 0; } .stagecol .ring { transform: scale(0.85); }
+  .dock a { width: 40px; height: 40px; } .dock { gap: 4px; padding: 6px 7px; border-radius: 18px; } .dock .opt-hide { display: none; }
+  .window .body { padding: 20px; } .faq { padding: 6px 20px 18px; }
+  .dmg .body { grid-template-columns: 1fr; } .dmg .arrow { rotate: 90deg; animation: none; }
+  .hello p { font-size: 17px; }
+  .zone { padding: 54px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
-
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34353a"/><stop offset="1" stop-color="#151619"/></linearGradient>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2b30"/><stop offset="1" stop-color="#121214"/></linearGradient>
     <symbol id="logo" viewBox="0 0 64 64">
       <rect x="1" y="1" width="62" height="62" rx="14.5" fill="url(#lg)"/>
       <rect x="1.5" y="1.5" width="61" height="61" rx="14" fill="none" stroke="rgba(255,255,255,.12)"/>
@@ -448,239 +345,178 @@ footer a:hover { color: var(--fg); }
   </defs>
 </svg>
 
-<div class="stage" aria-hidden="true"><div class="aurora"><i></i><i></i><i></i><i></i></div><div class="fade"></div></div>
+<div class="wallpaper" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
-<div class="cursor-light" id="cursorLight" aria-hidden="true"></div>
 
-<nav class="nav">
-  <a class="brand" href="#top" aria-label="Tapformat home"><svg aria-hidden="true"><use href="#logo"/></svg>Tapformat</a>
-  <div class="nav-links">
-    <a href="#how">How it works</a>
-    <a href="#formats">Formats</a>
-    <a href="#tools">Tools</a>
-    <a href="#faq">FAQ</a>
-    <a href="feedback">Feedback</a>
-    <a class="btn primary small" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download</a>
+<nav class="menubar" aria-label="Main">
+  <a class="logo" href="#top"><svg aria-hidden="true"><use href="#logo"/></svg>Tapformat</a>
+  <a class="item" href="#how">How it works</a>
+  <a class="item" href="#formats">Formats</a>
+  <a class="item opt-hide" href="#shrink">Shrink</a>
+  <a class="item opt-hide" href="#tools">Tools</a>
+  <a class="item" href="changelog">What's new</a>
+  <a class="item opt-hide" href="#faq">Help</a>
+  <div class="right">
+    <span class="count" id="count">✓ <span id="countN">0</span> converted</span>
+    <span class="clock" id="clock"></span>
+    <a class="dl" href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download</a>
   </div>
 </nav>
 
-<header class="hero" id="top">
-  <div class="wrap hero-inner">
-    <span class="pill"><b>NEW</b>Free for Mac · works offline</span>
-    <h1>
-      <span class="row"><span>Tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd>.</span></span>
-      <span class="row"><span class="shine">Convert <span class="serif">anything.</span></span></span>
-    </h1>
-    <p class="lede">Select a file in Finder and tap <b>⇧⌘</b>. A ring opens at your pointer with only the formats that make sense. <b>Point, click, saved.</b></p>
+<header class="desktop" id="top">
+  <div class="hello">
+    <span class="tag"><b>FREE</b>A Mac app · works offline · nothing uploaded</span>
+    <h1>Every file.<span class="serif">One tap.</span></h1>
+    <p>Select a file in Finder, tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd>, and a ring of formats opens right at your pointer. Point, click, saved.</p>
     <div class="cta">
-      <a class="btn primary glow" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
+      <a class="btn primary" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac</a>
       <span class="req">macOS 15+ · Apple silicon &amp; Intel · 26 MB</span>
     </div>
-
-    <div class="hero-ring" id="heroRing">
-      <div class="halo"></div>
-      <div class="tilt" id="tilt">
-        <div class="disc open" id="heroDisc"><div class="disc-bg"></div><div id="heroOpts"></div>
-          <div class="hub"><div class="thumb"><div class="sunset"></div></div></div>
-        </div>
-      </div>
-      <div class="floor"></div>
+  </div>
+  <p class="tryline"><span class="mouse">Try it: click a file, then tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></span><span class="touch">Try it: tap a file below</span></p>
+  <div class="icons" id="icons" aria-label="Try Tapformat on a desktop of files">
+    <div class="note" id="note" style="left:56px;top:430px">
+      <b>Try it right here</b>
+      <ol class="mouse"><li>Click a file</li><li>Tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd> on your keyboard</li><li>Pick a format</li></ol>
+      <div class="touch">Tap any file to open the ring.</div>
+      <button type="button" id="tryBtn">or click here</button>
     </div>
-    <div class="ring-caption" id="heroCap"><span class="dot"></span><span>Sunset.heic</span><span>→</span><span class="to" id="heroTo">Sunset.jpg</span></div>
-    <div class="try"><span class="k">Try it: press</span><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd><span class="k">anywhere on this page</span><button type="button" id="tryBtn">or tap here</button></div>
   </div>
 </header>
 
-<div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+<div class="ring" id="ring" role="dialog" aria-label="Pick a format">
+  <div class="disc"></div><div class="track"></div><div id="ringOpts"></div>
+  <div class="hub"><div class="thumb" id="ringThumb"></div>
+    <svg class="prog" viewBox="0 0 92 92"><circle id="ringProg" cx="46" cy="46" r="43" stroke-dasharray="270.2" stroke-dashoffset="270.2"/></svg>
+    <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
+  </div>
+  <div class="cap" id="ringCap"></div>
+</div>
+<div class="sparks" id="sparks"></div>
 
-<section class="story" id="how">
-  <div class="wrap story-pin">
-    <div class="steps">
-      <div class="step on" data-s="0"><span class="n">01</span><h3>Select a file.</h3><p>Any photo, PDF, document, song or video in Finder. Or select fifty.</p></div>
-      <div class="step" data-s="1"><span class="n">02</span><h3>Tap <kbd>⇧</kbd><kbd>⌘</kbd>.</h3><p>Just tap both keys and let go. The ring opens right where your pointer is.</p></div>
-      <div class="step" data-s="2"><span class="n">03</span><h3><span style="color:var(--jpg)">Done.</span></h3><p>The new file lands next to the original. The original is never touched.</p></div>
-    </div>
-    <div class="scene" id="scene">
-      <div class="bar"><i></i><i></i><i></i><span>~/Desktop</span></div>
-      <div class="file" id="src"><div class="icon"><div class="sunset"></div><span class="badge" style="--b:var(--heic)">HEIC</span></div><span class="name">Sunset.heic</span><span class="size">4.8 MB</span></div>
-      <div class="disc" id="storyDisc"><div class="disc-bg"></div><div id="storyOpts"></div>
-        <div class="hub"><div class="thumb"><div class="sunset"></div></div>
-          <svg class="prog" viewBox="0 0 90 90"><circle id="storyProg" cx="45" cy="45" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
-          <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
-        </div>
-      </div>
-      <div class="file" id="out"><div class="icon"><div class="sunset"></div><span class="badge" style="--b:var(--jpg)">JPG</span></div><span class="name">Sunset.jpg</span><span class="size">1.2 MB</span></div>
-      <div class="keys" id="storyKeys"><kbd>⇧</kbd><kbd>⌘</kbd></div>
-      <div class="saved" id="storySaved">✓ Saved next to the original</div>
-      <div class="sparks" id="sparks"></div>
+<section class="zone" id="how">
+  <div class="title reveal"><span class="k">How it works</span><h2>Three steps. <span class="serif">One second.</span></h2></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>How it works</span></div>
+    <div class="cols">
+      <div class="col"><div class="vis"><div class="mini-sel"><div class="photo"></div><span class="name">Sunset.heic</span></div></div>
+        <span class="n">01</span><h3>Select a file.</h3><p>Any photo, PDF, document, song or video in Finder. Or select fifty.</p></div>
+      <div class="col"><div class="vis" style="font-size:44px;gap:10px;display:flex;justify-content:center"><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></div>
+        <span class="n">02</span><h3>Tap ⇧⌘.</h3><p>Tap both keys and let go. The ring opens right where your pointer is. Or pick your own shortcut.</p></div>
+      <div class="col"><div class="vis"><div class="mini-ring" id="miniRing"></div></div>
+        <span class="n">03</span><h3>Done.</h3><p>The new file lands next to the original and gets selected for you. The original is never touched.</p></div>
     </div>
   </div>
 </section>
 
-<section class="pad" id="formats">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--png)">The ring</span>
-      <h2>Only what <span class="serif">makes sense.</span></h2>
-      <p>The ring reads your file and shows only the formats it can actually become. You never scroll a list of twenty options.</p>
-    </div>
-    <div class="wheel reveal">
-      <div class="tabs" id="tabs" role="tablist"></div>
-      <div class="wheel-stage" id="wheelStage">
-        <div class="disc open" id="wheelDisc"><div class="disc-bg"></div><div id="wheelOpts"></div><div class="hub"><div class="thumb" id="wheelThumb"></div></div></div>
-        <div class="wheel-label" id="wheelLabel"></div>
-      </div>
+<section class="zone" id="formats">
+  <div class="title reveal"><span class="k">The ring</span><h2>Only what <span class="serif">makes sense.</span></h2>
+    <p>The ring reads your file and offers only what it can actually become. No list of twenty options.</p></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>Get Info: what can it become?</span></div>
+    <div class="info">
+      <div class="kinds" id="kinds" role="tablist"></div>
+      <div class="stagecol"><div><div class="ring open" id="infoRing"><div class="disc"></div><div class="track"></div><div id="infoOpts"></div><div class="hub"><div class="thumb" id="infoThumb"></div></div></div>
+        <div class="label" id="infoLabel"></div></div></div>
     </div>
   </div>
 </section>
 
-<section class="pad" id="shrink">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--shrink)">Shrink</span>
-      <h2>Same file. <span class="serif">A fraction</span> of the size.</h2>
-      <p>Shrink keeps the format and saves <code>name (smaller)</code> next to the original. These are real results from our tests on the Balanced setting.</p>
-    </div>
-    <div class="shrink-grid" id="counters"></div>
+<section class="zone" id="shrink">
+  <div class="title reveal"><span class="k">Shrink</span><h2>Same file. <span class="serif">A fraction</span> of the size.</h2>
+    <p>Shrink keeps the format and saves <b>name (smaller)</b> next to the original. Real results from our tests on the Balanced setting.</p></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>Shrink: real results</span></div>
+    <div class="body" id="meters"></div>
   </div>
 </section>
 
-<section class="pad" id="new">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--heic)">New in 1.1</span>
-      <h2>Made to feel <span class="serif">like yours.</span></h2>
-      <p>Your own shortcut, drag and drop, and a converted file that's waiting for you, selected. <a href="changelog" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">See everything new</a></p>
-    </div>
-    <div class="bento">
-      <article class="card reveal">
-        <div class="art"><div class="undo"><kbd>⌥</kbd><kbd style="min-width:3.2em">Space</kbd></div></div>
-        <h3>Your shortcut</h3><p>Keep ⇧⌘ or record any combination you like, even ⌥Space.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="dropzone"><div class="file-chip"><div class="sunset"></div></div></div></div>
-        <h3>Drag &amp; drop</h3><p>Drop files on the Tapformat window and the ring opens right there.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="found"><div class="ic"><div class="sunset"></div></div><span>sunset.jpg</span></div></div>
-        <h3>Finds your file</h3><p>The new file is selected in Finder the moment it's ready. No hunting.</p>
-      </article>
-    </div>
+<section class="zone" id="new">
+  <div class="title reveal"><span class="k">New in 1.1</span><h2>Made to feel <span class="serif">like yours.</span></h2>
+    <p>Stuck to the desktop so you don't miss them. <a href="changelog" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">See everything new</a></p></div>
+  <div class="notes">
+    <div class="note reveal"><div class="doodle"><kbd style="font-size:22px">⌥</kbd><kbd style="font-size:22px;min-width:3em">Space</kbd></div><b>Your shortcut.</b>Keep ⇧⌘ or record any combination you like.</div>
+    <div class="note reveal"><div class="doodle"><span class="photo" style="width:44px;height:34px;transform:rotate(-8deg)"></span><span style="font-size:26px">→</span><span style="width:54px;height:38px;border:2px dashed currentColor;border-radius:8px;opacity:.6"></span></div><b>Drag &amp; drop.</b>Drop files on the Tapformat window and the ring opens right there.</div>
+    <div class="note reveal"><div class="doodle"><span style="padding:2px 8px;border-radius:5px;background:var(--sel);color:#fff;font-size:13px">Sunset.jpg</span></div><b>Finds your file.</b>The new file is selected in Finder the moment it's ready.</div>
   </div>
 </section>
 
-<section class="pad" id="tools">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--crop)">Tools</span>
-      <h2>Not just <span class="serif">formats.</span></h2>
-      <p>Crop, resize, rotate, mute, merge. All of them live in the same ring, so you never open another app.</p>
-    </div>
-    <div class="bento">
-      <article class="card w3 reveal">
-        <div class="art"><div class="crop"><div class="ph"><div class="sunset"></div><div class="frame"></div></div><span></span></div></div>
-        <h3>Crop for every feed</h3><p>1:1, 4:5, 16:9 or 9:16. Smart crop finds the subject and keeps it in frame.</p>
-      </article>
-      <article class="card w3 reveal">
-        <div class="art"><div class="resize"><i style="--i:0;width:30px;height:30px" data-l="50%"></i><i style="--i:1;width:52px;height:52px" data-l="1080"></i><i style="--i:2;width:78px;height:78px" data-l="2048"></i><i style="--i:3;width:108px;height:108px" data-l="4K"></i></div></div>
-        <h3>Resize in one click</h3><p>Half size, 1080px for the web, 2048 or 4K. Your aspect ratio is kept.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="rotate"><div class="sq">↻</div></div></div>
-        <h3>Rotate &amp; flip</h3><p>Photos and PDF pages, upright in a tap.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="mute" id="wave"></div></div>
-        <h3>Mute a video</h3><p>Strip the audio. The video isn't re-encoded, so it's instant.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="merge"><i></i><i></i><i></i></div></div>
-        <h3>Merge PDFs</h3><p>Select several, tap ⇧⌘, pick <code>1 PDF</code>.</p>
-      </article>
-      <article class="card w3 reveal">
-        <div class="art"><div class="offline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div></div>
-        <h3>Never uploaded</h3><p>Everything runs on your Mac's own hardware and works offline. New files never overwrite: you get <code>photo 2.jpg</code>.</p>
-      </article>
-      <article class="card reveal">
-        <div class="art"><div class="menu"><div>Open</div><div>Get Info</div><hr><div class="hot">Convert with Tapformat</div><div>Shrink with Tapformat</div></div></div>
-        <h3>Right-click too</h3><p>It's in Finder's Services menu.</p>
-      </article>
-      <article class="card w2 reveal">
-        <div class="art"><div class="undo"><kbd>⌘</kbd><kbd>Z</kbd></div></div>
-        <h3>Undo anything</h3><p>Press ⌘Z on the check mark and the new file goes to the Trash.</p>
-      </article>
-    </div>
+<section class="zone" id="tools">
+  <div class="title reveal"><span class="k">Tools</span><h2>Not just <span class="serif">formats.</span></h2>
+    <p>Crop, resize, rotate, mute, merge. All in the same ring, so you never open another app.</p></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>Tools</span></div>
+    <div class="body grid" id="toolGrid"></div>
   </div>
 </section>
 
-<section class="pad" id="film" style="padding-top:40px">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--gif)">Watch</span>
-      <h2>Watch it <span class="serif">in action.</span></h2>
-    </div>
-    <div class="film" id="filmFrame"><video id="filmVideo" src="tapformat-film.mp4" poster="film-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat launch film: select a file, tap ⇧⌘, pick a format"></video>
+<section class="zone" id="film">
+  <div class="title reveal"><span class="k">Watch</span><h2>See it <span class="serif">in action.</span></h2></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>tapformat-film.mp4</span></div>
+    <div class="player"><video id="filmVideo" src="tapformat-film.mp4" poster="film-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Tapformat launch film: select a file, tap ⇧⌘, pick a format"></video>
       <button class="sound" id="soundBtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="M22 9l-6 6M16 9l6 6"/></svg><span>Sound on</span></button></div>
   </div>
 </section>
 
-<section class="pad" id="faq">
-  <div class="wrap">
-    <div class="head reveal">
-      <span class="kicker" style="--k:var(--mp3)">Questions</span>
-      <h2>Before you <span class="serif">download.</span></h2>
-    </div>
-    <div class="faq reveal">
-      <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
-      <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
-      <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
-      <details><summary>Why does it ask about my Desktop and Documents folders?</summary><p>Tapformat saves the converted file right next to the original, so macOS asks once per folder before it can write there. The welcome guide asks for all of them in one go. To never see a folder prompt, turn on Tapformat in System Settings → Privacy &amp; Security → Full Disk Access (optional; Settings → Your Mac has a shortcut).</p></details>
-      <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
-      <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → Your Mac → Share anonymous usage count.</p></details>
-      <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
-      <details><summary>Can I change the shortcut?</summary><p>Yes, to anything you like. Pick ⌥⌘ or ⌃⌥ in Settings, or click <b>Record your own</b> and press any combination: a tap like ⌃⇧, or keys like ⌥Space or ⌃⌘K. It only listens while Finder is in front, so other apps keep their shortcuts.</p></details>
-      <details><summary>Can it convert a whole folder of photos?</summary><p>Select as many files as you like and tap ⇧⌘ once. The ring only offers formats every selected file supports, and several images can also become one PDF.</p></details>
+<section class="zone" id="faq">
+  <div class="title reveal"><span class="k">Questions</span><h2>Before you <span class="serif">download.</span></h2></div>
+  <div class="window reveal">
+    <div class="bar"><i></i><i></i><i></i><span>Notes</span></div>
+    <div class="notesapp">
+      <aside><b>Notes</b><div>Tapformat FAQ<small>9 answers</small></div></aside>
+      <div class="faq">
+        <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
+        <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
+        <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
+        <details><summary>Why does it ask about my Desktop and Documents folders?</summary><p>Tapformat saves the converted file right next to the original, so macOS asks once per folder before it can write there. The welcome guide asks for all of them in one go. To never see a folder prompt, turn on Tapformat in System Settings → Privacy &amp; Security → Full Disk Access (optional; Settings → Your Mac has a shortcut).</p></details>
+        <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
+        <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → Your Mac → Share anonymous usage count.</p></details>
+        <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
+        <details><summary>Can I change the shortcut?</summary><p>Yes, to anything you like. Pick ⌥⌘ or ⌃⌥ in Settings, or click <b>Record your own</b> and press any combination: a tap like ⌃⇧, or keys like ⌥Space or ⌃⌘K. It only listens while Finder is in front, so other apps keep their shortcuts.</p></details>
+        <details><summary>Can it convert a whole folder of photos?</summary><p>Select as many files as you like and tap ⇧⌘ once. The ring only offers formats every selected file supports, and several images can also become one PDF.</p></details>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="closing" id="download">
-  <div class="orbit reveal" aria-hidden="true">
-    <div class="sq"></div>
-    <div class="spin">
-      <span class="d" style="--c:var(--jpg);--a:0deg"></span><span class="d" style="--c:var(--heic);--a:60deg"></span>
-      <span class="d" style="--c:var(--png);--a:120deg"></span><span class="d" style="--c:var(--mp3);--a:180deg"></span>
-      <span class="d" style="--c:var(--gif);--a:240deg"></span><span class="d" style="--c:var(--pdf);--a:300deg"></span>
+<section class="zone closing" id="download">
+  <div class="title reveal"><span class="k">Get it</span><h2>Stop opening <span class="serif">converter websites.</span></h2></div>
+  <div class="window dmg reveal">
+    <div class="bar"><i></i><i></i><i></i><span>Tapformat</span></div>
+    <div class="body">
+      <div class="app" id="dmgApp"><svg aria-hidden="true"><use href="#logo"/></svg>Tapformat</div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="apps" id="dmgApps"><div class="folder"></div>Applications</div>
+      <div class="hint">Drag Tapformat onto Applications to download it. Yes, really.</div>
     </div>
-    <div class="core"></div>
   </div>
-  <h2 class="reveal">Stop opening <span class="serif">converter websites.</span></h2>
-  <p class="reveal">Tapformat <span data-version>1.1</span> · macOS 15 or later · Apple silicon &amp; Intel · <a href="changelog" style="text-decoration:underline;text-underline-offset:3px">What's new</a></p>
-  <a class="btn primary glow reveal" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
+  <div class="cta reveal">
+    <a class="btn primary" id="finalDl" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
+  </div>
+  <p class="req reveal" style="margin-top:16px">Tapformat <span data-version>1.1</span> · macOS 15 or later · Apple silicon &amp; Intel · <a href="changelog" style="text-decoration:underline;text-underline-offset:3px">What's new</a></p>
 </section>
 
-<div class="wrap">
-  <footer>
-    <span>© 2026 Tapformat · <a href="changelog">What's new</a> · <a href="feedback">Send feedback</a></span>
-    <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener">
-      <span class="made">Made one <kbd>⇧</kbd><kbd>⌘</kbd> at a time by</span>
-      <span class="handle"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</span>
-    </a>
-  </footer>
-</div>
+<footer>
+  <span>© 2026 Tapformat · <a href="changelog">What's new</a> · <a href="feedback">Send feedback</a></span>
+  <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener">Made one <kbd>⇧</kbd><kbd>⌘</kbd> at a time by
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</a>
+</footer>
 
-<div id="overlay" class="sparks" aria-hidden="true">
-  <div class="disc" id="ovDisc" role="menu" aria-label="Convert to">
-    <div class="disc-bg"></div><div id="ovOpts"></div>
-    <div class="hub">
-      <div class="thumb"><div class="sunset"></div></div>
-      <svg class="prog" viewBox="0 0 90 90"><circle id="ovRing" cx="45" cy="45" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
-      <div class="check"><svg viewBox="0 0 26 26"><path d="M6 13.5l4.6 4.5L20 8.5"/></svg></div>
-    </div>
-    <div class="cap"><b id="ovName">Sunset.heic</b> <span id="ovDetail">· aim and click</span></div>
-  </div>
-</div>
-<div class="toast" id="toast" role="status"><span>That's Tapformat. In Finder it converts the real file.</span><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download</a></div>
+<nav class="dock" id="dock" aria-label="Sections">
+  <a href="#top" style="--t:linear-gradient(#5ab0ff,#2370e8)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="15" rx="3"/><path d="M9 9v2M15 9v2M8.5 15c2 1.6 5 1.6 7 0"/></svg></span><span class="tip">Desktop</span></a>
+  <a href="#how" style="--t:linear-gradient(#ffb15c,#ff7a1a)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span class="tip">How it works</span></a>
+  <a href="#formats" style="--t:linear-gradient(#b788ff,#7c3cf0)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg></span><span class="tip">Formats</span></a>
+  <a class="opt-hide" href="#shrink" style="--t:linear-gradient(#5ce3bb,#14a37c)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20l6-6M10 14v5M10 14H5M20 4l-6 6M14 10V5M14 10h5"/></svg></span><span class="tip">Shrink</span></a>
+  <a class="opt-hide" href="#tools" style="--t:linear-gradient(#ffd35c,#f0a400)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 3v13a2 2 0 0 0 2 2h13M3 6h13a2 2 0 0 1 2 2v13"/></svg></span><span class="tip">Tools</span></a>
+  <a href="changelog" style="--t:linear-gradient(#ff7eb6,#e6337e)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.4 5.6L20 9.3l-4.3 3.9 1.3 5.8L12 16l-5 3 1.3-5.8L4 9.3l5.6-.7z"/></svg></span><span class="tip">What's new</span></a>
+  <a href="#faq" style="--t:linear-gradient(#ffe27a,#f5b800)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg></span><span class="tip">Questions</span></a>
+  <a href="feedback" style="--t:linear-gradient(#7cc4ff,#2f8cf0)"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><span class="tip">Feedback</span></a>
+  <span class="sep"></span>
+  <a href="https://tapformat.smit-jsv.workers.dev/download" data-download id="dockApp"><svg style="width:100%;height:100%" aria-hidden="true"><use href="#logo"/></svg><span class="tip">Download Tapformat</span></a>
+</nav>
+
+<div class="toast" id="toast" role="status"><span>That's Tapformat. On your Mac it converts the real file.</span><a href="https://tapformat.smit-jsv.workers.dev/download" data-download>Download</a></div>
 
 <div class="guide" id="guide" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-card">
@@ -690,11 +526,11 @@ footer a:hover { color: var(--fg); }
     </div>
     <div class="gsteps">
       <div class="gstep"><b>Open the download and drag Tapformat into Applications</b>
-        <div class="vis"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
+        <div class="vis2"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
       <div class="gstep"><b>Open Tapformat from Applications and follow the 1-minute welcome. Then select any file in Finder and tap ⇧⌘</b>
-        <div class="vis"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
+        <div class="vis2"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
     </div>
-    <div class="guide-foot"><span>Updates install automatically after that.</span><button class="btn primary small" id="guideClose" type="button">Got it</button></div>
+    <div class="guide-foot"><span>Updates install automatically after that.</span><button type="button" id="guideClose">Got it</button></div>
   </div>
 </div>
 
@@ -702,9 +538,9 @@ footer a:hover { color: var(--fg); }
 (() => {
   const $ = id => document.getElementById(id);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const C = { JPG: "#ff8f2e", PNG: "#3885ff", PDF: "#f5454d", HEIC: "#9e61ff", GIF: "#ff549e", MP3: "#29c770", M4A: "#ff6b66", WAV: "#fab81f", MP4: "#735cff", MOV: "#33a8ff",
+  const touch = matchMedia("(hover: none)").matches;
+  const C = { JPG: "#ff8f2e", PNG: "#3885ff", PDF: "#f5454d", HEIC: "#9e61ff", GIF: "#ff549e", MP3: "#29c770", M4A: "#ff6b66", WAV: "#fab81f", MP4: "#735cff",
     Word: "#336bf2", Shrink: "#2fc79c", "1 PDF": "#f5454d", Crop: "#fab81f", Resize: "#1ab8cc", Rotate: "#7c6cf0", Mute: "#ff6b66" };
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
   // Count one visit per browser session on the live counter.
   try {
@@ -714,136 +550,320 @@ footer a:hover { color: var(--fg); }
     }
   } catch {}
 
-  // Lay option circles around a disc. R comes from the disc's --R, so CSS breakpoints drive the size.
-  const placeOpts = (container, labels) => {
-    const R = parseFloat(getComputedStyle(container.parentElement).getPropertyValue("--R"));
-    container.innerHTML = "";
-    labels.forEach((label, i) => {
-      const a = i / labels.length * Math.PI * 2;
-      const o = document.createElement("div");
-      o.className = "opt";
-      o.textContent = label;
-      o.style.setProperty("--c", C[label]);
-      o.style.setProperty("--x", (Math.sin(a) * R).toFixed(1) + "px");
-      o.style.setProperty("--y", (-Math.cos(a) * R).toFixed(1) + "px");
-      o.style.setProperty("--d", (i * 0.04) + "s");
-      container.appendChild(o);
-    });
-    return [...container.children];
+  // Unique downloads: a device that already downloaded sends ?repeat=1, so the counter skips it.
+  const links = () => document.querySelectorAll("[data-download]");
+  const markRepeat = () => links().forEach(l => { l.href = l.href.split("?")[0] + "?repeat=1"; });
+  try { if (localStorage.getItem("tf-downloaded")) markRepeat(); } catch {}
+  const guide = $("guide");
+  links().forEach(l => l.addEventListener("click", () => {
+    try { if (!localStorage.getItem("tf-downloaded")) { localStorage.setItem("tf-downloaded", new Date().toISOString()); setTimeout(markRepeat, 50); } } catch {}
+    setTimeout(() => guide.classList.add("show"), 350);
+  }));
+  $("guideClose").addEventListener("click", () => guide.classList.remove("show"));
+  guide.addEventListener("click", e => { if (e.target === guide) guide.classList.remove("show"); });
+
+  // Menu bar clock, like the real one.
+  const clock = $("clock");
+  const tick = () => { clock.textContent = new Date().toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+  tick(); setInterval(tick, 15000);
+
+  // ── Desktop files ───────────────────────────────────────────
+  const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const ART = {
+    photo: `<div class="photo"></div>`,
+    page: `<div class="page"></div>`,
+    audio: `<div class="tile" style="--t:linear-gradient(#5ce38f,#1c9e52)">${svg('<path d="M4 12h2M8 8v8M12 5v14M16 8v8M20 11v2"/>')}</div>`,
+    video: `<div class="tile" style="--t:linear-gradient(#9a8aff,#5a3df0)">${svg('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z" fill="currentColor"/>')}</div>`,
+    logo: `<div class="photo" style="background:radial-gradient(circle at 50% 50%,#fff 0 22%,transparent 23%),conic-gradient(#ff8f2e,#9e61ff,#3885ff,#29c770,#ff549e,#f5454d,#ff8f2e)"></div>`,
   };
-  const select = (opts, i) => opts.forEach((o, j) => o.classList.toggle("sel", j === i));
-  function burst(host, x, y, n = 20) {
+  const artFor = (ext, from) => ({ mp3: "audio", m4a: "audio", wav: "audio", mp4: "video", mov: "video", gif: "video", pdf: "page", docx: "page" })[ext]
+    || (from === "page" || from === "logo" ? "photo" : from);
+  const FILES = [
+    { base: "Sunset", ext: "heic", art: "photo", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize"], x: 170, y: 0 },
+    { base: "Invoice", ext: "pdf", art: "page", to: ["JPG", "PNG", "Shrink", "Rotate"], x: 50, y: 10 },
+    { base: "Podcast", ext: "wav", art: "audio", to: ["MP3", "M4A", "Shrink"], x: 170, y: 140 },
+    { base: "Screen Recording", ext: "mov", art: "video", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"], x: 50, y: 150 },
+    { base: "Proposal", ext: "docx", art: "page", to: ["PDF", "Word"], x: 170, y: 290 },
+    { base: "Logo", ext: "png", art: "logo", to: ["JPG", "PDF", "Shrink", "Resize", "Rotate"], x: 50, y: 300 },
+  ];
+  const EXT = { JPG: "jpg", PNG: "png", PDF: "pdf", MP3: "mp3", M4A: "m4a", MP4: "mp4", GIF: "gif", Word: "docx" };
+  const BADGE = { heic: C.HEIC, pdf: C.PDF, wav: C.WAV, mov: C.MP4, docx: C.Word, png: C.PNG, jpg: C.JPG, mp3: C.MP3, m4a: C.M4A, mp4: C.MP4, gif: C.GIF };
+  // What a converted file can become next, so new icons keep working.
+  const NEXT = { jpg: ["PNG", "PDF", "Shrink", "Crop", "Resize"], png: ["JPG", "PDF", "Shrink", "Resize"], heic: ["JPG", "PNG", "Shrink"], pdf: ["JPG", "PNG", "Shrink", "Rotate"],
+    mp3: ["M4A", "WAV"], m4a: ["MP3", "WAV"], wav: ["MP3", "M4A"], mp4: ["GIF", "MP3", "Shrink", "Mute"], mov: ["MP4", "GIF", "Shrink"], gif: ["MP4", "Shrink"], docx: ["PDF"] };
+  const icons = $("icons");
+  let selected = null;
+
+  function makeIcon(f, x, y, isNew) {
+    const el = document.createElement("div");
+    el.className = "dicon" + (isNew ? " new" : "");
+    el.tabIndex = 0;
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-label", `${f.base}.${f.ext}. Press Enter to convert`);
+    el.style.left = x + "px"; el.style.top = y + "px";
+    el.innerHTML = `<div class="art">${ART[f.art]}<span class="badge" style="--b:${BADGE[f.ext] || "#555"}">${f.ext.toUpperCase()}</span></div><span class="name">${f.base}.${f.ext}</span>`;
+    el._file = f;
+    icons.appendChild(el);
+    makeDraggable(el);
+    return el;
+  }
+  function layout() {
+    // Wide screens: a right-hand column like a real Mac. Narrow: a grid under the headline.
+    const narrow = innerWidth <= 1000, w = icons.clientWidth;
+    [...icons.querySelectorAll(".dicon:not(.new)")].forEach((el, i) => {
+      const f = el._file;
+      if (narrow) {
+        const per = w >= 660 ? 6 : 3, cell = w / per;
+        el.style.left = (i % per * cell + (cell - 108) / 2) + "px"; el.style.top = (Math.floor(i / per) * 130) + "px";
+      } else { el.style.left = f.x + "px"; el.style.top = f.y + "px"; }
+    });
+    $("note").style.display = narrow ? "none" : "";
+  }
+  FILES.forEach(f => makeIcon(f, f.x, f.y));
+  layout();
+  addEventListener("resize", layout);
+
+  function select(el) {
+    icons.querySelectorAll(".dicon.sel").forEach(d => d.classList.remove("sel"));
+    selected = el;
+    if (el) el.classList.add("sel");
+  }
+  icons.addEventListener("pointerdown", e => { if (!e.target.closest(".dicon, .note")) select(null); });
+
+  function makeDraggable(el) {
+    let start = null, moved = false;
+    el.addEventListener("pointerdown", e => {
+      e.stopPropagation();
+      if (ring.classList.contains("open")) closeRing();
+      select(el);
+      start = { x: e.clientX, y: e.clientY, l: el.offsetLeft, t: el.offsetTop }; moved = false;
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener("pointermove", e => {
+      if (!start) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y;
+      if (!moved && Math.hypot(dx, dy) < 5) return;
+      moved = true; el.classList.add("dragging");
+      el.style.left = (start.l + dx) + "px"; el.style.top = (start.t + dy) + "px";
+    });
+    const end = () => {
+      if (!start) return;
+      start = null; el.classList.remove("dragging");
+      if (!moved && touch) openRing(el);
+    };
+    el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+    el.addEventListener("dblclick", () => openRing(el));
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(el); openRing(el); } });
+  }
+
+  // ── The ring ────────────────────────────────────────────────
+  const ring = $("ring"), ringOpts = $("ringOpts"), prog = $("ringProg");
+  let ringFile = null, ringIcon = null, opts = [], aim = 0, busy = false, center = { x: 0, y: 0 };
+  const R = 104;
+  function place(container, labels, radius) {
+    container.innerHTML = "";
+    return labels.map((label, i) => {
+      const a = i / labels.length * Math.PI * 2;
+      const o = document.createElement("button");
+      o.type = "button"; o.className = "opt"; o.textContent = label; o.tabIndex = -1;
+      o.style.setProperty("--c", C[label]);
+      o.style.setProperty("--x", (Math.sin(a) * radius).toFixed(1) + "px");
+      o.style.setProperty("--y", (-Math.cos(a) * radius).toFixed(1) + "px");
+      o.style.setProperty("--d", (i * 0.035) + "s");
+      container.appendChild(o);
+      return o;
+    });
+  }
+  const thumbFor = f => f.art === "photo" ? `<div style="width:100%;height:100%;background:var(--sunset)"></div>`
+    : `<div style="width:100%;height:100%;display:grid;place-items:center;background:${BADGE[f.ext]};font:700 13px var(--sans)">${f.ext.toUpperCase()}</div>`;
+  function outName(f, label) {
+    const tag = { Shrink: "smaller", Crop: "1x1", Resize: "1080", Rotate: "rotated", Mute: "muted" }[label];
+    return tag ? `${f.base} (${tag}).${f.ext}` : `${f.base}.${EXT[label]}`;
+  }
+  function setAim(i) {
+    aim = i;
+    opts.forEach((o, j) => o.classList.toggle("sel", j === i));
+    ring.style.setProperty("--accent", C[ringFile.to[i]]);
+    $("ringCap").innerHTML = `<b>${outName(ringFile, ringFile.to[i])}</b> · click to convert`;
+  }
+  function openRing(el) {
+    if (busy) return;
+    if (!el) el = icons.querySelector(".dicon");
+    select(el);
+    ringIcon = el; ringFile = el._file;
+    const r = el.querySelector(".art").getBoundingClientRect();
+    if (r.bottom < 60 || r.top > innerHeight - 60) { el.scrollIntoView({ block: "center" }); }
+    const r2 = el.querySelector(".art").getBoundingClientRect();
+    center = { x: Math.min(Math.max(r2.left + r2.width / 2, 160), innerWidth - 160), y: Math.min(Math.max(r2.top + r2.height / 2, 190), innerHeight - 210) };
+    ring.style.left = center.x + "px"; ring.style.top = center.y + "px";
+    ring.classList.remove("done", "open");
+    prog.style.transition = "none"; prog.style.strokeDashoffset = 270.2;
+    $("ringThumb").innerHTML = thumbFor(ringFile); $("ringThumb").style.opacity = 1;
+    opts = place(ringOpts, ringFile.to, R);
+    opts.forEach((o, i) => {
+      o.addEventListener("pointerenter", () => setAim(i));
+      o.addEventListener("click", e => { e.stopPropagation(); convert(i); });
+    });
+    setAim(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => ring.classList.add("open")));
+  }
+  function closeRing() { if (!busy) ring.classList.remove("open"); }
+  // Pie aiming: the option in the pointer's direction lights up, like the app.
+  addEventListener("pointermove", e => {
+    if (!ring.classList.contains("open") || busy || !opts.length) return;
+    const dx = e.clientX - center.x, dy = e.clientY - center.y;
+    if (Math.hypot(dx, dy) < 30) return;
+    const a = (Math.atan2(dx, -dy) + Math.PI * 2) % (Math.PI * 2);
+    const i = Math.round(a / (Math.PI * 2) * opts.length) % opts.length;
+    if (i !== aim) setAim(i);
+  });
+  addEventListener("pointerdown", e => { if (ring.classList.contains("open") && !e.target.closest(".ring, .dicon")) closeRing(); });
+  ring.addEventListener("click", e => { if (!busy && e.target.closest(".disc, .hub")) convert(aim); });
+
+  let converted = 0, toastShown = false;
+  function convert(i) {
+    if (busy || !ringFile) return;
+    busy = true;
+    const label = ringFile.to[i];
+    opts.forEach((o, j) => o.style.opacity = j === i ? 1 : 0.25);
+    $("ringCap").innerHTML = `Converting to <b>${label}</b>… on your Mac, nothing uploaded`;
+    $("ringThumb").style.opacity = 0.45;
+    requestAnimationFrame(() => { prog.style.transition = ""; prog.style.strokeDashoffset = 0; });
+    setTimeout(() => {
+      ring.classList.add("done");
+      const name = outName(ringFile, label);
+      $("ringCap").innerHTML = `<b>✓ ${name}</b> · saved next to the original`;
+      burst(center.x, center.y);
+      // The new file lands beside the original, already selected, like 1.1 does in Finder.
+      const ext = name.split(".").pop(), base = name.slice(0, -(ext.length + 1));
+      const f = { base, ext, art: artFor(ext, ringFile.art), to: NEXT[ext] || ringFile.to };
+      const [nx, ny] = freeSpot(ringIcon.offsetLeft, ringIcon.offsetTop);
+      const fresh = makeIcon(f, nx, ny, true);
+      converted++;
+      $("count").classList.add("on"); $("countN").textContent = converted;
+      setTimeout(() => {
+        busy = false; ring.classList.remove("open"); opts.forEach(o => o.style.opacity = "");
+        select(fresh);
+        if (!toastShown) { toastShown = true; $("toast").classList.add("show"); setTimeout(() => $("toast").classList.remove("show"), 6000); }
+        const d = $("dockApp"); d.classList.remove("bounce"); void d.offsetWidth; d.classList.add("bounce");
+      }, 1100);
+    }, 950);
+  }
+  // The nearest empty spot beside a file: left first (towards the middle of the desktop), then around it.
+  function freeSpot(x, y) {
+    const taken = [...icons.querySelectorAll(".dicon")].map(d => [d.offsetLeft, d.offsetTop]);
+    const minX = innerWidth <= 1000 ? 0 : -icons.getBoundingClientRect().left + 40, maxX = icons.clientWidth - 108, maxY = icons.clientHeight - 60;
+    for (let ring = 1; ring < 6; ring++)
+      for (const [dx, dy] of [[-1, 0], [0, 1], [1, 0], [-1, 1], [1, 1], [0, -1], [-1, -1], [1, -1]]) {
+        const cx = x + dx * ring * 118, cy = y + dy * ring * 130;
+        if (cx < minX || cx > maxX || cy < 0 || cy > maxY) continue;
+        if (taken.every(([tx, ty]) => Math.abs(tx - cx) > 96 || Math.abs(ty - cy) > 110)) return [cx, cy];
+      }
+    return [x - 118, y + 26];
+  }
+  function burst(x, y, n = 22) {
+    if (reduce) return;
     const colors = Object.values(C);
     for (let i = 0; i < n; i++) {
-      const a = i / n * Math.PI * 2, d = 70 + (i * 37) % 70, c = colors[i % colors.length];
+      const a = i / n * Math.PI * 2, d = 80 + (i * 37) % 80, c = colors[i % colors.length];
       const b = document.createElement("span");
       b.style.left = x + "px"; b.style.top = y + "px"; b.style.background = c; b.style.boxShadow = `0 0 10px ${c}`;
-      b.style.setProperty("--bx", (Math.cos(a) * d).toFixed(0) + "px");
-      b.style.setProperty("--by", (Math.sin(a) * d).toFixed(0) + "px");
-      host.appendChild(b);
+      b.style.setProperty("--bx", (Math.cos(a) * d).toFixed(0) + "px"); b.style.setProperty("--by", (Math.sin(a) * d).toFixed(0) + "px");
+      $("sparks").appendChild(b);
       setTimeout(() => b.remove(), 950);
     }
   }
 
-  // Unique downloads: a device that already downloaded sends ?repeat=1, so the counter skips it.
-  try {
-    if (localStorage.getItem("tf-downloaded")) document.querySelectorAll("[data-download]").forEach((l) => { l.href = l.href.split("?")[0] + "?repeat=1"; });
-  } catch {}
-  document.querySelectorAll("[data-download]").forEach((l) => l.addEventListener("click", () => {
-    try {
-      if (!localStorage.getItem("tf-downloaded")) { localStorage.setItem("tf-downloaded", new Date().toISOString()); setTimeout(() => document.querySelectorAll("[data-download]").forEach((x) => { x.href = x.href.split("?")[0] + "?repeat=1"; }), 50); }
-    } catch {}
-  }));
-  // ── Download → first-launch guide ────────────────────────────
-  const guide = $("guide");
-  document.querySelectorAll("[data-download]").forEach(a => a.addEventListener("click", () => setTimeout(() => guide.classList.add("show"), 350)));
-  $("guideClose").addEventListener("click", () => guide.classList.remove("show"));
-  guide.addEventListener("click", e => { if (e.target === guide) guide.classList.remove("show"); });
+  // The real ⇧⌘ tap: both held, nothing else pressed, then let go.
+  const setKey = (k, d) => document.querySelectorAll(`kbd[data-key="${k}"]`).forEach(x => x.classList.toggle("down", d));
+  const held = new Set();
+  let armed = false, spoiled = false;
+  addEventListener("keydown", e => {
+    if (e.key === "Escape") { closeRing(); return; }
+    if (ring.classList.contains("open") && !busy && !held.size) {
+      if (e.key === "Enter") { e.preventDefault(); convert(aim); return; }
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); setAim((aim + 1) % opts.length); return; }
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); setAim((aim - 1 + opts.length) % opts.length); return; }
+    }
+    if (e.key === "Shift" || e.key === "Meta") { held.add(e.key); setKey(e.key, true); if (held.size === 2) { armed = true; spoiled = false; } }
+    else if (held.size) spoiled = true;
+  });
+  addEventListener("keyup", e => {
+    if (e.key !== "Shift" && e.key !== "Meta") return;
+    held.delete(e.key); setKey(e.key, false);
+    if (!held.size) {
+      if (armed && !spoiled) { if (ring.classList.contains("open")) closeRing(); else openRing(selected); }
+      armed = false;
+    }
+  });
+  addEventListener("blur", () => { held.clear(); armed = false; setKey("Shift", false); setKey("Meta", false); });
+  $("tryBtn").addEventListener("click", e => { e.stopPropagation(); openRing(selected); });
 
-  // ── Cursor light + hero tilt ────────────────────────────────
-  const light = $("cursorLight"), tilt = $("tilt"), heroRing = $("heroRing");
-  let pointer = { x: innerWidth / 2, y: innerHeight / 2 };
-  const moveLight = () => { light.style.transform = `translate(${pointer.x - 280}px, ${pointer.y - 280}px)`; };
-  moveLight();
-  addEventListener("pointermove", e => {
-    pointer = { x: e.clientX, y: e.clientY };
-    moveLight();
-    if (reduce) return;
-    const r = heroRing.getBoundingClientRect();
-    if (r.bottom < 0) return;
-    const nx = (e.clientX - (r.left + r.width / 2)) / innerWidth, ny = (e.clientY - (r.top + r.height / 2)) / innerHeight;
-    tilt.style.setProperty("--ry", (nx * 26).toFixed(2) + "deg");
-    tilt.style.setProperty("--rx", (6 - ny * 22).toFixed(2) + "deg");
-  }, { passive: true });
+  // ── How it works: the little ring keeps aiming ──────────────
+  const mini = $("miniRing");
+  for (let i = 0; i < 6; i++) { const d = document.createElement("i"), a = i / 6 * Math.PI * 2; d.style.transform = `translate(${Math.sin(a) * 44}px, ${-Math.cos(a) * 44}px)`; mini.appendChild(d); }
+  mini.appendChild(document.createElement("b"));
+  let mi = 0;
+  setInterval(() => { [...mini.querySelectorAll("i")].forEach((d, j) => d.classList.toggle("on", j === mi)); mi = (mi + 1) % 6; }, 900);
 
-  document.querySelectorAll(".card").forEach(card => card.addEventListener("pointermove", e => {
-    const r = card.getBoundingClientRect();
-    card.style.setProperty("--mx", (e.clientX - r.left) + "px");
-    card.style.setProperty("--my", (e.clientY - r.top) + "px");
-  }));
-
-  // Keycaps follow the visitor's real keyboard
-  const setKey = (key, down) => document.querySelectorAll(`kbd[data-key="${key}"]`).forEach(k => k.classList.toggle("down", down));
-
-  // ── Hero ring: aims around the options on its own ───────────
-  const HERO = ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize"];
-  const heroOut = { JPG: "Sunset.jpg", PNG: "Sunset.png", PDF: "Sunset.pdf", Shrink: "Sunset (smaller).heic", Crop: "Sunset (4x5).heic", Resize: "Sunset (1080px).heic" };
-  const heroDisc = $("heroDisc"), heroCap = $("heroCap"), heroTo = $("heroTo");
-  let heroOpts = placeOpts($("heroOpts"), HERO), heroI = 0;
-  const heroAim = () => {
-    select(heroOpts, heroI);
-    const c = C[HERO[heroI]];
-    [heroRing, heroDisc, heroCap].forEach(el => el.style.setProperty("--accent", c));
-    heroTo.textContent = heroOut[HERO[heroI]];
-  };
-  heroAim();
-  setInterval(() => { heroI = (heroI + 1) % HERO.length; heroAim(); }, 1400);
-
-  // ── Marquee ─────────────────────────────────────────────────
-  const ticks = [["HEIC", "JPG", C.JPG], ["PNG", "PDF", C.PDF], ["MOV", "MP4", C.MP4], ["WAV", "MP3", C.MP3], ["PDF", "PNG", C.PNG], ["DOCX", "PDF", C.PDF],
-    ["MOV", "GIF", C.GIF], ["87 MB", "41 MB", C.Shrink], ["3 PDFs", "1 PDF", C.PDF], ["4032px", "1080px", C.Resize], ["16:9", "4:5", C.Crop], ["5.2 MB", "177 KB", C.Shrink]];
-  const tickHTML = ticks.map(([a, b, c]) => `<span class="tick" style="--c:${c}"><i></i>${a} → <b>${b}</b></span>`).join("");
-  $("marquee").innerHTML = tickHTML + tickHTML;
-
-  // ── Scroll story ────────────────────────────────────────────
-  const story = document.querySelector(".story"), steps = [...document.querySelectorAll(".step")];
-  const src = $("src"), out = $("out"), sDisc = $("storyDisc"), sKeys = $("storyKeys"), sSaved = $("storySaved"), sProg = $("storyProg");
-  const S_LABELS = ["JPG", "PNG", "PDF", "Shrink"];
-  let sOpts = placeOpts($("storyOpts"), S_LABELS);
-  const seg = (p, a, b) => clamp((p - a) / (b - a));
-  const ease = t => 1 - Math.pow(1 - t, 3);
-  let burstDone = false;
-  function storyFrame() {
-    const r = story.getBoundingClientRect();
-    const p = clamp(-r.top / (r.height - innerHeight));
-    const step = p < 0.28 ? 0 : p < 0.72 ? 1 : 2;
-    steps.forEach((s, i) => s.classList.toggle("on", i === step));
-    // 1. select the file
-    src.classList.toggle("selected", p > 0.08);
-    // 2. tap the keys, the ring springs open
-    sKeys.style.opacity = (p > 0.2 && p < 0.74) ? 1 : 0;
-    sKeys.querySelectorAll("kbd").forEach(kb => kb.classList.toggle("down", p > 0.29 && p < 0.37));
-    const open = ease(seg(p, 0.34, 0.44)), close = ease(seg(p, 0.8, 0.88));
-    sDisc.style.setProperty("--s", (0.6 + 0.4 * open - 0.25 * close).toFixed(3));
-    sDisc.style.setProperty("--o", (open * (1 - close)).toFixed(3));
-    sDisc.classList.toggle("open", open > 0.15);
-    // aim sweeps PNG → PDF → JPG, then converts
-    const aimIdx = p < 0.5 ? 1 : p < 0.56 ? 2 : 0;
-    select(sOpts, aimIdx);
-    sDisc.style.setProperty("--accent", C[S_LABELS[aimIdx]]);
-    sProg.style.strokeDashoffset = (263.9 * (1 - seg(p, 0.6, 0.74))).toFixed(1);
-    sDisc.classList.toggle("done", p > 0.74);
-    // 3. the converted file lands
-    const o = ease(seg(p, 0.8, 0.9));
-    out.style.opacity = o;
-    out.style.transform = `translate(-50%, -50%) translateX(${(-60 * (1 - o)).toFixed(1)}px) scale(${(0.6 + 0.4 * o).toFixed(3)})`;
-    src.style.opacity = 1 - 0.45 * o;
-    sSaved.style.opacity = seg(p, 0.86, 0.92);
-    if (p > 0.86 && !burstDone) { burstDone = true; if (!reduce) burst($("sparks"), out.offsetLeft, out.offsetTop - 20); }
-    if (p < 0.8) burstDone = false;
+  // ── Formats: Get Info ───────────────────────────────────────
+  const KINDS = [
+    { name: "Image", from: "HEIC · PNG · JPG · WebP", ic: "IMG", color: C.HEIC, file: "IMG_2041.heic", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize", "Rotate"] },
+    { name: "PDF", from: ".pdf", ic: "PDF", color: C.PDF, file: "Report.pdf", to: ["JPG", "PNG", "Shrink", "Rotate"] },
+    { name: "Several PDFs", from: "select 2 or more", ic: "2×", color: C.PDF, file: "3 PDFs", to: ["JPG", "PNG", "1 PDF", "Shrink"] },
+    { name: "Document", from: "Word · RTF · Markdown", ic: "DOC", color: C.Word, file: "Proposal.docx", to: ["PDF", "Word"] },
+    { name: "Audio", from: "WAV · M4A · FLAC · AIFF", ic: "AUD", color: C.MP3, file: "Voice memo.wav", to: ["MP3", "M4A", "WAV"] },
+    { name: "Video", from: "MOV · MP4 · MKV · WebM", ic: "VID", color: C.MP4, file: "Screen Recording.mov", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"] },
+  ];
+  const kinds = $("kinds"), infoRing = $("infoRing");
+  let infoTimer;
+  function showKind(k) {
+    [...kinds.children].forEach((t, i) => { t.classList.toggle("on", i === k); t.setAttribute("aria-selected", String(i === k)); });
+    const kind = KINDS[k];
+    $("infoThumb").innerHTML = `<div style="width:100%;height:100%;display:grid;place-items:center;background:${kind.color};font:700 13px var(--sans)">${kind.ic}</div>`;
+    $("infoLabel").innerHTML = `<b>${kind.file}</b> → ${kind.to.join(" · ")}`;
+    const o = place($("infoOpts"), kind.to, R);
+    let i = 0;
+    const light = () => { o.forEach((x, j) => x.classList.toggle("sel", j === i)); infoRing.style.setProperty("--accent", C[kind.to[i]]); };
+    light();
+    clearInterval(infoTimer);
+    infoTimer = setInterval(() => { i = (i + 1) % o.length; light(); }, 1100);
   }
+  KINDS.forEach((kind, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "kind"; b.setAttribute("role", "tab");
+    b.innerHTML = `<span class="ic" style="--c:${kind.color}">${kind.ic}</span><span><b>${kind.name}</b><small>${kind.from}</small></span><span class="cnt">${kind.to.length}</span>`;
+    b.addEventListener("click", () => showKind(i));
+    kinds.appendChild(b);
+  });
+  showKind(0);
 
-  // Sound toggle: browsers only autoplay muted, so the visitor turns sound on.
+  // ── Shrink results (real tests, Balanced) ───────────────────
+  const MB = 1024 * 1024;
+  const fmt = b => b >= MB ? (b / MB).toFixed(1).replace(/\.0$/, "") + " MB" : Math.round(b / 1024) + " KB";
+  const results = [
+    { what: "Screen recording", detail: "30 s, Retina", before: 87.0 * MB, after: 41.2 * MB },
+    { what: "Photo", detail: "4032 × 3024 JPG", before: 5.2 * MB, after: 1.2 * MB },
+    { what: "Scanned PDF", detail: "3 pages", before: 5.2 * MB, after: 0.177 * MB },
+    { what: "1080p video", detail: "4 s, MOV", before: 112 * MB, after: 4.6 * MB },
+  ];
+  $("meters").innerHTML = results.map(r => `<div class="meter" data-r="${(r.after / r.before).toFixed(4)}"><div><b>${r.what}</b><small>${r.detail}</small></div>
+    <div class="bars"><i></i><i></i></div><div class="num"><em>−${Math.round((1 - r.after / r.before) * 100)}%</em>${fmt(r.before)} → ${fmt(r.after)}</div></div>`).join("");
+
+  // ── Tools: icon view ────────────────────────────────────────
+  const TOOLS = [
+    ["Crop for every feed", "1:1, 4:5, 16:9 or 9:16. Smart crop keeps the subject in frame.", "#fab81f", '<path d="M6 3v13a2 2 0 0 0 2 2h13M3 6h13a2 2 0 0 1 2 2v13"/>'],
+    ["Resize in one click", "Half size, 1080px, 2048 or 4K. Aspect ratio kept.", "#1ab8cc", '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>'],
+    ["Rotate &amp; flip", "Photos and PDF pages, upright in a tap.", "#7c6cf0", '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>'],
+    ["Mute a video", "Strip the audio instantly. No re-encoding.", "#ff6b66", '<path d="M11 5L6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6"/>'],
+    ["Merge PDFs", "Select several, tap ⇧⌘, pick 1 PDF.", "#f5454d", '<path d="M8 3h8l4 4v10H8zM4 7v14h12"/>'],
+    ["Undo anything", "⌘Z on the check mark sends the new file to the Trash.", "#8b8b96", '<path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/>'],
+    ["Right-click too", "Convert or Shrink from Finder's Services menu.", "#3885ff", '<path d="M5 3l14 8-6 2-2 6z"/>'],
+    ["Never uploaded", "Runs on your Mac and works offline. Never overwrites: you get photo 2.jpg.", "#2fc79c", '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'],
+  ];
+  $("toolGrid").innerHTML = TOOLS.map(([t, d, c, p]) => `<div class="tool"><div class="tile" style="--t:linear-gradient(${c},color-mix(in srgb,${c} 70%,#000))">${svg(p)}</div><b>${t}</b><small>${d}</small></div>`).join("");
+
+  // ── Film sound: browsers only autoplay muted ────────────────
   const filmVideo = $("filmVideo"), soundBtn = $("soundBtn");
   soundBtn.addEventListener("click", () => {
     const on = filmVideo.muted;
@@ -853,188 +873,49 @@ footer a:hover { color: var(--fg); }
     soundBtn.querySelector("span").textContent = on ? "Sound off" : "Sound on";
   });
 
-  // Demo film flattens as it scrolls into view
-  const film = $("filmFrame");
-  function filmFrame() {
-    const r = film.getBoundingClientRect();
-    const t = clamp(1 - (r.top - innerHeight * 0.15) / (innerHeight * 0.7));
-    film.style.setProperty("--fx", (18 * (1 - t)).toFixed(2) + "deg");
-    film.style.setProperty("--fs", (0.9 + 0.1 * t).toFixed(3));
-  }
-  let ticking = false;
-  const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { storyFrame(); filmFrame(); ticking = false; }); };
-  addEventListener("scroll", onScroll, { passive: true });
-  storyFrame(); filmFrame();
-
-  // ── Format wheel ────────────────────────────────────────────
-  const KINDS = [
-    { name: "Image", from: "HEIC · PNG · JPG · WebP", ic: "IMG", color: C.HEIC, file: "IMG_2041.heic", to: ["JPG", "PNG", "PDF", "Shrink", "Crop", "Resize", "Rotate"] },
-    { name: "PDF", from: ".pdf", ic: "PDF", color: C.PDF, file: "Report.pdf", to: ["JPG", "PNG", "Shrink", "Rotate"] },
-    { name: "Several PDFs", from: "select 2 or more", ic: "2×", color: C.PDF, file: "3 PDFs", to: ["JPG", "PNG", "1 PDF", "Shrink"] },
-    { name: "Document", from: "Word · RTF · Markdown", ic: "DOC", color: C.Word, file: "Proposal.docx", to: ["PDF", "Word"] },
-    { name: "Audio", from: "WAV · M4A · FLAC · AIFF", ic: "AUD", color: C.MP3, file: "Voice memo.wav", to: ["MP3", "M4A", "WAV"] },
-    { name: "Video", from: "MOV · MP4 · MKV · WebM", ic: "VID", color: C.MP4, file: "Screen Recording.mov", to: ["MP4", "GIF", "MP3", "Shrink", "Mute"] },
-  ];
-  const tabs = $("tabs"), wheelDisc = $("wheelDisc"), stage = $("wheelStage");
-  let wheelTimer, kindIdx = 0;
-  function showKind(k) {
-    kindIdx = k;
-    [...tabs.children].forEach((t, i) => { t.classList.toggle("on", i === k); t.setAttribute("aria-selected", String(i === k)); });
-    const kind = KINDS[k];
-    stage.style.setProperty("--accent", kind.color);
-    wheelDisc.style.setProperty("--accent", kind.color);
-    $("wheelThumb").innerHTML = `<div style="width:100%;height:100%;display:grid;place-items:center;background:${kind.color};color:#fff;font:700 13px var(--sans)">${kind.ic}</div>`;
-    $("wheelLabel").innerHTML = `<b>${kind.file}</b><br>→ ${kind.to.join(" · ")}`;
-    wheelDisc.classList.remove("open");
-    const opts = placeOpts($("wheelOpts"), kind.to);
-    requestAnimationFrame(() => requestAnimationFrame(() => wheelDisc.classList.add("open")));
-    let i = 0;
-    select(opts, i);
-    clearInterval(wheelTimer);
-    wheelTimer = setInterval(() => { i = (i + 1) % opts.length; select(opts, i); }, 1100);
-  }
-  KINDS.forEach((kind, i) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab");
-    b.innerHTML = `<span class="ic" style="--c:${kind.color}">${kind.ic}</span><span><b>${kind.name}</b><span class="sub">${kind.from}</span></span><span class="to">${kind.to.length} options</span>`;
-    b.addEventListener("click", () => showKind(i));
-    tabs.appendChild(b);
+  // ── Installer: drag the app onto Applications to download ───
+  const app = $("dmgApp"), apps = $("dmgApps"), finalDl = $("finalDl");
+  let ds = null;
+  app.addEventListener("pointerdown", e => { ds = { x: e.clientX, y: e.clientY }; app.setPointerCapture(e.pointerId); app.classList.add("dragging"); });
+  app.addEventListener("pointermove", e => {
+    if (!ds) return;
+    app.style.transform = `translate(${e.clientX - ds.x}px, ${e.clientY - ds.y}px)`;
+    const r = apps.getBoundingClientRect();
+    apps.classList.toggle("hot", e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom);
   });
-  showKind(0);
-
-  // Ring sizes change at breakpoints, so re-place the circles on resize.
-  let resizeT;
-  addEventListener("resize", () => {
-    clearTimeout(resizeT);
-    resizeT = setTimeout(() => { heroOpts = placeOpts($("heroOpts"), HERO); heroAim(); sOpts = placeOpts($("storyOpts"), S_LABELS); storyFrame(); filmFrame(); showKind(kindIdx); }, 150);
-  });
-
-  // ── Mute waveform bars ──────────────────────────────────────
-  $("wave").innerHTML = Array.from({ length: 22 }, (_, i) => `<i style="--i:${i};height:${30 + (i * 53) % 70}%"></i>`).join("");
-
-  // ── Shrink counters ─────────────────────────────────────────
-  const MB = 1e6;
-  const fmt = b => b >= MB ? (b / MB).toFixed(b >= 10 * MB ? 0 : 1) + " MB" : Math.round(b / 1000) + " KB";
-  const results = [
-    { what: "Screen recording", detail: "30 s, Retina", before: 87.0 * MB, after: 41.2 * MB },
-    { what: "Photo", detail: "4032 × 3024 JPG", before: 5.2 * MB, after: 1.2 * MB },
-    { what: "Scanned PDF", detail: "3 pages", before: 5.2 * MB, after: 0.177 * MB },
-    { what: "1080p video", detail: "4 s, MOV", before: 112 * MB, after: 4.6 * MB },
-  ];
-  $("counters").innerHTML = results.map((r, i) => `<div class="card counter reveal" data-i="${i}">
-      <span class="what">${r.what}</span><span class="detail">${r.detail}</span>
-      <div class="nums"><span class="num">${fmt(r.before)}</span><span class="from">${fmt(r.before)}</span><span class="pct">−${Math.round((1 - r.after / r.before) * 100)}%</span></div>
-      <div class="track"><i></i></div></div>`).join("");
-  const runCounter = el => {
-    const r = results[el.dataset.i], num = el.querySelector(".num"), bar = el.querySelector(".track i");
-    bar.style.width = (Math.max(r.after / r.before, 0.035) * 100).toFixed(1) + "%";
-    if (reduce) { num.textContent = fmt(r.after); return; }
-    const t0 = performance.now();
-    const stepFn = now => {
-      const p = Math.min(1, (now - t0) / 1400), e = 1 - Math.pow(1 - p, 3);
-      num.textContent = fmt(r.before + (r.after - r.before) * e);
-      if (p < 1) requestAnimationFrame(stepFn);
-    };
-    requestAnimationFrame(stepFn);
+  const drop = () => {
+    if (!ds) return;
+    ds = null; app.classList.remove("dragging");
+    const hit = apps.classList.contains("hot");
+    apps.classList.remove("hot");
+    app.style.transition = "transform 0.4s var(--spring)"; app.style.transform = ""; setTimeout(() => app.style.transition = "", 400);
+    if (hit) { const r = apps.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + 46); finalDl.click(); }
   };
+  app.addEventListener("pointerup", drop); app.addEventListener("pointercancel", drop);
 
-  // ── Reveal on scroll ────────────────────────────────────────
-  const show = el => { el.classList.add("in"); if (el.classList.contains("counter")) setTimeout(() => runCounter(el), 250); };
+  // ── Dock: magnify near the pointer ──────────────────────────
+  const dock = $("dock"), dockItems = [...dock.querySelectorAll("a")];
+  if (!touch && !reduce) {
+    dock.addEventListener("pointermove", e => dockItems.forEach(a => {
+      const r = a.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2));
+      a.style.transform = `scale(${(1 + Math.max(0, 1 - d / 130) * 0.55).toFixed(3)})`;
+    }));
+    dock.addEventListener("pointerleave", () => dockItems.forEach(a => a.style.transform = ""));
+  }
+
+  // ── Reveal windows, fill the shrink bars, mark the Dock ─────
+  const show = el => {
+    el.classList.add("in");
+    el.querySelectorAll(".meter").forEach(m => { m.querySelector(".bars i + i").style.transform = `scaleX(${m.dataset.r})`; });
+  };
   if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(entries => entries.forEach(en => {
-      if (!en.isIntersecting) return;
-      io.unobserve(en.target);
-      const grid = en.target.closest(".bento, .shrink-grid");
-      setTimeout(() => show(en.target), grid ? ([...grid.children].indexOf(en.target) % 3) * 90 : 0);
-    }), { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } }), { threshold: 0.12 });
     document.querySelectorAll(".reveal").forEach(el => io.observe(el));
-  } else {
-    document.querySelectorAll(".reveal").forEach(show);
-  }
-
-  // ── ⇧⌘ anywhere: the ring opens at the pointer ─────────────
-  const overlay = $("overlay"), disc = $("ovDisc"), ring = $("ovRing"), toast = $("toast");
-  const LABELS = ["JPG", "PNG", "PDF", "Shrink"], LEN = 263.9;
-  let ovOpts = [], center = { x: 0, y: 0 }, choice = 0, phase = "closed";
-  addEventListener("pointermove", e => { if (phase === "choosing") aim(e.clientX, e.clientY); }, { passive: true });
-  function openRing(x, y) {
-    if (phase !== "closed") return;
-    const half = 94 + 28 + 17 + 10;
-    center = { x: clamp(x, half, innerWidth - half), y: clamp(y, half + 64, innerHeight - half - 40) };
-    disc.style.left = center.x + "px"; disc.style.top = center.y + "px";
-    disc.classList.remove("done", "open");
-    ovOpts = placeOpts($("ovOpts"), LABELS);
-    choice = 0; ring.style.strokeDashoffset = LEN;
-    $("ovName").textContent = "Sunset.heic"; $("ovDetail").textContent = "· aim and click";
-    phase = "choosing"; highlight();
-    overlay.classList.add("open");
-    requestAnimationFrame(() => requestAnimationFrame(() => disc.classList.add("open")));
-    toast.classList.remove("show");
-  }
-  function closeRing() { disc.classList.remove("open"); overlay.classList.remove("open"); phase = "closed"; }
-  function highlight() { select(ovOpts, choice); disc.style.setProperty("--accent", C[LABELS[choice]]); }
-  function aim(x, y) {
-    const dx = x - center.x, dy = y - center.y;
-    if (Math.hypot(dx, dy) < 39) return false;
-    let a = Math.atan2(dx, -dy); if (a < 0) a += Math.PI * 2;
-    const i = Math.round(a / (Math.PI * 2 / LABELS.length)) % LABELS.length;
-    if (i !== choice) { choice = i; highlight(); }
-    return true;
-  }
-  function convert() {
-    if (phase !== "choosing") return;
-    phase = "working";
-    const label = LABELS[choice], o = ovOpts[choice];
-    o.innerHTML = '<span class="spinner"></span>';
-    const t0 = performance.now();
-    const tick = now => {
-      const p = Math.min(1, (now - t0) / 850);
-      ring.style.strokeDashoffset = LEN * (1 - p);
-      if (p < 1) return requestAnimationFrame(tick);
-      phase = "done";
-      $("ovName").textContent = label === "Shrink" ? "Sunset (smaller).heic" : "Sunset." + label.toLowerCase();
-      $("ovDetail").textContent = "· saved";
-      disc.classList.add("done");
-      if (!reduce) burst(overlay, center.x, center.y, 26);
-      setTimeout(() => { closeRing(); toast.classList.add("show"); }, 1500);
-      setTimeout(() => toast.classList.remove("show"), 6500);
-    };
-    requestAnimationFrame(tick);
-  }
-  disc.addEventListener("click", e => {
-    e.stopPropagation();
-    if (phase === "choosing") { if (aim(e.clientX, e.clientY)) convert(); else closeRing(); }
-    else if (phase === "done") closeRing();
-  });
-  overlay.addEventListener("click", () => { if (phase === "choosing") closeRing(); });
-  $("tryBtn").addEventListener("click", e => { e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); openRing(r.left + r.width / 2, r.top - 170); });
-
-  // The gesture: ⇧ and ⌘ pressed together, released with nothing else in between.
-  const down = new Set();
-  let armed = false, armedAt = 0;
-  addEventListener("keydown", e => {
-    if (e.key === "Escape") guide.classList.remove("show");
-    if (e.key === "Shift" || e.key === "Meta") {
-      setKey(e.key, true); down.add(e.key);
-      if (down.has("Shift") && down.has("Meta")) { armed = true; armedAt = performance.now(); }
-      return;
-    }
-    armed = false;
-    if (phase !== "choosing") return;
-    if (e.key === "Escape") { closeRing(); e.preventDefault(); }
-    else if (e.key === "Enter") { convert(); e.preventDefault(); }
-    else if (e.key === "ArrowRight" || e.key === "ArrowDown") { choice = (choice + 1) % LABELS.length; highlight(); e.preventDefault(); }
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { choice = (choice + LABELS.length - 1) % LABELS.length; highlight(); e.preventDefault(); }
-  });
-  addEventListener("keyup", e => {
-    if (e.key !== "Shift" && e.key !== "Meta") return;
-    setKey(e.key, false); down.delete(e.key);
-    if (down.size === 0 && armed) {
-      armed = false;
-      if (performance.now() - armedAt < 900) { if (phase === "choosing") closeRing(); else if (phase === "closed") openRing(pointer.x, pointer.y); }
-    }
-  });
-  addEventListener("blur", () => { down.clear(); armed = false; setKey("Shift", false); setKey("Meta", false); });
+    const secs = new IntersectionObserver(es => es.forEach(en => {
+      if (en.isIntersecting) dockItems.forEach(a => a.classList.toggle("here", a.getAttribute("href") === "#" + en.target.id));
+    }), { threshold: 0.4 });
+    document.querySelectorAll("header[id], section[id]").forEach(s => secs.observe(s));
+  } else document.querySelectorAll(".reveal").forEach(show);
 })();
 </script>
 </body>

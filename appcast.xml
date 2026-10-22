@@ -6,6 +6,20 @@
     <description>Tapformat updates</description>
     <language>en</language>
     <item>
+      <title>Version 1.0.2</title>
+      <pubDate>Thu, 22 Oct 2026 10:19:09 GMT</pubDate>
+      <sparkle:version>3</sparkle:version>
+      <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<h2>Tapformat 1.0.2</h2>
+<ul>
+<li><b>Anonymous usage count.</b> Tapformat now counts how many files it converts, to help us understand what to improve. It sends just the number, never your files, their names, or anything about you. You can turn it off anytime in Settings → More → Share anonymous usage count.</li>
+<li>Small fixes and improvements.</li>
+</ul>
+<p><i>Coming from 1.0?</i> Tapformat is now verified by Apple, so there's no more security warning. macOS may ask you to turn Accessibility on again once (System Settings → Privacy &amp; Security → Accessibility).</p>]]></description>
+      <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.0.2/Tapformat.dmg" sparkle:edSignature="jaKF8EvhToqyYiM5r8MBUq7IkidAVQnA0/bhx4m7T2lfccT2CEbvgPEcvsNjWV/geYOi/Mmv3C0pCQ3ENc7TBg==" length="23594246" type="application/octet-stream"/>
+    </item>
+    <item>
       <title>Version 1.0.1</title>
       <pubDate>Thu, 22 Oct 2026 08:15:32 GMT</pubDate>
       <sparkle:version>2</sparkle:version>

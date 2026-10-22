@@ -327,6 +327,13 @@ h2 { margin: 0; font-weight: 600; font-size: clamp(38px, 6vw, 76px); line-height
 .menu hr { border: 0; height: 1px; background: var(--line-2); margin: 5px 6px; }
 .menu .hot { background: var(--sel); color: #fff; }
 .undo { display: flex; gap: 10px; font-size: 38px; }
+.dropzone { width: 170px; height: 120px; border-radius: 18px; border: 1.5px dashed rgba(255,255,255,0.35); display: grid; place-items: center; background: rgba(255,255,255,0.03); }
+.dropzone .file-chip { width: 54px; height: 54px; border-radius: 12px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,0.5); animation: dropin 2.6s var(--ease) infinite; }
+@keyframes dropin { 0% { transform: translate(40px, -60px) rotate(12deg); opacity: 0; } 30%, 80% { transform: none; opacity: 1; } 100% { transform: none; opacity: 0; } }
+.found { display: grid; justify-items: center; gap: 10px; }
+.found .ic { width: 70px; height: 70px; border-radius: 14px; overflow: hidden; outline: 3px solid rgba(59,130,255,0.85); outline-offset: 4px; }
+.found span { font-size: 14px; padding: 2px 10px; border-radius: 6px; background: var(--sel); color: #fff; }
+.dropzone .sunset, .found .sunset { width: 100%; height: 100%; }
 .offline { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
 .offline::before, .offline::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(47, 199, 156, 0.45); animation: ping 3s var(--ease) infinite; }
 .offline::after { animation-delay: 1.5s; }
@@ -538,6 +545,30 @@ footer a:hover { color: var(--fg); }
   </div>
 </section>
 
+<section class="pad" id="new">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker" style="--k:var(--heic)">New in 1.1</span>
+      <h2>Made to feel <span class="serif">like yours.</span></h2>
+      <p>Your own shortcut, drag and drop, and a converted file that's waiting for you, selected. <a href="changelog" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">See everything new</a></p>
+    </div>
+    <div class="bento">
+      <article class="card reveal">
+        <div class="art"><div class="undo"><kbd>⌥</kbd><kbd style="min-width:3.2em">Space</kbd></div></div>
+        <h3>Your shortcut</h3><p>Keep ⇧⌘ or record any combination you like, even ⌥Space.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="dropzone"><div class="file-chip"><div class="sunset"></div></div></div></div>
+        <h3>Drag &amp; drop</h3><p>Drop files on the Tapformat window and the ring opens right there.</p>
+      </article>
+      <article class="card reveal">
+        <div class="art"><div class="found"><div class="ic"><div class="sunset"></div></div><span>sunset.jpg</span></div></div>
+        <h3>Finds your file</h3><p>The new file is selected in Finder the moment it's ready. No hunting.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section class="pad" id="tools">
   <div class="wrap">
     <div class="head reveal">
@@ -603,10 +634,11 @@ footer a:hover { color: var(--fg); }
       <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
       <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
       <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
+      <details><summary>Why does it ask about my Desktop and Documents folders?</summary><p>Tapformat saves the converted file right next to the original, so macOS asks once per folder before it can write there. The welcome guide asks for all of them in one go. To never see a folder prompt, turn on Tapformat in System Settings → Privacy &amp; Security → Full Disk Access (optional; Settings → Your Mac has a shortcut).</p></details>
       <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
-      <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → More → Share anonymous usage count.</p></details>
+      <details><summary>Does Tapformat track what I convert?</summary><p>Your files never leave your Mac. The app sends an anonymous count of how many files it converted (like "3 images"), never the files, their names or anything about you. You can turn it off in Settings → Your Mac → Share anonymous usage count.</p></details>
       <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
-      <details><summary>Can I change the shortcut?</summary><p>Yes. In Settings you can switch to ⌥⌘ or ⌃⌥.</p></details>
+      <details><summary>Can I change the shortcut?</summary><p>Yes, to anything you like. Pick ⌥⌘ or ⌃⌥ in Settings, or click <b>Record your own</b> and press any combination: a tap like ⌃⇧, or keys like ⌥Space or ⌃⌘K. It only listens while Finder is in front, so other apps keep their shortcuts.</p></details>
       <details><summary>Can it convert a whole folder of photos?</summary><p>Select as many files as you like and tap ⇧⌘ once. The ring only offers formats every selected file supports, and several images can also become one PDF.</p></details>
     </div>
   </div>
@@ -623,13 +655,13 @@ footer a:hover { color: var(--fg); }
     <div class="core"></div>
   </div>
   <h2 class="reveal">Stop opening <span class="serif">converter websites.</span></h2>
-  <p class="reveal">Tapformat 1.0 · macOS 15 or later · Apple silicon &amp; Intel</p>
+  <p class="reveal">Tapformat <span data-version>1.1</span> · macOS 15 or later · Apple silicon &amp; Intel · <a href="changelog" style="text-decoration:underline;text-underline-offset:3px">What's new</a></p>
   <a class="btn primary glow reveal" href="https://tapformat.smit-jsv.workers.dev/download" data-download><svg aria-hidden="true"><use href="#dl"/></svg>Download for Mac, free</a>
 </section>
 
 <div class="wrap">
   <footer>
-    <span>© 2026 Tapformat · <a href="feedback">Send feedback</a></span>
+    <span>© 2026 Tapformat · <a href="changelog">What's new</a> · <a href="feedback">Send feedback</a></span>
     <a class="maker" href="https://x.com/SmitVanani06" target="_blank" rel="noopener">
       <span class="made">Made one <kbd>⇧</kbd><kbd>⌘</kbd> at a time by</span>
       <span class="handle"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@SmitVanani06</span>
@@ -659,7 +691,7 @@ footer a:hover { color: var(--fg); }
     <div class="gsteps">
       <div class="gstep"><b>Open the download and drag Tapformat into Applications</b>
         <div class="vis"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
-      <div class="gstep"><b>Open Tapformat from Applications, then select any file in Finder and tap ⇧⌘</b>
+      <div class="gstep"><b>Open Tapformat from Applications and follow the 1-minute welcome. Then select any file in Finder and tap ⇧⌘</b>
         <div class="vis"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
     </div>
     <div class="guide-foot"><span>Updates install automatically after that.</span><button class="btn primary small" id="guideClose" type="button">Got it</button></div>

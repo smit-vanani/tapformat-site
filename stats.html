@@ -628,6 +628,9 @@ footer a:hover { color: var(--fg); }
       data = next; seen = keys;
       $("updated").textContent = "Live · " + new Date(data.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
       $("dayBadge").querySelector("b").textContent = dayNumber();
+      // ?demo shows sample conversion numbers to preview the layout (never stored anywhere).
+      if (new URLSearchParams(location.search).has("demo")) data.usage = { total: 1284, today: 96, macsToday: 14, installs: 37,
+        kinds: { image: 612, video: 188, shrink: 164, pdf: 121, document: 74, audio: 52, crop: 31, resize: 22, merge: 12, rotate: 5, mute: 3 } };
       renderUsage();
       paintOpts(); setAim(aim, true); renderFeed(fresh); renderDays(); draw(); setText();
       if (newDownload) { setAim(0, true); lastHover = performance.now(); burst(); toast("🎉 Someone just downloaded Tapformat"); }

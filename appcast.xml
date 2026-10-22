@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Tapformat</title>
+    <link>https://tapformat.com</link>
+    <description>Tapformat updates</description>
+    <language>en</language>
+    <item>
+      <title>Version 1.0.1</title>
+      <pubDate>Thu, 22 Oct 2026 08:15:32 GMT</pubDate>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<h2>Tapformat 1.0.1</h2>
+<ul>
+<li><b>Now notarized by Apple.</b> No more "can't verify this app" warning.</li>
+<li><b>Send Feedback…</b> in the menu bar menu and in Settings.</li>
+<li><b>A cleaner installer.</b></li>
+</ul>
+<p>After updating, macOS may ask you to turn on Accessibility for Tapformat again (System Settings → Privacy &amp; Security → Accessibility). It's a one-time step because of the new Apple signature.</p>]]></description>
+      <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.0.1/Tapformat.dmg" sparkle:edSignature="u6zBObdf8temnA4SXWPNoAvmUH+SoBBZhVjmMzMzJCuedd+yw9TcBy8kSvtEC8fmkpFuSCufXEl4yz+VY3BqDw==" length="23564517" type="application/octet-stream"/>
+    </item>
+    <item>
+      <title>Version 1.0</title>
+      <pubDate>Tue, 20 Oct 2026 13:25:57 +0000</pubDate>
+      <sparkle:version>1</sparkle:version>
+      <sparkle:shortVersionString>1.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[First release: convert, shrink, crop, resize, rotate and mute files from Finder with ⇧⌘.]]></description>
+      <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.0/Tapformat.dmg" sparkle:edSignature="ospE6QnyCJZF90pTTu7GKhTRjcK/HAyK00wo3Qp25/HvWy9L0+G9130cZNdfJl4QNUu1sL8T2KVE7rbz3l8wDw==" length="25593778" type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>

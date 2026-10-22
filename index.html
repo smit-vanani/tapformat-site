@@ -598,7 +598,7 @@ footer a:hover { color: var(--fg); }
     </div>
     <div class="faq reveal">
       <details><summary>Is it really free?</summary><p>Yes. Download it and convert as much as you like.</p></details>
-      <details><summary>Why does macOS say it can't verify Tapformat?</summary><p>Tapformat isn't registered in Apple's paid developer program yet, so macOS asks you to confirm it the first time. Click Done, then open System Settings → Privacy &amp; Security and click Open Anyway. You only do this once, and updates install automatically after that.</p></details>
+      <details><summary>Is it safe to install?</summary><p>Yes. Tapformat is notarized by Apple, which means Apple scanned it for malware and checked who built it. It opens like any other app, with no security warning.</p></details>
       <details><summary>Why does it ask for Accessibility permission?</summary><p>macOS only lets an app notice a key tap made inside Finder if you allow it under Accessibility. Tapformat uses it to spot the ⇧⌘ tap and nothing else. It doesn't read or store what you type.</p></details>
       <details><summary>Why does it ask to control Finder?</summary><p>That's how it finds out which files you've selected when you tap ⇧⌘. macOS shows a one-time prompt for it.</p></details>
       <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon or Intel running macOS 15 Sequoia or later.</p></details>
@@ -650,15 +650,13 @@ footer a:hover { color: var(--fg); }
   <div class="guide-card">
     <div>
       <h3 id="guideTitle">Your download has started</h3>
-      <p class="sub">Opening Tapformat the first time takes one extra step, because it isn't in Apple's paid developer program yet. You only do this once.</p>
+      <p class="sub">Two quick steps and you're converting. Tapformat is notarized by Apple, so it opens without any warning.</p>
     </div>
     <div class="gsteps">
       <div class="gstep"><b>Open the download and drag Tapformat into Applications</b>
         <div class="vis"><svg aria-hidden="true"><use href="#logo"/></svg><span>→</span><span class="folder"></span><span>Applications</span></div></div>
-      <div class="gstep"><b>Open Tapformat. When macOS says it can't verify it, click Done</b>
-        <div class="vis"><svg aria-hidden="true"><use href="#logo"/></svg><span>“Tapformat” Not Opened</span><div class="row"><span class="no">Move to Trash</span><span class="hot">Done</span></div></div></div>
-      <div class="gstep"><b>Go to System Settings → Privacy &amp; Security and click Open Anyway</b>
-        <div class="vis"><span>“Tapformat” was blocked to protect your Mac.</span><div class="row"><span class="hot">Open Anyway</span></div></div></div>
+      <div class="gstep"><b>Open Tapformat from Applications, then select any file in Finder and tap ⇧⌘</b>
+        <div class="vis"><span>Select a file</span><span>→</span><span class="hot">⇧⌘</span><span>→</span><span>pick a format</span></div></div>
     </div>
     <div class="guide-foot"><span>Updates install automatically after that.</span><button class="btn primary small" id="guideClose" type="button">Got it</button></div>
   </div>

@@ -75,11 +75,11 @@ kbd.down { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,.5); backgro
 .menubar .clock { font-variant-numeric: tabular-nums; }
 
 /* ── Desktop hero ──────────────────────────────────────────── */
-.desktop { position: relative; min-height: max(100svh, 700px); padding: 90px 48px 150px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; }
+.desktop { position: relative; min-height: max(100svh, 720px); padding: 90px max(48px, 5vw) 140px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 60px; max-width: 1500px; margin: 0 auto; }
 .hello { align-self: center; max-width: 640px; }
 .hello .tag { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .hello .tag b { padding: 1px 8px; border-radius: 999px; background: linear-gradient(90deg, var(--jpg), var(--gif), var(--heic)); color: #fff; font: 600 11px var(--mono); letter-spacing: 0.06em; }
-.hello h1 { margin: 22px 0 18px; font-size: clamp(56px, 8.4vw, 128px); line-height: 0.9; letter-spacing: -0.055em; font-weight: 700; }
+.hello h1 { margin: 22px 0 18px; font-size: clamp(56px, 7.4vw, 118px); line-height: 0.9; letter-spacing: -0.055em; font-weight: 700; }
 .hello h1 .serif { display: block; font-size: 1.08em; background: linear-gradient(90deg, var(--jpg), var(--gif) 45%, var(--heic)); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 0.08em; }
 .hello p { margin: 0; color: #b9b9c4; font-size: 19px; max-width: 34ch; }
 .cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 30px; }
@@ -90,7 +90,32 @@ kbd.down { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,.5); backgro
 .req { color: var(--dim); font-size: 13px; }
 
 /* Desktop icons: a right-hand column, like a real Mac. Draggable; click selects, ⇧⌘ opens the ring. */
-.icons { position: relative; width: 300px; height: 600px; align-self: center; }
+.stagewrap { position: relative; align-self: center; perspective: 1400px; padding: 110px 0 60px; }
+.finder { position: relative; width: 640px; border-radius: 14px; background: rgba(24, 24, 30, 0.72); border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5);
+  box-shadow: 0 60px 120px -30px rgba(0,0,0,0.85), 0 0 0 0.5px rgba(0,0,0,0.7), 0 0 140px -40px rgba(158,97,255,0.55);
+  transform: rotateX(var(--rx, 4deg)) rotateY(var(--ry, -8deg)); transform-style: preserve-3d; transition: transform 0.6s var(--ease); }
+.fbar { position: relative; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 1px solid var(--line); }
+.fbar i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; } .fbar i:nth-child(2) { background: #febc2e; } .fbar i:nth-child(3) { background: #28c840; }
+.fbar .nav-arrows { margin-left: 14px; color: rgba(255,255,255,0.35); letter-spacing: 6px; font-size: 18px; }
+.fbar .ftitle { font-weight: 650; font-size: 13.5px; }
+.fbar .search { margin-left: auto; padding: 3px 12px; border-radius: 7px; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4); font-size: 12px; }
+.fbody { display: grid; grid-template-columns: 150px 1fr; }
+.side { padding: 12px 8px; border-right: 1px solid var(--line); background: rgba(0,0,0,0.12); display: grid; align-content: start; gap: 1px; font-size: 12.5px; color: rgba(255,255,255,0.8); }
+.side small { padding: 8px 8px 3px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,0.35); }
+.side span { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 6px; }
+.side span.on { background: rgba(255,255,255,0.1); }
+.side svg { width: 15px; height: 15px; fill: none; stroke: var(--png); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.side i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin: 0 3px; }
+.icons { position: relative; height: 360px; margin: 14px 10px; }
+.fstatus { display: flex; justify-content: space-between; gap: 10px; padding: 7px 16px; border-top: 1px solid var(--line); font-size: 11.5px; color: rgba(255,255,255,0.45); }
+.fstatus #statusHint { color: #fff6a8; }
+.stagewrap .note { right: -40px; top: -4px; width: 196px; transform: rotate(5deg); }
+.bigkeys { position: absolute; left: -96px; bottom: -14px; display: flex; align-items: center; gap: 10px; font-size: 40px; transform: rotate(-6deg); }
+.bigkeys kbd { width: 76px; height: 76px; border-radius: 18px; font-size: 38px; box-shadow: 0 7px 0 #8d8d96, 0 18px 34px rgba(0,0,0,0.55); }
+.bigkeys kbd.down, .bigkeys:active kbd { transform: translateY(6px); box-shadow: 0 1px 0 #8d8d96, 0 8px 20px rgba(0,0,0,0.5); }
+.bigkeys span { font: 500 13px var(--mono); color: rgba(255,255,255,0.5); align-self: flex-end; margin-bottom: 8px; transform: rotate(6deg); }
+.bigkeys:hover kbd { filter: brightness(1.05); }
 .dicon { position: absolute; width: 108px; display: grid; justify-items: center; gap: 6px; padding: 8px 4px; border-radius: 10px; cursor: default; touch-action: none; user-select: none; -webkit-user-select: none; transition: background 0.15s; outline: none; }
 .dicon.dragging { z-index: 5; transition: none; }
 .dicon .art { position: relative; width: 68px; height: 68px; display: grid; place-items: center; filter: drop-shadow(0 10px 18px rgba(0,0,0,0.5)); pointer-events: none; }
@@ -115,9 +140,8 @@ kbd.down { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,.5); backgro
 .note ol { margin: 0; padding-left: 18px; }
 .note kbd { font-size: 0.85em; }
 .note button { margin-top: 10px; padding: 6px 12px; border-radius: 999px; background: #3b3300; color: #fff6a8; font-weight: 600; font-size: 13px; }
-.note .touch, .tryline .touch { display: none; }
-.tryline { display: none; margin: 0; text-align: center; color: #fff6a8; font-weight: 560; font-size: 15px; }
-@media (hover: none) { .note .mouse, .tryline .mouse { display: none; } .note .touch, .tryline .touch { display: block; } }
+.note .touch { display: none; }
+@media (hover: none) { .note .mouse { display: none; } .note .touch { display: block; } }
 
 /* The ring, shaped like the app's */
 .ring { position: fixed; z-index: 70; left: 0; top: 0; width: 300px; height: 300px; margin: -150px 0 0 -150px; pointer-events: none; opacity: 0; transform: scale(0.6); transition: opacity 0.18s, transform 0.35s var(--spring); --accent: var(--jpg); }
@@ -307,8 +331,9 @@ footer .maker svg { width: 13px; height: 13px; }
 @media (max-width: 1000px) {
   .menubar .item.opt-hide { display: none; }
   .desktop { grid-template-columns: 1fr; padding: 80px 24px 130px; min-height: 0; }
-  .icons { width: 100%; max-width: 700px; height: 280px; margin: 0 auto; }
-  .tryline { display: block; margin-bottom: -20px; }
+  .stagewrap { width: 100%; max-width: 680px; margin: 0 auto; padding-bottom: 20px; }
+  .finder { width: 100%; transform: none !important; }
+  .stagewrap .note, .bigkeys { display: none; }
   .info, .notesapp { grid-template-columns: 1fr; }
   .kinds { border-right: 0; border-bottom: 1px solid var(--line); grid-template-columns: repeat(2, 1fr); }
   .grid { grid-template-columns: repeat(2, 1fr); }
@@ -324,6 +349,9 @@ footer .maker svg { width: 13px; height: 13px; }
   .window .body { padding: 20px; } .faq { padding: 6px 20px 18px; }
   .dmg .body { grid-template-columns: 1fr; } .dmg .arrow { rotate: 90deg; animation: none; }
   .hello p { font-size: 17px; }
+  .fbody { grid-template-columns: 1fr; } .side { display: none; }
+  .fbar .search, .fbar .nav-arrows { display: none; }
+  .icons { height: 360px; }
   .zone { padding: 54px 16px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
@@ -373,14 +401,31 @@ footer .maker svg { width: 13px; height: 13px; }
       <span class="req">macOS 15+ · Apple silicon &amp; Intel · 26 MB</span>
     </div>
   </div>
-  <p class="tryline"><span class="mouse">Try it: click a file, then tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd></span><span class="touch">Try it: tap a file below</span></p>
-  <div class="icons" id="icons" aria-label="Try Tapformat on a desktop of files">
-    <div class="note" id="note" style="left:56px;top:430px">
+  <div class="stagewrap" id="stagewrap">
+    <div class="finder" id="finder">
+      <div class="fbar"><i></i><i></i><i></i><span class="nav-arrows">‹ ›</span><span class="ftitle">Desktop</span><span class="search">⌕ Search</span></div>
+      <div class="fbody">
+        <aside class="side" aria-hidden="true">
+          <small>Favorites</small>
+          <span class="on"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Desktop</span>
+          <span><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Downloads</span>
+          <span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/></svg>Documents</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 5"/></svg>Pictures</span>
+          <small>Tags</small>
+          <span><i style="--c:var(--jpg)"></i>Orange</span>
+          <span><i style="--c:var(--heic)"></i>Purple</span>
+          <span><i style="--c:var(--png)"></i>Blue</span>
+        </aside>
+        <div class="icons" id="icons" aria-label="Try Tapformat: files on a desktop"></div>
+      </div>
+      <div class="fstatus"><span id="statusCount">6 items</span><span id="statusHint">Click a file, then tap ⇧⌘</span></div>
+    </div>
+    <div class="note" id="note">
       <b>Try it right here</b>
       <ol class="mouse"><li>Click a file</li><li>Tap <kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd> on your keyboard</li><li>Pick a format</li></ol>
       <div class="touch">Tap any file to open the ring.</div>
-      <button type="button" id="tryBtn">or click here</button>
     </div>
+    <button class="bigkeys" type="button" id="tryBtn" aria-label="Open the ring"><kbd data-key="Shift">⇧</kbd><kbd data-key="Meta">⌘</kbd><span>tap</span></button>
   </div>
 </header>
 
@@ -607,19 +652,14 @@ footer .maker svg { width: 13px; height: 13px; }
     makeDraggable(el);
     return el;
   }
+  // Icons sit on a grid inside the Finder window, like "Sort by: None, snap to grid".
+  const cell = () => { const w = icons.clientWidth, cols = Math.max(3, Math.floor(w / 118)); return { cols, w: w / cols, h: 120, rows: Math.max(2, Math.floor((icons.clientHeight + 20) / 120)) }; };
+  const cellPos = (i, c = cell()) => [i % c.cols * c.w + (c.w - 108) / 2, Math.floor(i / c.cols) * c.h];
   function layout() {
-    // Wide screens: a right-hand column like a real Mac. Narrow: a grid under the headline.
-    const narrow = innerWidth <= 1000, w = icons.clientWidth;
-    [...icons.querySelectorAll(".dicon:not(.new)")].forEach((el, i) => {
-      const f = el._file;
-      if (narrow) {
-        const per = w >= 660 ? 6 : 3, cell = w / per;
-        el.style.left = (i % per * cell + (cell - 108) / 2) + "px"; el.style.top = (Math.floor(i / per) * 130) + "px";
-      } else { el.style.left = f.x + "px"; el.style.top = f.y + "px"; }
-    });
-    $("note").style.display = narrow ? "none" : "";
+    const c = cell();
+    [...icons.querySelectorAll(".dicon")].forEach((el, i) => { const [x, y] = cellPos(i, c); el.style.left = x + "px"; el.style.top = y + "px"; });
   }
-  FILES.forEach(f => makeIcon(f, f.x, f.y));
+  FILES.forEach((f, i) => makeIcon(f, 0, 0));
   layout();
   addEventListener("resize", layout);
 
@@ -627,8 +667,19 @@ footer .maker svg { width: 13px; height: 13px; }
     icons.querySelectorAll(".dicon.sel").forEach(d => d.classList.remove("sel"));
     selected = el;
     if (el) el.classList.add("sel");
+    $("statusHint").textContent = el ? `“${el._file.base}.${el._file.ext}” selected · ${touch ? "tap it" : "now tap ⇧⌘"}` : (touch ? "Tap a file to convert it" : "Click a file, then tap ⇧⌘");
   }
-  icons.addEventListener("pointerdown", e => { if (!e.target.closest(".dicon, .note")) select(null); });
+  icons.addEventListener("pointerdown", e => { if (!e.target.closest(".dicon")) select(null); });
+  select(null);
+  // The window leans a little towards the pointer.
+  const finder = $("finder"), wrap = $("stagewrap");
+  if (!touch && !reduce) {
+    $("top").addEventListener("pointermove", e => {
+      if (innerWidth <= 1000) return;
+      const r = wrap.getBoundingClientRect(), nx = (e.clientX - r.left) / r.width - 0.5, ny = (e.clientY - r.top) / r.height - 0.5;
+      finder.style.setProperty("--ry", (-8 + nx * 6).toFixed(2) + "deg"); finder.style.setProperty("--rx", (4 - ny * 5).toFixed(2) + "deg");
+    });
+  }
 
   function makeDraggable(el) {
     let start = null, moved = false;
@@ -737,9 +788,10 @@ footer .maker svg { width: 13px; height: 13px; }
       // The new file lands beside the original, already selected, like 1.1 does in Finder.
       const ext = name.split(".").pop(), base = name.slice(0, -(ext.length + 1));
       const f = { base, ext, art: artFor(ext, ringFile.art), to: NEXT[ext] || ringFile.to };
-      const [nx, ny] = freeSpot(ringIcon.offsetLeft, ringIcon.offsetTop);
+      const [nx, ny] = freeSpot();
       const fresh = makeIcon(f, nx, ny, true);
       converted++;
+      $("statusCount").textContent = icons.querySelectorAll(".dicon").length + " items";
       $("count").classList.add("on"); $("countN").textContent = converted;
       setTimeout(() => {
         busy = false; ring.classList.remove("open"); opts.forEach(o => o.style.opacity = "");
@@ -749,17 +801,16 @@ footer .maker svg { width: 13px; height: 13px; }
       }, 1100);
     }, 950);
   }
-  // The nearest empty spot beside a file: left first (towards the middle of the desktop), then around it.
-  function freeSpot(x, y) {
-    const taken = [...icons.querySelectorAll(".dicon")].map(d => [d.offsetLeft, d.offsetTop]);
-    const minX = innerWidth <= 1000 ? 0 : -icons.getBoundingClientRect().left + 40, maxX = icons.clientWidth - 108, maxY = icons.clientHeight - 60;
-    for (let ring = 1; ring < 6; ring++)
-      for (const [dx, dy] of [[-1, 0], [0, 1], [1, 0], [-1, 1], [1, 1], [0, -1], [-1, -1], [1, -1]]) {
-        const cx = x + dx * ring * 118, cy = y + dy * ring * 130;
-        if (cx < minX || cx > maxX || cy < 0 || cy > maxY) continue;
-        if (taken.every(([tx, ty]) => Math.abs(tx - cx) > 96 || Math.abs(ty - cy) > 110)) return [cx, cy];
-      }
-    return [x - 118, y + 26];
+  // The first empty grid cell; when the window is full, the oldest converted file makes room.
+  function freeSpot() {
+    const c = cell(), all = [...icons.querySelectorAll(".dicon")];
+    for (let i = 0; i < c.cols * c.rows; i++) {
+      const [x, y] = cellPos(i, c);
+      if (all.every(d => Math.abs(d.offsetLeft - x) > 60 || Math.abs(d.offsetTop - y) > 70)) return [x, y];
+    }
+    const old = icons.querySelector(".dicon.new");
+    if (old) { const pos = [old.offsetLeft, old.offsetTop]; old.remove(); return pos; }
+    return cellPos(0, c);
   }
   function burst(x, y, n = 22) {
     if (reduce) return;

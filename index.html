@@ -326,7 +326,43 @@ footer .maker svg { width: 13px; height: 13px; }
   .hello p { font-size: 17px; }
   .zone { padding: 54px 16px; }
 }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
+/* ── Intro: a MacBook opens and the camera flies into its screen (first visit per session) ── */
+.intro { position: fixed; inset: 0; z-index: 200; background: radial-gradient(80% 60% at 50% 70%, #101016, #000 70%); display: grid; place-items: center; overflow: hidden;
+  perspective: 1900px; perspective-origin: 50% 30%; cursor: pointer; transition: opacity 0.5s ease; }
+.intro.gone { opacity: 0; pointer-events: none; }
+.intro .laptop { position: relative; width: min(720px, 84vw); transform-style: preserve-3d; transform: translateY(4vh) scale(0.92); transition: transform 1.05s cubic-bezier(0.7, 0, 0.2, 1); }
+/* The lid hinges on its bottom edge. Closed, it lies face-down on the keyboard (deck is at 80°, so the lid is at −100°). */
+.intro .lid { position: relative; width: 100%; aspect-ratio: 16 / 10.4; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateX(-97deg); transition: transform 1.5s cubic-bezier(0.35, 0.8, 0.25, 1); }
+.intro .front, .intro .back { position: absolute; inset: 0; border-radius: 20px 20px 6px 6px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.intro .front { padding: 2.2%; background: linear-gradient(#26262c, #101013); box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset; }
+.intro .back { transform: rotateX(180deg); background: linear-gradient(160deg, #4a4a52, #2a2a30 45%, #1c1c21); box-shadow: 0 0 0 1px rgba(255,255,255,0.12) inset; display: grid; place-items: center; }
+.intro .back svg { width: 13%; height: auto; aspect-ratio: 1; opacity: 0.85; filter: drop-shadow(0 0 18px rgba(158,97,255,0.6)); }
+.intro .screen { position: relative; width: 100%; height: 100%; border-radius: 12px 12px 3px 3px; overflow: hidden; background: #000; }
+.intro .screen .wall { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease;
+  background: radial-gradient(60% 70% at 15% 10%, rgba(158,97,255,0.85), transparent 70%), radial-gradient(60% 70% at 90% 30%, rgba(56,133,255,0.6), transparent 70%),
+    radial-gradient(60% 60% at 40% 110%, rgba(255,143,46,0.45), transparent 70%), #050507; }
+.intro .screen .mark { position: absolute; left: 50%; top: 50%; width: 15%; aspect-ratio: 1; transform: translate(-50%, -50%) scale(0.6); opacity: 0; transition: transform 0.7s var(--spring), opacity 0.4s;
+  filter: drop-shadow(0 0 30px rgba(158,97,255,0.9)); }
+.intro .screen .mark svg { width: 100%; height: 100%; }
+.intro .screen .notch { position: absolute; left: 50%; top: 0; width: 13%; height: 3.4%; transform: translateX(-50%); background: #000; border-radius: 0 0 8px 8px; z-index: 2; }
+/* The keyboard deck: hangs from the hinge and tilts towards you, so it reads as the laptop's body seen from above. */
+.intro .deck { position: relative; width: 100%; aspect-ratio: 16 / 10.4; transform-origin: 50% 0; transform: rotateX(80deg); border-radius: 4px 4px 22px 22px;
+  background: linear-gradient(#3a3a41, #24242a 70%, #1a1a1f); box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 60px 80px rgba(0,0,0,0.7); transition: opacity 0.4s; }
+.intro .deck .keys { position: absolute; left: 7%; right: 7%; top: 7%; height: 46%; border-radius: 6px; background-color: #0d0d10;
+  background-image: linear-gradient(90deg, transparent 0 88%, #2a2a31 88% 100%), linear-gradient(transparent 0 82%, #2a2a31 82% 100%); background-size: 6.25% 16.6%; opacity: 0.9; }
+.intro .deck .pad { position: absolute; left: 33%; right: 33%; top: 60%; height: 32%; border-radius: 8px; background: linear-gradient(#2e2e35, #26262c); box-shadow: 0 0 0 1px rgba(255,255,255,0.07) inset; }
+.intro .glow { position: absolute; left: 50%; top: 45%; width: 70vmax; height: 70vmax; transform: translate(-50%, -50%); border-radius: 50%; opacity: 0; transition: opacity 0.9s;
+  background: radial-gradient(circle, rgba(158,97,255,0.24), transparent 60%); pointer-events: none; }
+.intro .skip { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font: 500 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.intro.open .lid { transform: rotateX(0deg); }
+.intro.wake .wall { opacity: 1; }
+.intro.wake .mark { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.intro.wake .glow { opacity: 1; }
+.intro.fly .laptop { transform: translateY(var(--fy, 0)) scale(var(--zoom, 2.6)); }
+.intro.fly .deck, .intro.fly .skip { opacity: 0; }
+.intro.fly .mark { opacity: 0; transform: translate(-50%, -50%) scale(1.5); transition: transform 0.8s ease, opacity 0.5s ease; }
+html.intro-on, html.intro-on body { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } .intro { display: none; } }
 </style>
 </head>
 <body>
@@ -345,6 +381,52 @@ footer .maker svg { width: 13px; height: 13px; }
   </defs>
 </svg>
 
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="glow"></div>
+  <div class="laptop" id="laptop">
+    <div class="lid">
+      <div class="front"><div class="screen" id="introScreen"><div class="wall"></div><div class="notch"></div><div class="mark"><svg><use href="#logo"/></svg></div></div></div>
+      <div class="back"><svg><use href="#logo"/></svg></div>
+    </div>
+    <div class="deck"><div class="keys"></div><div class="pad"></div></div>
+  </div>
+  <span class="skip">Click to skip</span>
+</div>
+<script>
+// Runs before the page paints: show the intro only on the first visit of a session, never with reduced motion.
+(() => {
+  let seen = false;
+  try { seen = !!sessionStorage.getItem("tf-intro"); sessionStorage.setItem("tf-intro", "1"); } catch {}
+  const el = document.getElementById("intro");
+  if (seen || matchMedia("(prefers-reduced-motion: reduce)").matches) { el.remove(); return; }
+  document.documentElement.classList.add("intro-on");
+  const timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const finish = () => {
+    timers.forEach(clearTimeout);
+    el.classList.add("gone");
+    document.documentElement.classList.remove("intro-on");
+    setTimeout(() => el.remove(), 550);
+  };
+  // Zoom until the laptop's screen covers the window, centred on it.
+  const fit = () => {
+    const sr = document.getElementById("introScreen").getBoundingClientRect(), lr = document.getElementById("laptop").getBoundingClientRect();
+    // The deck's 3D box inflates the laptop's rect; its layout centre is the lid's bottom edge (lid and deck are the same height).
+    const k = 0.92; // the resting scale the laptop is measured at
+    const z = Math.max(innerWidth / (sr.width / k), innerHeight / (sr.height / k)) * 1.04;
+    const lid = document.querySelector(".intro .lid").getBoundingClientRect();
+    const d = (sr.top + sr.height / 2 - lid.bottom) / k; // screen centre relative to the laptop's layout centre (the hinge)
+    el.style.setProperty("--zoom", z.toFixed(3));
+    el.style.setProperty("--fy", (-d * z).toFixed(0) + "px");
+  };
+  at(500, () => el.classList.add("open"));
+  at(1650, () => el.classList.add("wake"));
+  at(2550, () => { fit(); el.classList.add("fly"); });
+  at(3300, finish);
+  el.addEventListener("click", finish);
+  addEventListener("keydown", function k() { finish(); removeEventListener("keydown", k); });
+})();
+</script>
 <div class="wallpaper" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
 

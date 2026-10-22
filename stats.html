@@ -176,6 +176,11 @@ footer a:hover { color: var(--fg); }
 .tabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); width: max-content; max-width: 100%; overflow-x: auto; }
 .tab { border: 0; cursor: pointer; padding: 8px 16px; border-radius: 999px; background: transparent; color: var(--muted); font: 560 14px var(--sans); white-space: nowrap; }
 .tab[aria-selected="true"] { background: #fff; color: #08080a; }
+.usage { display: grid; gap: 10px; }
+.urow { display: grid; grid-template-columns: 120px 1fr 70px; align-items: center; gap: 14px; font-size: 15px; }
+.urow .ubar { height: 14px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.urow .ubar i { display: block; height: 100%; border-radius: inherit; background: var(--c); box-shadow: 0 0 16px var(--c); }
+.urow b { font: 600 15px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
 .fbtabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); width: max-content; max-width: 100%; overflow-x: auto; margin-bottom: 18px; }
 .fbtab { border: 0; cursor: pointer; padding: 8px 14px; border-radius: 999px; background: transparent; color: var(--muted); font: 560 14px var(--sans); white-space: nowrap; }
 .fbtab[aria-selected="true"] { background: #fff; color: #08080a; }
@@ -250,6 +255,14 @@ footer a:hover { color: var(--fg); }
       <div class="legend"><span><i style="background:var(--heic)"></i>visitors</span><span><i style="background:var(--jpg)"></i>download clicks</span></div>
     </div>
     <div class="days" id="days"></div>
+  </section>
+
+  <section class="section" id="usage">
+    <div class="section-head">
+      <h2>What people <span class="serif">convert.</span></h2>
+      <div class="legend" id="usageMeta"></div>
+    </div>
+    <div class="usage" id="usageBars"><p class="fbempty">No conversions reported yet. They appear here once people use the app version with usage counts.</p></div>
   </section>
 
   <section class="section" id="inbox">
@@ -336,6 +349,7 @@ footer a:hover { color: var(--fg); }
     { key: "tdl", short: "Today ↓", label: "downloads", cap: "today", color: "#ff549e", val: () => today().downloads },
     { key: "tvis", short: "Today 👀", label: "visitors", cap: "today", color: "#3885ff", val: () => today().visits },
     { key: "rate", short: "Rate", label: "download", cap: "of visitors click download", color: "#2fc79c", val: () => data.visits ? Math.round((data.downloads / data.visits) * 100) : 0, suffix: "%" },
+    { key: "conv", short: "Converted", label: "files converted", cap: "in the app, all time", color: "#2fc79c", val: () => (data.usage && data.usage.total) || 0 },
     { key: "day", short: "Day", label: "building", cap: "in public", color: "#fab81f", val: () => dayNumber(data.launched), prefix: "Day " },
   ];
   const ring = $("ring"), optsEl = $("opts"), hub = $("hub");
@@ -552,6 +566,17 @@ footer a:hover { color: var(--fg); }
   }, "image/png"));
   $("copy").addEventListener("click", async () => { try { await navigator.clipboard.writeText($("text").value); toast("Copied"); } catch { $("text").select(); toast("Press ⌘C to copy"); } });
 
+  // ── Conversions by type ────────────────────────────────────
+  const KIND_LABEL = { image: ["Images", "#9e61ff"], pdf: ["PDFs", "#f5454d"], document: ["Documents", "#336bf2"], audio: ["Audio", "#29c770"], video: ["Video", "#735cff"],
+    shrink: ["Shrink", "#2fc79c"], crop: ["Crop", "#fab81f"], resize: ["Resize", "#1ab8cc"], rotate: ["Rotate", "#7c6cf0"], mute: ["Mute", "#ff6b66"], merge: ["Merge PDFs", "#ff8f2e"] };
+  function renderUsage() {
+    const u = data.usage; if (!u || !u.total) return;
+    $("usageMeta").innerHTML = `<span>${fmt(u.total)} files</span><span>${fmt(u.today)} today</span><span>${fmt(u.macsToday)} Macs active today</span><span>${fmt(u.installs)} installs reporting</span>`;
+    const rows = Object.entries(u.kinds).sort((a, b) => b[1] - a[1]), max = Math.max(1, ...rows.map((r) => r[1]));
+    $("usageBars").innerHTML = rows.map(([k, n]) => { const [label, c] = KIND_LABEL[k] || [k, "#8b8b96"];
+      return `<div class="urow" style="--c:${c}"><span>${label}</span><div class="ubar"><i style="width:${(n / max) * 100}%"></i></div><b>${fmt(n)}</b></div>`; }).join("");
+  }
+
   // ── Feedback inbox ─────────────────────────────────────────
   const FB_API = "https://tapformat.smit-jsv.workers.dev/feedback";
   const FB_KIND = { idea: ["💡 Idea", "#fab81f"], bug: ["🐞 Bug", "#ff6b66"], love: ["❤️ Love", "#ff549e"], other: ["💬 Other", "#3885ff"] };
@@ -603,6 +628,7 @@ footer a:hover { color: var(--fg); }
       data = next; seen = keys;
       $("updated").textContent = "Live · " + new Date(data.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
       $("dayBadge").querySelector("b").textContent = dayNumber();
+      renderUsage();
       paintOpts(); setAim(aim, true); renderFeed(fresh); renderDays(); draw(); setText();
       if (newDownload) { setAim(0, true); lastHover = performance.now(); burst(); toast("🎉 Someone just downloaded Tapformat"); }
       else if (fresh.size) burst(10);

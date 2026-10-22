@@ -335,6 +335,7 @@ footer a:hover { color: var(--fg); }
   const COLORS = ["#ff8f2e", "#9e61ff", "#3885ff", "#29c770", "#ff549e", "#f5454d"];
   let data = null, edited = false, seen = null;
 
+  const DEMO = new URLSearchParams(location.search).has("demo"); // read before the key handling cleans the address
   const todayKey = () => (data && data.today) || new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10); // India time, same as the counter
   // Public launch day counts as Day 1 (the first release went up the evening before, for testing).
   const LAUNCH_DAY = "2026-10-21";
@@ -629,7 +630,7 @@ footer a:hover { color: var(--fg); }
       $("updated").textContent = "Live · " + new Date(data.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
       $("dayBadge").querySelector("b").textContent = dayNumber();
       // ?demo shows sample conversion numbers to preview the layout (never stored anywhere).
-      if (new URLSearchParams(location.search).has("demo")) data.usage = { total: 1284, today: 96, macsToday: 14, installs: 37,
+      if (DEMO) data.usage = { total: 1284, today: 96, macsToday: 14, installs: 37,
         kinds: { image: 612, video: 188, shrink: 164, pdf: 121, document: 74, audio: 52, crop: 31, resize: 22, merge: 12, rotate: 5, mute: 3 } };
       renderUsage();
       paintOpts(); setAim(aim, true); renderFeed(fresh); renderDays(); draw(); setText();
@@ -642,7 +643,7 @@ footer a:hover { color: var(--fg); }
   const getKey = () => { try { return localStorage.getItem(KEY) || ""; } catch { return ""; } };
   const setKey = (k) => { try { localStorage.setItem(KEY, k); } catch {} };
   const m = location.hash.match(/^#k=(.+)$/);
-  if (m) { setKey(decodeURIComponent(m[1])); history.replaceState(null, "", location.pathname); }
+  if (m) { setKey(decodeURIComponent(m[1])); history.replaceState(null, "", location.pathname + location.search); }
   function showLock(msg) {
     try { localStorage.removeItem(KEY); } catch {}
     $("keyErr").textContent = msg || ""; $("lock").hidden = false; setTimeout(() => $("keyInput").focus(), 50);

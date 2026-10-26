@@ -6,6 +6,28 @@
     <description>Tapformat updates</description>
     <language>en</language>
     <item>
+      <title>Version 1.1</title>
+      <pubDate>Mon, 26 Oct 2026 04:41:17 GMT</pubDate>
+      <sparkle:version>4</sparkle:version>
+      <sparkle:shortVersionString>1.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description><![CDATA[<h2>Tapformat 1.1</h2>
+<ul>
+<li><b>A cinematic welcome.</b> It teaches you the shortcut by having you press it, and sets everything up in one pass.</li>
+<li><b>Your own shortcut.</b> Keep ⇧⌘ or record anything: a tap like ⌃⇧, or keys like ⌥Space.</li>
+<li><b>Drag &amp; drop.</b> Drop files on the Tapformat window and the ring opens.</li>
+<li><b>Finds your file.</b> The converted file is selected in Finder as soon as it is ready.</li>
+<li><b>Fewer folder prompts.</b> Desktop, Documents and Downloads are asked for in one go.</li>
+<li><b>New Settings and menu bar.</b> Everything in one place, with a count of the files you have converted.</li>
+</ul>]]></description>
+      <sparkle:deltas>
+        <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.1/Tapformat4-1.delta" sparkle:deltaFrom="1" sparkle:edSignature="eng69wqClLf73Rh0zfEzhBve12IEIuM97gBS2p8Gb4ZXEtQA8Ys13SFJShxILZyk2mhzlgTbJi8Tqn/bN2CxCQ==" length="643174" type="application/octet-stream"/>
+        <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.1/Tapformat4-3.delta" sparkle:deltaFrom="3" sparkle:edSignature="hLNXgWSLt9OIAzKLLbTfjPLkcRpiiuKptAQjJvkbjBrYcwb0IthtN46mtmdH61Q7mR61JB3pfK8WviuRxDjXBA==" length="615178" type="application/octet-stream"/>
+        <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.1/Tapformat4-2.delta" sparkle:deltaFrom="2" sparkle:edSignature="vXtRtO7XDdhHHn8jB4IcnKt+IUEub1lDkkqTYA2MUHDvBdeUtld8/hnBWDNNi2ErekXtXUJxkMP26yCdrd3/Dg==" length="625398" type="application/octet-stream"/>
+      </sparkle:deltas>
+      <enclosure url="https://github.com/smit-vanani/tapformat-releases/releases/download/v1.1/Tapformat.dmg" sparkle:edSignature="LDe1/twLYxvJ8c3i1hY3Rtb5Y42JOu7wCpZuujST+vD+cdQV6mYqDsOCiz9QaUiICHq6/B/C4Tqmu+e3UXvrAw==" length="23644902" type="application/octet-stream"/>
+    </item>
+    <item>
       <title>Version 1.0.2</title>
       <pubDate>Thu, 22 Oct 2026 10:19:09 GMT</pubDate>
       <sparkle:version>3</sparkle:version>

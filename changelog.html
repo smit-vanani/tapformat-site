@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tapformat Changelog</title>
-<meta name="description" content="What's new in Tapformat, release by release, and what's coming next.">
+<meta name="description" content="What's new in Tapformat, release by release.">
 <meta name="theme-color" content="#050507">
 <meta property="og:title" content="What's new in Tapformat">
-<meta property="og:description" content="Every release, and what's coming next. A new feature every week.">
+<meta property="og:description" content="Every Tapformat release, newest first.">
 <meta property="og:image" content="https://tapformat.com/og-v2.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://tapformat.com/og-v2.png">
@@ -16,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
-/* Changelog: releases as a timeline down the site's aurora stage. Each release is a card with a glowing dot on the line;
-   "Coming next" sits on top in dashed outline, since it isn't out yet. Dark-only, like the rest of the site. */
+/* Changelog: releases as a timeline down the site's aurora stage. Each release is a card with a glowing dot on the line.
+   Dark-only, like the rest of the site. */
 :root {
   --bg: #050507; --fg: #f4f4f6; --muted: #8b8b96; --dim: #55555f;
   --line: rgba(255, 255, 255, 0.08); --line-2: rgba(255, 255, 255, 0.14); --glass: rgba(255, 255, 255, 0.04);
@@ -51,8 +51,6 @@ h1 { margin: 22px 0 10px; font-weight: 600; font-size: clamp(46px, 9vw, 84px); l
 .timeline::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: linear-gradient(var(--c1, #9e61ff), rgba(255,255,255,0.06)); }
 .rel { position: relative; border-radius: 24px; border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); padding: 24px 26px; }
 .rel::before { content: ""; position: absolute; left: -30px; top: 30px; width: 16px; height: 16px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 5px color-mix(in srgb, var(--c) 22%, transparent), 0 0 22px var(--c); }
-.rel.next { border-style: dashed; background: rgba(255,255,255,0.02); }
-.rel.next::before { background: transparent; border: 2px dashed var(--c); box-shadow: none; }
 .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .rel h2 { margin: 0; font-size: 28px; letter-spacing: -0.04em; font-weight: 600; }
 .rel h2 .serif { color: var(--c); }
@@ -85,16 +83,6 @@ kbd { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em
   </header>
 
   <div class="timeline">
-    <article class="rel next" style="--c:#ff8f2e">
-      <div class="top"><h2>Coming <span class="serif">next</span></h2><span class="date">A new feature every week</span></div>
-      <ul>
-        <li><span><span class="when">Nov 2</span><b>Remove background</b> from any photo, right on your Mac.</span></li>
-        <li><span><span class="when">Nov 9</span><b>Copy text</b> out of any image or PDF.</span></li>
-        <li><span><span class="when">Nov 16</span><b>Video to GIF</b>, plus quick trimming.</span></li>
-      </ul>
-      <p class="intro">Something you'd rather see first? <a href="feedback">Tell us.</a></p>
-    </article>
-
     <article class="rel" style="--c:#9e61ff">
       <div class="top"><h2>Tapformat <span class="serif">1.1</span><span class="badge">LATEST</span></h2><span class="date">October 26, 2026</span></div>
       <p class="intro">A redesign of nearly everything you see.</p>
